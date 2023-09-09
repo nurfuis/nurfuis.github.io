@@ -255,6 +255,11 @@ footer {
 	height: 96x;
 	margin-top: .5em;
 	}
+.background-tile {
+	background-size: tile;			
+	background-image: url("../images/night.png");  
+
+}	
 .background-tile1 {
 	background-color: #666;
 	background-image: url("../images/battlescene1.png");  
