@@ -1,14 +1,19 @@
 // ANIMATION
-
 // textFillAnimation fills text into a container 1 character
 // at a time. It has an adjustable rate of fire and will stop 
 // playing the sound and animation if the screens are changed.
-let fillText = null;
+let fillText = "Welcome to the battle tower, where tough competitors await your challenge! Choose your character, select your power, and start battling. But be warned, there are strong opponents around every corner. Can you survive the melee and become a champion?";
+let textIsPlaying = false;
+
 function textFillAnimation(elementId, screenId) {
 	const animationBox = document.getElementById(elementId);
 	if (fillText === null) {
 		fillText = animationBox.textContent;		
 	}
+	if (textIsPlaying) {
+		return;
+	}
+	textIsPlaying = true;
 	const animationScreen = document.getElementById(screenId);
 	const screenDisplay = getComputedStyle(animationScreen) 
 	const characterLimit = 190;
@@ -28,7 +33,6 @@ function textFillAnimation(elementId, screenId) {
 			if ( screenDisplay.display === "none" ) {
 				// Sound
 				gameSound.stopEffect(textFillSoundEffect);
-				return;
 			}
 			if (animationBox.innerText.length >= characterLimit) {
 				animationBox.innerText = "-" + animationBox.innerText.substring(characterLimit / 5);
@@ -40,6 +44,7 @@ function textFillAnimation(elementId, screenId) {
 			setTimeout(addNextLetterToTextBox, delay);
 			if (i === fillText.length) {
 				gameSound.stopEffect(textFillSoundEffect);
+				textIsPlaying = false;
 			}			
 		}
 	}
