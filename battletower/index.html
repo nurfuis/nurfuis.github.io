@@ -1,0 +1,243 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Le Battle Tower</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="./css/style.css">	
+</head>
+<body>
+<div id="wrapper">
+<header id="header" class="center-text">
+	<h1>Ross Clayton Cramer</h1>
+</header>
+
+<!-- MAIN -->	
+
+<div id="splash-screen" class="center-this center-text background-tile1">	
+
+	<div class="center-text"><h2>Battle Tower!</h2>
+	<nav><a id="start-game-button">Play</a></div></nav>		
+</div>
+	
+<div id="main" class="center-this">
+
+<div id="main-menu" class="screen night-theme">
+	<div id="menu-art">
+		<div class="overlay center-text">	
+		<h2>Battle Tower!</h2>
+
+		<div class="two-col center-text">
+			<!-- Col 1 -->
+			<div id="main-menu-portrait"><img src="./images/silver-frame.png" /></div>
+		
+			<!-- Col2 -->
+			<div id="main-menu-list">
+				<nav>
+					<a id="start-arena-button">Arena Battle</a><br />
+					<a id="start-test-button">Test</a><br />			
+					<a id="exit-game-button">Exit</a>			
+				</nav>
+			</div>
+		</div>
+		<div class="text-box">
+			<p id="main-menu-text">"Welcome to the battle tower, where tough competitors await your challenge! Choose your character, select your power, and start battling. But be warned, there are strong opponents around every corner. Can you survive the melee and become a champion?"</p>
+		</div>
+	<div id="menu-art-2"><img src="./images/crows2.png" /></div>
+	</div></div>		
+</div>
+
+<!-- CHARACTER SELECTION -->	
+<div id="character-selection" class="screen stone-tile">
+<div class="overlay">
+	<h2>Character Selection</h2>			
+	<!-- two column grid -->	
+	<div class="two-col">
+		
+		<!-- CHARACTER OPTIONS -->
+		<!-- column 1 -->
+		<div class="center-text">
+			<div id="character-selection-menu">
+			<ul class="center-text">	
+				<li><a id=""></a></li>
+				<li><a id=""></a></li>
+				<li><a id=""></a></li>
+				<li><a id=""></a></li>
+				<li><a id=""></a></li>
+			</ul>		
+			</div>
+		</div>
+		<!-- end column 1 -->		
+		<!-- CHARACTER SELECTION PREVIEW -->
+		<!-- column 2 -->		
+		<div class="selection-preview center-text">
+		<h4 id="character-selection-heading">Selection</h4>
+			<div class="selection-frame center-text">
+				<canvas id="character-selection-icon"></canvas>
+<!--				<img id="character-selection-icon" src="./images/armory.png" /> -->
+			</div>
+			<ul>
+				<li id="character-selection-lore-item-one"></li>
+				<li id="character-selection-lore-item-two"></li>
+			</ul>				
+		</div>
+		<!-- end column 2 -->
+	</div>
+	<!-- end two column grid -->
+	
+	<!-- CHARACTER SELECTION FORWARDS AND BACKWARDS NAV -->
+	<nav class="center-text">	
+		<a id="cancel-character-selection-button">Go Back</a>	
+		<a id="accept-character-selection-button">Proceed</a>	
+
+	</nav>
+	<div id="character-selection-text" class="text-box center-this"><p><b>Ablity:</b> "Ravage"<br /><b>Description:</b> The Fighter unleashes a series of devastating attacks with their chosen weapon, striking multiple times consecutively.</p></div>
+</div>
+</div>
+
+<!-- POWER SELECT SCREEN -->	
+<div id="power-selection" class="screen stone-tile">
+<div class="overlay">
+	<h2>Power Selection</h2>
+	<!-- two column grid -->	
+	<div class="two-col">	
+		
+		<!-- POWER OPTIONS -->
+		<!-- div column 1 -->		
+		<div class="center-text">
+			<div id="power-selection-menu">
+			<ul class="center-text">	
+				<li><a id=""></a></li>
+				<li><a id=""></a></li>
+				<li><a id=""></a></li>
+				<li><a id=""></a></li>
+				<li><a id=""></a></li>
+			</ul>
+			</div>
+		</div><!-- end column 1 -->	
+		
+		<!-- POWER SELECTION PREVIEW -->
+		<div class="selection-preview center-text">
+		<h4 id="power-selection-heading">Selection</h4>
+			<div class="selection-frame center-text"><img id="power-selection-icon" src="./images/library.png" /></div>
+			<ul>
+				<li id="power-selection-lore-item-one"></li>
+				<li id="power-selection-lore-item-two"></li>
+			</ul>				
+		</div><!-- end column 2 -->
+	</div><!-- end two column grid -->
+	<!-- POWER SCREEN FORWARDS AND BACKWARDS NAV -->
+	<nav class="center-text">
+		<a id="cancel-power-selection-button">Go Back</a>
+		<a id="accept-power-selection-button">Proceed</a>		
+	</nav>
+</div>		
+</div>	
+
+<!-- PREP SCREEN -->	
+<div id="prepare-battle" class="screen background-tile1">
+<div class="overlay center-text">
+	<h2>Prepare to Battle</h2>		
+	<div>
+
+	</div>
+	<!-- BATTLE PREP FORWARDS AND BACK NAV -->
+	<nav class="center-text">	
+		<a id="cancel-battle-preview-button">Back</a>
+		<a id="begin-arena-battle-button">Battle</a>
+	</nav>
+</div>			
+</div>
+
+<!-- BATTLE SCREEN -->
+<div id="battle-screen" class="screen wood-tile">
+<div class="overlay center-text">
+	<h2>OPPONENT</h2>	
+	
+	<!-- BATTLEFIELD -->
+	<div id="battlefield">
+	<div id="enemy-screen" class="two-col-battle"><!-- 2 col div -->
+		
+		<!-- OPPONENT INFO -->			
+		<div><!-- col 1 of 2 -->
+			<img src="./images/goblin.png" class="enemy" />
+			<div id="enemy-health-bar"><div id="enemy-health-indicator"></div></div>
+		</div><!-- end col 1of 2 -->
+		
+		<!-- ANIMATION BOX -->	
+		<div id="animation-window"><!-- col 2 of 2 -->
+			<p id="battle-text"></p>
+		</div><!-- end col 2 of 2 -->	
+	</div><!-- end two col grid -->
+	
+	<div id="player-screen" class="three-col">
+		
+		<!-- CHARACTER MOVE MENU  -->
+		<div><!-- col 1 of 3 -->
+			<ul id="player-moves" class="moves">
+				<li><a id="move-block">0</a></li>		
+				<li><a id="player-power">1</a></li>				
+				<li><a id="player-item">2</a></li>
+			</ul>		
+		</div><!-- end col 1 of 3 -->
+		
+		<!-- PLAYER MOVE MENU -->
+		<div><!-- col 2 of 3 -->
+			<ul id="player-moves" class="moves">
+				<li><a id="move-block">Block</a></li>		
+				<li><a id="player-power">Power</a></li>				
+				<li><a id="player-item">Item</a></li>
+			</ul>	
+		</div><!-- end col 2 of 3 -->
+		
+		<!-- PLAYER INFO -->
+		<div><!-- col 3 of 3 -->		
+			<div id="player-graphic"></div>
+			<div id="player-health-bar"><div id="player-health-indicator"></div></div>
+		</div><!-- end col 3 of 3 -->
+	</div><!-- end div 3 col grid -->
+	</div>
+	
+	<!-- TEXT DISPLAY -->
+	<p id="description"></p>	
+
+	<!-- BATTLE SCREEN FORWARDS AND BACK MENU -->
+	<nav class="center-text">		
+		
+	</nav>
+</div>			
+</div>
+
+<!-- VICTORY SCREEN-->
+<div id="battle-results" class="screen clouds-tile">
+<div class="overlay center-text">
+	<h2>Battle Results</h2>		
+	
+	<nav class="center-text">				
+		<a id="continue-game">Continue</a>	
+	</nav>
+</div>		
+</div>
+
+</div><!-- end display box -->
+
+<!-- FOOTER -->
+<footer id="footer" class="center-text">
+	&copy; 2022
+</footer>
+</div><!--end wrapper -->	
+<script src="./js/audio.js"></script>
+<script src="./js/animation.js"></script>
+<script src="./js/characterPreview.js"></script>
+
+<script src="index.js"></script>
+<script src="./js/main.js"></script>
+
+
+</script>
+<script>
+
+
+</script>
+</body>
+</html>
