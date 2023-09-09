@@ -281,7 +281,7 @@ function loadBattlePreviewScreenButtons() {
     gameSound.stopTheme("theme3");
     gameSound.playTheme("theme2");
     gameSound.playEffect("effect4");
-    hideBattlePreviewScreenScreen();    
+    hideBattlePreviewScreen();    
 	displayPowerSelectionScreen();
   });
 
