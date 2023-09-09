@@ -120,11 +120,11 @@ function acceptCharacterSelection() {
 
 var playerPower = null;
 const playablePowers = [
-	{ id: 0, type: "wood", name: "Jupiter", icon: "./images/wood.png", lore1: "&gt; Earth", lore2: "&lt; Metal" },
-	{ id: 1, type: "fire", name: "Mars", icon: "./images/fire.png", lore1: "&gt; Metal", lore2: "&lt; Water" }, 
-	{ id: 2, type: "earth", name: "Saturn", icon: "./images/earth.png", lore1: "&gt; Water", lore2: "&lt; Wood" }, 
-	{ id: 3, type: "metal", name: "Venus", icon: "./images/metal.png", lore1: "&gt; Wood", lore2: "&lt; Fire" }, 
-	{ id: 4, type: "water", name: "Mercury", icon: "./images/water.png", lore1: "&gt; Fire", lore2: "&lt; Earth" },
+	{ id: 0, type: "wood", name: "Jupiter", icon: "./images/wood.png", style: "url(./images/woodland-tile.png)", lore1: "&gt; Earth", lore2: "&lt; Metal" },
+	{ id: 1, type: "fire", name: "Mars", icon: "./images/fire.png", style: "url(./images/fire-tile.png)", lore1: "&gt; Metal", lore2: "&lt; Water" }, 
+	{ id: 2, type: "earth", name: "Saturn", icon: "./images/earth.png", style: "url(./images/earth-tile.png)", lore1: "&gt; Water", lore2: "&lt; Wood" }, 
+	{ id: 3, type: "metal", name: "Venus", icon: "./images/metal.png", style: "url(./images/metal-tile.png)", lore1: "&gt; Wood", lore2: "&lt; Fire" }, 
+	{ id: 4, type: "water", name: "Mercury", icon: "./images/water.png", style: "url(./images/water-tile.png)", lore1: "&gt; Fire", lore2: "&lt; Earth" },
 	];
 
 function displayPowerSelectionScreen() {
@@ -198,10 +198,18 @@ function hideBattlePreviewScreen() {
 }
 
 function displayArenaBattleScreen() {
-	document.getElementById("battle-screen").style.display = "block";	
+	const battleScreen = document.getElementById("battle-screen");
+	const battleScreenBackground = (playablePowers[playerPower].style);
+	console.log(battleScreenBackground);
+	battleScreen.style.backgroundImage = battleScreenBackground;
+	battleScreen.style.display = "block";	
 	console.log("arena-battle screen displayed");	
 }
-
+function hideArenaBattleScreen() {
+	const battleScreen = document.getElementById("battle-screen");
+	battleScreen.style.display = "none";	
+	
+}
 // BUTTONS
 const loadStartGameButton = () => {
   const startGameButton = document.getElementById("start-game-button");
@@ -292,9 +300,21 @@ function loadBattlePreviewScreenButtons() {
     gameSound.playTheme("theme4");
     gameSound.playEffect("effect3");
     hideBattlePreviewScreen();
+	loadArenBattleScreenButtons();
     displayArenaBattleScreen();
   });
 }
 	
-
+function loadArenBattleScreenButtons() {
+  const cancelArenaBattleButton = document.getElementById("cancel-arena-battle-button");
+  cancelArenaBattleButton.addEventListener("click", () => {
+    console.log("user clicked: " + "cancelArenaBattleButton");
+    gameSound.stopTheme("theme4");
+    gameSound.playTheme("theme2");
+    gameSound.playEffect("effect4");
+    hideArenaBattleScreen();    
+	displayPowerSelectionScreen();
+  });
+}
+	
 
