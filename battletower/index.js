@@ -120,7 +120,7 @@ function acceptCharacterSelection() {
 
 var playerPower = null;
 const playablePowers = [
-	{ id: 0, type: "wood", name: "Jupiter", icon: "./images/wood.png", style: "url(./images/woodland-tile.png)", lore1: "&gt; Earth", lore2: "&lt; Metal" },
+	{ id: 0, type: "wood", name: "Jupiter", icon: "./images/wood.png", style: "url(./images/woodland-tile-tile.png)", lore1: "&gt; Earth", lore2: "&lt; Metal" },
 	{ id: 1, type: "fire", name: "Mars", icon: "./images/fire.png", style: "url(./images/fire-tile.png)", lore1: "&gt; Metal", lore2: "&lt; Water" }, 
 	{ id: 2, type: "earth", name: "Saturn", icon: "./images/earth.png", style: "url(./images/earth-tile.png)", lore1: "&gt; Water", lore2: "&lt; Wood" }, 
 	{ id: 3, type: "metal", name: "Venus", icon: "./images/metal.png", style: "url(./images/metal-tile.png)", lore1: "&gt; Wood", lore2: "&lt; Fire" }, 
