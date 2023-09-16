@@ -1,0 +1,63 @@
+body {
+	font-family: handjet;
+	background-color: rgba(235, 212, 203, .8);
+	color: #2C0703;
+	background-image: url('../images/bg.png');
+	overflow: hidden;
+}
+header {
+	text-align: center;
+}
+.hover {
+	cursor: pointer;
+}
+.period {
+	display: block;
+	border: 1px dashed #DA9F93;
+	margin: .25em .25em .25em 2em;
+	padding: .25em;
+	line-height: 1.25;
+	font-size: 1.2em;
+	background-color: rgba(235, 212, 203, 0.90);
+	
+}
+h1 {
+	color: #B6465F;
+	margin: 0;
+	margin-top: .25em;
+	padding: 0;
+}
+h2 {
+	color: #890620;	
+	margin: .5em;
+}
+h3 {
+	font-size: 1.5em;
+	color: #890620;	
+	
+}
+h3, h4 {
+	margin: .1em;
+}
+#ticker {
+	margin: 0;
+	margin-top: .25em;
+	font-size: 1.2em;
+	
+}
+#weather {
+}
+#settings {
+	margin: auto;
+	display: none;
+}
+button {
+	padding: .3em;
+	margin: .3em;
+	margin-top: .6em;
+	line-height: 1.4em;
+	font-size: 1em;
+	color: rgba(44, 7, 3, 1);
+	border: 1px solid #890620;
+	background-color: rgba(235, 212, 203, .8);
+}
