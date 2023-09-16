@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Damage Script</title>
+  <style>
+	body {
+		background-color: #ccc;
+	}
+	canvas {
+		cursor: url('./images/reticle1.png') 39 35,  auto;
+
+	}
+	.two-col { 
+		display: grid; 
+		grid-template-columns: auto auto;
+		width: 900px;
+		margin: auto;
+	}
+	@keyframes jiggle {
+	  10% {
+		left: -2px;
+	  }
+	  25%  {
+		rotate: -1deg;
+		left: 2px;
+	  }
+	  50%  {
+		left: -1px;
+	  }
+	  75%  {
+		rotate: 1deg;
+		left: 1px;
+	  }
+	  90%  {
+		left: -2px; 
+	  }
+	}
+	.shake {
+	  animation: jiggle .5s linear 1;
+	  animation-timing-function: ease-in-out;
+	}
+  </style>
+</head>
+<body>
+<div class="two-col">
+  <div style="width: 400; height: 400; ">
+  <canvas id="canvas" class="shake" width="400" height="400" style="background-image: url('./images/battleback5.png'); border: 1px solid #000; margin: auto; margin-top: 5em; display: block; padding: .5em; "></canvas></div>
+
+  <div id="damage-report" style="height: 400px; width: 400px; overflow: hidden; margin: auto; margin-top: 5em; border: 1px solid #000; padding: .5em;"></div>
+</div>
+  <button id="repopulate" style="margin: auto; margin-top: 5em; display: block;">Repopulate</button>
+  
+  <script src="./audio.js"></script>
+  <script>
+    let canvas = document.getElementById("canvas");
+    let ctx = canvas.getContext("2d");
+
+    let entities = [];
+
+    let dotImage = new Image();
+    dotImage.src = "./images/fly.png";
+
+    let drawEntities = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let entity of entities) {
+        ctx.drawImage(dotImage, entity.x, entity.y);
+
+        //Draw the health text
+        ctx.fillStyle = "white";
+        ctx.textAlign = "center";
+        ctx.font = "9px Arial";
+        ctx.textBaseline = "middle";
+        ctx.fillText(entity.health.toFixed(2), entity.x + dotImage.width * 1.2 , entity.y + dotImage.height * 1.2);
+      }
+    };
+
+
+	// DMG
+	let damage = (x, y) => {
+	let power = 800;
+	let radius =64;
+	let damage = [];
+
+	for (let i = x - radius; i <= x + radius; i++) {
+	for (let j = y - radius; j <= y + radius; j++) {
+	  let distance = Math.sqrt((i - x) * (i - x) + (j - y) * (j - y));
+	  damage[i + j * canvas.width] = power * (1 - distance / radius);
+	}
+	}
+
+	for (let i = 0; i < entities.length; i++) {
+	let entity = entities[i];
+
+	if (entity !== undefined) {
+	  if (entity.x >= x - radius && entity.x <= x + radius && entity.y >= y - radius && entity.y <= y + radius) {
+		let damageAmount = damage[entity.x + entity.y * canvas.width];
+		if (damageAmount >= 0) {
+		  entity.health -= damageAmount;
+		  addDamageReport(entity, damageAmount);		  
+
+		  if (entity.health <= 0) {
+			entities.splice(i, 1);			
+		  } 
+		}
+	  }
+	}
+	}
+
+      entitiesAddedOrRemoved();
+      damageDone();
+      clickRegistered();
+    };
+
+	function repopulateEntities() {
+	  entities.splice(0, entities.length);
+
+	  for (let i = 0; i <= 3; i++) {
+		const x = Math.floor(Math.random() * 368);
+		const y = Math.floor(Math.random() * 368);
+
+		// Check if the entity collides with the edge of the canvas.
+		if (x < 0) {
+		  x = 50;
+		} else if (x >= canvas.width) {
+		  x = canvas.width - 50;
+		}
+
+		if (y < 0) {
+		  y = 50;
+		} else if (y >= canvas.height) {
+		  y = canvas.height - 50;
+		}
+
+		entities.push({
+		  "x": x,
+		  "y": y,
+		  "health": Math.floor(Math.random() * 300) + 300
+		});
+	  }
+	  drawEntities();
+	  let themePlaying = false;
+	  if (themePlaying === false) {
+		themePlaying = true;		
+		gameSound.playTheme("theme1");
+	  }
+	  
+	  entitiesAddedOrRemoved();
+	}
+
+	document.getElementById("repopulate").addEventListener("click", repopulateEntities);
+
+    canvas.addEventListener("click", (event) => {
+      let x = event.clientX - canvas.offsetLeft;
+      let y = event.clientY - canvas.offsetTop;
+	  console.log("click xy" + x + ", " + y);
+	  
+	  newReport();
+
+      damage(x, y);
+	  gameSound.playEffect("effect1");
+      drawEntities();
+    });
+
+
+    // Callback for when entities are added or removed
+    function entitiesAddedOrRemoved() {
+      console.log("Entities added or removed");
+    }
+
+    // Callback for when damage is done
+    function damageDone() {
+      console.log("Damage done");
+    }
+
+    // Callback for when a click is registered
+    function clickRegistered() {
+      console.log("Click registered");
+    }
+	
+	const damageReportDiv = document.getElementById("damage-report");
+	function newReport() {
+	  const newDashLine = `><<>><<>><<>><<>><<>><<>><<>><`;
+
+	  // Get the current text content of the div.
+	  const textContent = damageReportDiv.innerHTML;
+
+	  // Insert the new line at the beginning of the text content.
+	  damageReportDiv.innerHTML = newDashLine + textContent;	
+	}
+	function addDamageReport(entity, damageAmount) {
+	  let isAlive = true;
+	  if (entity.health <= 0) {
+		isAlive = false;
+	  }
+	  const newLine = "<p>entity x: " + entity.x + "y: " + entity.y + " dmg = " + damageAmount.toFixed(2) + " isAlive = " + isAlive + "</p>";
+
+	  // Get the current text content of the div.
+	  const textContent = damageReportDiv.innerHTML;
+
+	  // Insert the new line at the beginning of the text content.
+	  damageReportDiv.innerHTML = newLine + textContent;
+	}
+  </script>
+</body>
+</html>
