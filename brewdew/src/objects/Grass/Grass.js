@@ -5,7 +5,7 @@ import { resources } from "../../Resource.js";
 import { GameObject } from "../../GameObject.js";
 import { Vector2 } from "../../Vector2.js";
 import { Sprite } from "../../Sprite.js";
-import { gridSize } from "../helpers/grid.js";
+import { gridSize } from "../../helpers/grid.js";
 import { Animations } from "../../Animations.js";
 import { FrameIndexPattern } from "../../FrameIndexPattern.js";
 import {
