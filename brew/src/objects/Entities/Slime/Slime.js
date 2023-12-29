@@ -27,7 +27,7 @@ export class Slime extends GameObject {
     this.shieldImage = null;
     this.shieldTime = 0;
     this.body = new Sprite({
-      position: new Vector2(-8, -22), // offset x, y
+      position: new Vector2(-4, -8), // offset x, y
       resource: resources.images.slime,
       frameSize: new Vector2(16, 16),
       hFrames: 2,
