@@ -27,7 +27,8 @@ export class Slime extends GameObject {
     this.shieldImage = null;
     this.shieldTime = 0;
     this.body = new Sprite({
-      position: new Vector2(-4, -8), // offset x, y
+      position: new Vector2(0, -8), // offset x, y
+      
       resource: resources.images.slime,
       frameSize: new Vector2(16, 16),
       hFrames: 2,
@@ -42,13 +43,9 @@ export class Slime extends GameObject {
     this.body.animations.play('idle');
     this.addChild(this.body);
    
-    // Default Facing
     this.facingDirection = IDLE;
-    // Movement 
-    
     
     this.currentWorld = 'world';
-    
     this.destinationPosition = this.position.duplicate();
 
      // Collision tile
@@ -58,24 +55,16 @@ export class Slime extends GameObject {
 
     this.isAlive = true;   
     this.isMoving = true;
-
-    events.on("COLLISION_DETECTED", this, collision => {
-      if (collision.owner === this.entityId && collision.entity === 'katana') {
-        this.onEnergyShield();
-        this.isAlive = false;
-      };
-    });    
+ 
   }
   ready() {
     this.entityId = `slime-${generateUniqueId()}`;
-    
-    colliders.addCollider(Math.floor(this.position.x), Math.floor(this.position.y), this.currentWorld, this.entityId );
-    console.log('slime spawned');
+    colliders.addCollider(Math.floor(this.position.x), Math.floor(this.position.y), this.currentWorld, this );
+    // console.log(this.entityId, 'spawned at', this.position.x, this.position.y, this.currentWorld);
   }
   deSpawn() {
-    colliders.removeCollider( this.colliderPositionLast.x, this.colliderPositionLast.y, this.currentWorld, this.entityId );
-    
-    colliders.removeCollider( this.colliderPosition.x, this.colliderPosition.y, this.currentWorld, this.entityId );
+    colliders.removeCollider( this.colliderPositionLast.x, this.colliderPositionLast.y, this.currentWorld, this );
+    colliders.removeCollider( this.colliderPosition.x, this.colliderPosition.y, this.currentWorld, this );
     this.destroy();
   }
   step(delta, root) { 
@@ -87,24 +76,25 @@ export class Slime extends GameObject {
       this.workOnEnergyShield(delta);
       return;
     }
-    // Try move 
-
     const distance = moveTowards(this, this.destinationPosition, .4)
+    const pickupCollider = distance < .5;
     const hasArrived = distance < .3;
+    
+    if (pickupCollider) {
+      if (this.colliderPositionLast) {
+        colliders.removeCollider( this.colliderPositionLast.x, this.colliderPositionLast.y, this.currentWorld, this );   
+      }      
+    }
+    
     if (hasArrived) {
       // Collision tile
       if (this.isMoving) {
         this.isMoving = false;
-        if (this.colliderPositionLast) {
-          colliders.removeCollider( this.colliderPositionLast.x, this.colliderPositionLast.y, this.currentWorld, this.entityId );   
-        }
       }      
       this.tryMove(delta)
     }    
   } 
-  // Try Move
-  tryMove(delta) {
-   
+  tryMove(delta) { 
     // Create a movement sequence array
     const sequence = [
       { direction: LEFT, steps: 2 },
@@ -120,12 +110,10 @@ export class Slime extends GameObject {
       { direction: UP, steps: 2 },
       { direction: UP, steps: 2 },   
     ];
-
     // Check if the sequence has finished
     if (this.currentStep === undefined || this.currentStep >= sequence.length) {
       this.currentStep = 0; // Reset sequence on completion
     }
-
     // Get the current movement data from the sequence
     const currentStepData = sequence[this.currentStep];
     // Handle movement based on the data
@@ -154,7 +142,7 @@ export class Slime extends GameObject {
       
       this.currentStep++;     
       
-      if (isSpaceFree(nextX, nextY, this.currentWorld, this.entityId).collisionDetected === false) {
+      if (isSpaceFree(nextX, nextY, this.currentWorld, this).collisionDetected === false) {
         this.destinationPosition.x = nextX;
         this.destinationPosition.y = nextY;
         
@@ -163,7 +151,7 @@ export class Slime extends GameObject {
         this.colliderPositionLast = new Vector2(Math.round(this.position.x), Math.round(this.position.y));
         
         this.colliderPosition = new Vector2(Math.round(nextX), Math.round(nextY)); 
-        colliders.addCollider( this.colliderPosition.x, this.colliderPosition.y, this.currentWorld, this.entityId );                 
+        colliders.addCollider( this.colliderPosition.x, this.colliderPosition.y, this.currentWorld, this );                 
       }
     }
     // Update facing direction   
@@ -174,18 +162,17 @@ export class Slime extends GameObject {
     if (this.shieldTime > 0) {
       return;
     }
-    this.shieldTime = 100; // ms
+    this.shieldTime = 500; // ms
     
     this.shieldImage = new GameObject({});
     this.shieldImage.addChild(new Sprite({
       frameSize: new Vector2(32, 32),
       scale: 1.1,
       resource: resources.images.energyShield,
-      position: new Vector2(-10, -9)
+      position: new Vector2(-10, -18)
     }))
     this.addChild(this.shieldImage) 
   }
- 
   workOnEnergyShield(delta) {
     this.shieldTime -= delta;
     this.body.animations.play("shield");
