@@ -105,7 +105,8 @@ export class Interface {
         this.handleOutput({details: "Welcome to life." });        
       } else {
         // this.toggleSettingsDisplay();
-        // events.emit("CAPACITY_UP");  
+        // events.emit("CAPACITY_UP");
+        this.toggleStatsAndSettingsTemporarily();        
       }
     });
     events.on("RIGHT_CLICK", this, () => {
@@ -188,6 +189,17 @@ export class Interface {
     
     // this.toggleSettingsDisplay();
   }
+  toggleStatsAndSettingsTemporarily() {
+    if (!this.statisticsDisplay && !this.settingsDisplay) {
+      this.statisticsDisplay = true;
+      this.settingsDisplay = true;
+
+      setTimeout(() => {
+        this.statisticsDisplay = false;
+        this.settingsDisplay = false;
+      }, 5000); // Turn off after 5 seconds
+    }
+  }  
   toggleClockDisplay(){
     
     if (this.helpDisplay) {
