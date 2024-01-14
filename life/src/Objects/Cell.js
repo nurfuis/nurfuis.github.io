@@ -455,9 +455,9 @@ export class Cell extends GameObject {
       if (neighborId > cellsArray.length) {
         
         if (neighborId > cellsArray.length * 2) {
-          
-        } else {
           neighborId = neighborId - cellsArray.length * 2;
+        } else {
+          neighborId = neighborId - cellsArray.length;
         }
       }       
       
