@@ -1,0 +1,34 @@
+{
+    "maps": [
+        {
+            "fileName": "0_0.tmx",
+            "height": 256,
+            "width": 256,
+            "x": 0,
+            "y": 0
+        },
+        {
+            "fileName": "0_-1.tmx",
+            "height": 256,
+            "width": 256,
+            "x": 0,
+            "y": -256
+        },
+        {
+            "fileName": "0_-2.tmx",
+            "height": 256,
+            "width": 256,
+            "x": 0,
+            "y": -512
+        },
+        {
+            "fileName": "-1_0.tmx",
+            "height": 256,
+            "width": 256,
+            "x": -256,
+            "y": 0
+        }
+    ],
+    "onlyShowAdjacentMaps": false,
+    "type": "world"
+}
