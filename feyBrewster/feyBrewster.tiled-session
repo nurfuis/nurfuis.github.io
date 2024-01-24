@@ -1,0 +1,42 @@
+{
+    "activeFile": "src/levels/brewhouse2/0_0.tmx",
+    "expandedProjectPaths": [
+        "src",
+        "src/levels",
+        "src/levels/brewhouse2",
+        "."
+    ],
+    "fileStates": {
+        "src/levels/brewhouse2/0_0.tmx": {
+            "expandedObjectLayers": [
+                8
+            ],
+            "scale": 1.1429687499999999,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 320.2187286397813,
+                "y": 256.78742310321263
+            }
+        },
+        "src/levels/brewhouse2/1_0.tmx": {
+            "scale": 1.10771484375,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 256.38367274971347,
+                "y": 256.83505245525873
+            }
+        },
+        "src/levels/brewhouse2/FullTileSet1.tsx": {
+            "scaleInDock": 1
+        }
+    },
+    "openFiles": [
+        "src/levels/brewhouse2/0_0.tmx",
+        "src/levels/brewhouse2/1_0.tmx"
+    ],
+    "project": "feyBrewster.tiled-project",
+    "recentFiles": [
+        "src/levels/brewhouse2/1_0.tmx",
+        "src/levels/brewhouse2/0_0.tmx"
+    ]
+}
