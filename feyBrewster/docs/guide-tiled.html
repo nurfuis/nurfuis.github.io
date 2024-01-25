@@ -77,6 +77,16 @@
       209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,<br />
       225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,<br />
       241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256]<br />
+      
+    <h3>Organizing Sprites</h3>
+      <p>When making game sprites include the terrain and scenery onto one spritesheet. Creatures and equipment and objects that can be interacted with will use individual spritesheets.</p>
+      
+      <p>Here is the inside of the WoodFermenter.js script.  It has a custom size and a unique image file. Other custom properties and behaviors can be set to the wood fermenter during development.</p>
+      <img src="./images/screenshot20.png" /> 
+      
+      <p>The wood fermenter will be added to the map on the entities layer.</p>
+      
+      
     
     <h3>Add a new tileset...</h3>
       <img src="./images/screenshot8.png" /> 
@@ -99,7 +109,10 @@
       <img src="./images/screenshot14.png" />
       
     <h2>Entities</h2>
-      <p>Coming soon</p>
+      <p>Adding the wood fermenter to the entities layer is as easy as pie. Make a new rectangle object and name it for the entity you want to place.</p>
+      <img src="./images/screenshot21.png" />
+      <img src="./images/screenshot22.png" />
+      
       
     <h2>Foreground</h2>
       <p>I add a rectangle object and name it spawnLocation. I add a custom property named spawnLocation with the value tutorialMap (which must match the name of the directory). I will also update the main.js to load the new map because there is no other way at the moment to load worlds.</p>
@@ -116,7 +129,7 @@
       <p>We will be able to call scripts and create zones on this layer.</p>
       
     <h2>Save the file</h2>
-      <p>Save the file.</p>
+      <p>Save the file. Then export as json map files.</p>
     
     <h2>Make a world file</h2>
       <p>Just one chunk is not enough. We must add more chunks. To do so we need to make a world file (named world.world). On the menu go to World and select New World. Then select the world tool (N).</p>
