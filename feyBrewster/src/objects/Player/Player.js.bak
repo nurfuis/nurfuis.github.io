@@ -266,7 +266,7 @@ export class Player extends GameObject {
       
       // Collision tile
       this.isMoving = true;
-      this.colliderPositionLast = this.colliderPosition.duplicate();
+      this.colliderPositionLast = this.colliderPosition;
       this.colliderPosition = new Vector2(nextX, nextY); ; 
       this.placeCollider(); 
     } else {

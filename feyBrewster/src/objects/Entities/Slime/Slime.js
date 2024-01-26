@@ -12,7 +12,7 @@ import { generateUniqueId } from "../../../helpers/nextId.js";
 import { moveTowards } from "../../../helpers/moveTowards.js";
 import { events } from "../../../Events.js";
 import { isSpaceFree } from "../../../helpers/grid.js";
-import {obstacles} from "../../../helpers/grid.js";
+import { obstacles } from "../../../helpers/grid.js";
 
 import {
   IDLE,
@@ -45,7 +45,7 @@ export class Slime extends GameObject {
    
     this.facingDirection = IDLE;
     
-    this.currentWorld = 'world';
+    this.currentWorld = world;
     this.destinationPosition = this.position.duplicate();
 
      // Collision tile
@@ -79,29 +79,15 @@ export class Slime extends GameObject {
       this.workOnEnergyShield(delta);
       return;
     }
-    if (!this.parent) {
-      console.log(this.parent);
-    }
+
     const distance = moveTowards(this, this.destinationPosition, .5);
-    // const removeCollider = distance < 16;
     const hasArrived = distance < 1;
     
-    
-    // if (removeCollider){
-      // this.removeOldCollider();      
-    // }
-
-    if (hasArrived) {
-      // Collision tile
-      // if (this.isMoving) {
-        // this.isMoving = false;
-       
-      // }      
+    if (hasArrived) {      
       this.tryMove(delta)
     }    
   } 
   tryMove(delta) { 
-    // Create a movement sequence array
     const sequence = [
       { direction: LEFT, steps: 2 },
       { direction: LEFT, steps: 2 },      

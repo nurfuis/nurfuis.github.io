@@ -44,7 +44,7 @@ export class Spark extends GameObject {
    
     this.facingDirection = IDLE;
     
-    this.currentWorld = world;
+    this.currentWorld = 'world';
     this.destinationPosition = this.position.duplicate();
 
      // Collision tile

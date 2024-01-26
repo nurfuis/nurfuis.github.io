@@ -5,6 +5,7 @@ import { iterateChunkTiles } from "../../helpers/iterateChunkTiles.js";
 
 import { Slime } from "./Slime/Slime.js";
 import { Spark } from "./Spark/Spark.js";
+import { Spark } from "./Spark/Spark.js";
 import { WoodFermenter } from "./Equipment/woodFermenter.js";
 
 export class Entities extends GameObject {

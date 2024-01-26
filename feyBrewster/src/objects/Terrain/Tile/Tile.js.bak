@@ -18,8 +18,8 @@ export class Tile extends GameObject{
     const sprite = new Sprite({
       resource: resources.images[spriteSheet], 
       frameSize: new Vector2(gridSize,gridSize),
-      hFrames: 16,
-      vFrames: 16,
+      hFrames: 10,
+      vFrames: 10,
       spacing: 0,
       frame: tileData-1, 
     })

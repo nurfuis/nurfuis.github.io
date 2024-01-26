@@ -1,4 +1,4 @@
-// Spark.js
+// Slime.js
 import { resources } from "../../../Resource.js";
 import { GameObject } from "../../../GameObject.js";
 import { Vector2 } from "../../../Vector2.js";
@@ -12,14 +12,14 @@ import { generateUniqueId } from "../../../helpers/nextId.js";
 import { moveTowards } from "../../../helpers/moveTowards.js";
 import { events } from "../../../Events.js";
 import { isSpaceFree } from "../../../helpers/grid.js";
-import {obstacles} from "../../../helpers/grid.js";
+import { obstacles } from "../../../helpers/grid.js";
 
 import {
   IDLE,
   SHIELD,
-} from "./sparkAnimations.js";
+} from "./slimeAnimations.js";
 
-export class Spark extends GameObject {
+export class Slime extends GameObject {
   constructor(x, y, world, chunkId) {
     super({
       position: new Vector2(x, y),
@@ -27,9 +27,10 @@ export class Spark extends GameObject {
     this.shieldImage = null;
     this.shieldTime = 0;
     this.body = new Sprite({
-      position: new Vector2(-8, -10), // offset x, y    
-      resource: resources.images.spark,
-      frameSize: new Vector2(32, 32),
+      position: new Vector2(0, -8), // offset x, y
+      
+      resource: resources.images.slime,
+      frameSize: new Vector2(16, 16),
       hFrames: 2,
       vFrames: 2,
       spacing: 0,
@@ -44,7 +45,7 @@ export class Spark extends GameObject {
    
     this.facingDirection = IDLE;
     
-    this.currentWorld = world;
+    this.currentWorld = 'world';
     this.destinationPosition = this.position.duplicate();
 
      // Collision tile
@@ -57,7 +58,7 @@ export class Spark extends GameObject {
     this.chunkId = chunkId;
   }
   ready() {
-    this.entityId = `spark-${generateUniqueId()}`;
+    this.entityId = `slime-${generateUniqueId()}`;
     // console.log(this.entityId, 'spawned at', this.position.x, this.position.y, this.currentWorld);
   }
   despawn() {
@@ -81,7 +82,7 @@ export class Spark extends GameObject {
     if (!this.parent) {
       console.log(this.parent);
     }
-    const distance = moveTowards(this, this.destinationPosition, .9);
+    const distance = moveTowards(this, this.destinationPosition, .5);
     // const removeCollider = distance < 16;
     const hasArrived = distance < 1;
     
