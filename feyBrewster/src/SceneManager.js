@@ -39,7 +39,7 @@ export class SceneManager {
 
     this.currentChunkX = null;
     this.currentChunkY = null;
-    this.currentWorld = 'brewhouse2';
+    this.currentWorld = 'brewhouse';
 
     this.terrain = new Terrain({ position: new Vector2(0, 0) });
     this.mainScene.addChild(this.terrain);
