@@ -14,8 +14,8 @@ import { Player } from "./src/objects/Player/Player.js";
 const playerOne = new Player();
 const playerList = [playerOne];
 
-const setOne = "world";
-const setTwo = "brewhouse2";
+const setOne = "tutorialMap";
+const setTwo = "brewhouse";
 const setList = [setOne, setTwo]; 
 
 const stage = document.querySelector("#game-stage"); 
