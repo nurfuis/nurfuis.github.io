@@ -19,7 +19,10 @@ class Resources {
       shroud: "./public/sprites/shroud.png",
       spark: "./public/sprites/spark-sheet.png",
       FullTileSet1: "./public/sprites/FullTileSet1.png",
-    
+      snowTileset: "./public/sprites/snow.png",
+      woodFermenter: "./public/sprites/wood-fermenter.png",
+      FeyBrewsterTileSet: "./public/sprites/FeyBrewsterTileSet.png",
+      woodenfvTileset: "./public/sprites/woodenfvTileset.png",
     };
 
     this.images = {};
