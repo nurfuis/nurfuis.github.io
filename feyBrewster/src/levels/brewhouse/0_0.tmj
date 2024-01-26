@@ -169,7 +169,7 @@
  "tilesets":[
         {
          "firstgid":1,
-         "source":"..\/..\/..\/..\/..\/Users\/nurfuis\/Downloads\/feyBrewster (2)\/feyBrewster\/src\/levels\/brewhouse\/FeyBrewsterTileSet.tsx"
+         "source":"FeyBrewsterTileSet.tsx"
         }],
  "tilewidth":32,
  "type":"map",
