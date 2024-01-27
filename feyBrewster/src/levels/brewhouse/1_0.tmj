@@ -65,6 +65,12 @@
                  "height":96,
                  "id":1,
                  "name":"woodFermenter",
+                 "properties":[
+                        {
+                         "name":"facingDirection",
+                         "type":"string",
+                         "value":"DOWN"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -76,6 +82,12 @@
                  "height":96,
                  "id":2,
                  "name":"woodFermenter",
+                 "properties":[
+                        {
+                         "name":"facingDirection",
+                         "type":"string",
+                         "value":"DOWN"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -87,6 +99,12 @@
                  "height":96,
                  "id":3,
                  "name":"woodFermenter",
+                 "properties":[
+                        {
+                         "name":"facingDirection",
+                         "type":"string",
+                         "value":"DOWN"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -98,6 +116,12 @@
                  "height":96,
                  "id":4,
                  "name":"woodFermenter",
+                 "properties":[
+                        {
+                         "name":"facingDirection",
+                         "type":"string",
+                         "value":"UP"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -109,6 +133,12 @@
                  "height":96,
                  "id":5,
                  "name":"woodFermenter",
+                 "properties":[
+                        {
+                         "name":"facingDirection",
+                         "type":"string",
+                         "value":"UP"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -120,6 +150,12 @@
                  "height":96,
                  "id":6,
                  "name":"woodFermenter",
+                 "properties":[
+                        {
+                         "name":"facingDirection",
+                         "type":"string",
+                         "value":"UP"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
