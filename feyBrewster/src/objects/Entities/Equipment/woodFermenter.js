@@ -47,7 +47,7 @@ export class WoodFermenter extends GameObject {
     }    
     
     this.body = new Sprite({
-      position: new Vector2(0, -32), // offset x, y    
+      position: new Vector2(0, -64), // offset x, y    
       resource: resources.images.woodenfvTileset,
       frameSize: new Vector2(64, 96),
       hFrames: 2,
@@ -61,7 +61,7 @@ export class WoodFermenter extends GameObject {
       this.overlayObject = new GameObject({});
       this.overlayObject.position = this.position.duplicate();
       this.overlayObject.addChild(new Sprite({
-        position: new Vector2(0, -32), // offset x, y    
+        position: new Vector2(0, -64), // offset x, y    
         resource: resources.images.woodenfvTileset,
         frameSize: new Vector2(64, 96),
         hFrames: 2,
