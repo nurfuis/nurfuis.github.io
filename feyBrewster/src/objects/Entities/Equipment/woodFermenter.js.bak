@@ -11,10 +11,10 @@ import { events } from "../../../Events.js";
 import { obstacles } from "../../../helpers/grid.js";
 
 export class WoodFermenter extends GameObject {
-  constructor(x, y, world, chunkId, overlay) {
+  constructor(x, y, world, chunkId, overlay, objectData) {
     super({
       position: new Vector2(x, y),
-    });
+    });  
     this.body = new Sprite({
       position: new Vector2(0, -32), // offset x, y    
       resource: resources.images.woodenfvTileset,
@@ -22,7 +22,7 @@ export class WoodFermenter extends GameObject {
       hFrames: 2,
       vFrames: 2,
       spacing: 0,
-      frame: 3,
+      frame: 2,
     });
     this.addChild(this.body);
        
@@ -35,10 +35,15 @@ export class WoodFermenter extends GameObject {
 
     this.hasOverlay = true;
     this.overlayPlane = overlay;
-    this.overlaySpriteFrame = 1;
+    this.overlaySpriteFrame = 0;
     this.overlayObject = null;
+    
+    this.facingDirection = objectData.properties[0].value;
+    console.log('facing',this.facingDirection);  
+    
   } 
   ready() {
+    
     this.entityId = `woodFermenter-${generateUniqueId()}`;
     
     if (this.hasCollision) {
@@ -46,7 +51,8 @@ export class WoodFermenter extends GameObject {
     }
 
     if (this.hasOverlay) {
-      this.overlayObject = new GameObject({})
+      this.overlayObject = new GameObject({});
+      this.overlayObject.position = this.position.duplicate();
       this.overlayObject.addChild(new Sprite({
         position: new Vector2(0, -32), // offset x, y    
         resource: resources.images.woodenfvTileset,
@@ -57,7 +63,7 @@ export class WoodFermenter extends GameObject {
         frame: this.overlaySpriteFrame,
       }))
       this.overlayPlane.addChild(this.overlayObject)
-    }      
+    } 
   }
  
   step(delta, root) { 

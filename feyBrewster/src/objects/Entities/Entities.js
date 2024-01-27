@@ -32,9 +32,8 @@ export class Entities extends GameObject {
         
         const entityX = entityObject.x + chunkX * 512;
         const entityY = entityObject.y + chunkY * 512;
-      	
+              	
 				if (entityObject) {
-					console.log(entityObject.name);			
 					switch(entityObject.name) {
 						case "slime":
 							let slime = new Slime(entityX, entityY, world, chunkId);
@@ -45,7 +44,7 @@ export class Entities extends GameObject {
 							this.addChild(spark);
 							break;
 						case "woodFermenter":
-							let woodFermenter = new WoodFermenter(entityX, entityY, world, chunkId, overlay);
+							let woodFermenter = new WoodFermenter(entityX, entityY, world, chunkId, overlay, entityObject);
 							this.addChild(woodFermenter);
 							break;              
 					}
