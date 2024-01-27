@@ -11,58 +11,67 @@ import { events } from "../../../Events.js";
 import { obstacles } from "../../../helpers/grid.js";
 
 export class WoodFermenter extends GameObject {
-  constructor(x, y, world, chunkId) {
+  constructor(x, y, world, chunkId, overlay) {
     super({
       position: new Vector2(x, y),
     });
     this.body = new Sprite({
-      position: new Vector2(0, 0), // offset x, y    
-      resource: resources.images.woodFermenter,
+      position: new Vector2(0, -32), // offset x, y    
+      resource: resources.images.woodenfvTileset,
       frameSize: new Vector2(64, 96),
-      hFrames: 1,
-      vFrames: 1,
+      hFrames: 2,
+      vFrames: 2,
       spacing: 0,
+      frame: 3,
     });
     this.addChild(this.body);
        
     this.currentWorld = world;
 
-     // Collision tile
-    this.entityId = null;
-    this.colliderPosition = null;
-    this.isMoving = false;
-    this.type = 'entity';
-    this.chunkId = chunkId;
-  }
+    this.entityId = null;   
+    this.hasCollision = true;
+    this.width = gridSize * 2;
+    this.height = gridSize * 1;
+
+    this.hasOverlay = true;
+    this.overlayPlane = overlay;
+    this.overlaySpriteFrame = 1;
+    this.overlayObject = null;
+  } 
   ready() {
     this.entityId = `woodFermenter-${generateUniqueId()}`;
-    this.colliderPosition = this.position.duplicate();
-    this.place();
+    
+    if (this.hasCollision) {
+      obstacles.push(this);        
+    }
+
+    if (this.hasOverlay) {
+      this.overlayObject = new GameObject({})
+      this.overlayObject.addChild(new Sprite({
+        position: new Vector2(0, -32), // offset x, y    
+        resource: resources.images.woodenfvTileset,
+        frameSize: new Vector2(64, 96),
+        hFrames: 2,
+        vFrames: 2,
+        spacing: 0,
+        frame: this.overlaySpriteFrame,
+      }))
+      this.overlayPlane.addChild(this.overlayObject)
+    }      
   }
+ 
+  step(delta, root) { 
+    // ...
+  }
+  
   despawn() {
+    if (this.hasOverlay) { this.overlayObject.destroy(); }
+    
     for (let i = obstacles.length - 1; i >= 0; i--) { // Iterate backwards to avoid index issues
       if (obstacles[i].owner === this) {
         obstacles.splice(i, 1); 
       }
     }
     this.destroy();
-  }      
-  
-  step(delta, root) { 
-    // ...
-  } 
-
-  place() {
-    obstacles.push({ id: `${this.colliderPosition.x},${this.colliderPosition.y},${this.currentWorld}`, owner: this });    
-  }
-  
-  removeOldCollider() {
-    if (this.colliderPositionLast) {
-      for (let i = obstacles.length - 1; i >= 0; i--) { // Iterate backwards to avoid index issues
-        if (obstacles[i].id === `${this.colliderPositionLast.x},${this.colliderPositionLast.y},${this.currentWorld}` && obstacles[i].owner === this) {
-          obstacles.splice(i, 1); // Remove only the matched element
-        }
-      }            
-    }      
-  }  
+  }   
 }

@@ -5,7 +5,7 @@ import {Sprite} from "../../Sprite.js";
 import {gridSize} from "../../helpers/grid.js";
 import {obstacles} from "../../helpers/grid.js";
 
-export class Wall extends GameObject{
+export class Collider extends GameObject{
   constructor(tileData, tileSets, x, y, world, chunkId) {
     super({
       position: new Vector2(x,y)

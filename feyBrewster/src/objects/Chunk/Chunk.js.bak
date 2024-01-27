@@ -27,8 +27,8 @@ export class Chunk extends GameObject{
     scenery.removeChunk(this.chunkId);
   }  
 
-  addEntities(entities, overlay) {
-    entities.addChunkEntities(this.x, this.y, this.world, this.data, this.chunkId, overlay);
+  addEntities(entities) {
+    entities.addChunkEntities(this.x, this.y, this.world, this.data, this.chunkId);
   }
   
   removeEntities(entities) {

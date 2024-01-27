@@ -22,34 +22,30 @@ export class Entities extends GameObject {
       }, 0));
     }
   }
-  async addChunkEntities(chunkX, chunkY, world, chunkData, chunkId) {
-  	/*
-    await iterateChunkTiles(chunkX, chunkY, chunkData, async (entry, posX, posY, tileSets) => {
-      await new Promise((resolve) => setTimeout(() => {
-        this.addEntity(chunkData.layers[1].data[entry], posX, posY, world, chunkId);
-        resolve();
-      }, 0));
-    });
-    */
+  async addChunkEntities(chunkX, chunkY, world, chunkData, chunkId, overlay) {
+
     if (chunkData.layers && chunkData.layers[2] && chunkData.layers[2].objects) {
       
       const numObjects = chunkData.layers[2].objects.length;
       for (let i = 0; i < numObjects; i++) {
       	const entityObject = chunkData.layers[2].objects[i];
+        
+        const entityX = entityObject.x + chunkX * 512;
+        const entityY = entityObject.y + chunkY * 512;
       	
 				if (entityObject) {
 					console.log(entityObject.name);			
 					switch(entityObject.name) {
 						case "slime":
-							let slime = new Slime(entityObject.x, entityObject.y, world, chunkId);
+							let slime = new Slime(entityX, entityY, world, chunkId);
 							this.addChild(slime);
 							break;
 						case "spark":
-							let spark = new Spark(entityObject.x, entityObject.y, world, chunkId);
+							let spark = new Spark(entityX, entityY, world, chunkId);
 							this.addChild(spark);
 							break;
 						case "woodFermenter":
-							let woodFermenter = new WoodFermenter(entityObject.x, entityObject.y, world, chunkId);
+							let woodFermenter = new WoodFermenter(entityX, entityY, world, chunkId, overlay);
 							this.addChild(woodFermenter);
 							break;              
 					}

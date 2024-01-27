@@ -389,16 +389,14 @@ export class SceneManager {
     const chunkId = this.getChunkId(chunkX, chunkY, world);
     this.chunks[chunkId] = 'BUILDING';
     const chunk = new Chunk(chunkX, chunkY, world, chunkData, chunkId);
-
-    chunk.addCollision(this.collision);
     
     chunk.addTerrain(this.terrain);
     chunk.addScenery(this.scenery);
-    chunk.addEntities(this.entities);
-    chunk.addOverlay(this.overlay);  
+    chunk.addEntities(this.entities, this.overlay);
+    chunk.addForeground(this.foreground);    
+    chunk.addOverlay(this.overlay);
+    chunk.addCollision(this.collision);    
     chunk.addScripts(this.scripts);
-    
-    chunk.addForeground(this.foreground);
 
     this.chunks[chunkId] = 'COMPLETE';
     this.recentlyLoadedChunks[chunkId] = 6;
@@ -409,16 +407,14 @@ export class SceneManager {
     const chunkId = this.getChunkId(chunkX, chunkY, world);
     const chunk = this.loadedChunks[chunkId];
     
-    chunk.removeCollision(this.collision);
-    
     chunk.removeTerrain(this.terrain);
     chunk.removeScenery(this.scenery);
     chunk.removeEntities(this.entities);
+    chunk.removeForeground(this.foreground);    
     chunk.removeOverlay(this.overlay);  
+    chunk.removeCollision(this.collision);
     chunk.removeScripts(this.scripts);
     
-    chunk.removeForeground(this.foreground);
-
     delete this.loadedChunks[chunkId];
     delete this.chunks[chunkId];
   }

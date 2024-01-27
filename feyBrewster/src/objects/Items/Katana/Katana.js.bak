@@ -109,7 +109,7 @@ export class Katana extends GameObject {
     // if (isSpaceFree(nextX, nextY, this.world, this).collisionDetected === true) {
       // const owner = isSpaceFree(nextX, nextY, this.world, this).owner;
       // if (owner.isAlive) {
-        // owner.isAlive = false;
+        owner.isAlive = false;
         // owner.onEnergyShield();
         
       // }

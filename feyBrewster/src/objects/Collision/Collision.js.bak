@@ -26,7 +26,7 @@ export class Collision extends GameObject {
 
   addCollider(collidersData, tileSets, x, y, world, chunkId) {
     if (collidersData >= 1) {      
-      const collider = new Wall(collidersData, tileSets, x, y, world, chunkId);
+      const collider = new Collider(collidersData, tileSets, x, y, world, chunkId);
       this.addChild(collider);   
     }    
   }  
