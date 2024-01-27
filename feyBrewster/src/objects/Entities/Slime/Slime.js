@@ -80,11 +80,11 @@ export class Slime extends GameObject {
   }
   onCollision(repulsionForce) {
     this.position = new Vector2(
-      this.position.x - repulsionForce.x, 
-      this.position.y - repulsionForce.y
+      Math.round(this.position.x + repulsionForce.x), 
+      Math.round(this.position.y + repulsionForce.y)
       );
 
-    this.destinationPosition = this.position.duplicate();
+    // this.destinationPosition = this.position.duplicate();
   }  
   overlaps(other) {
     const dx = this.center.x - other.center.x;

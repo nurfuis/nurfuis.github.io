@@ -32,9 +32,7 @@ export class WoodenKettle extends GameObject {
     
     this.body = null;
     this.baseSpriteFrame = 4;     
-    
-    this.facingDirection = objectData.properties[0].value;
-    
+        
     this.type = 'brewing equipment';
   } 
   ready() {
@@ -43,12 +41,7 @@ export class WoodenKettle extends GameObject {
     
     if (this.hasCollision) {
       obstacles.push(this);        
-    }
-    
-    if (this.facingDirection === 'UP') {
-      this.overlaySpriteFrame = 1;
-      this.baseSpriteFrame = 3;
-    }    
+    }   
     
     this.body = new Sprite({
       position: new Vector2(0, -64), // offset x, y    

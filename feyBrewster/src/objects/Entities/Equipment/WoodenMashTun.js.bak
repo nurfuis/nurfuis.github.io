@@ -5,12 +5,15 @@ import { Sprite } from "../../../Sprite.js";
 import { gridSize } from "../../../helpers/grid.js";
 import { Animations } from "../../../Animations.js";
 import { FrameIndexPattern } from "../../../FrameIndexPattern.js";
-
+import {
+  WOODEN_MASH_TUN_EMPTY,  
+  WOODEN_MASH_TUN_MASHING,
+} from "./woodenAnimations.js";
 import { generateUniqueId } from "../../../helpers/nextId.js";
 import { events } from "../../../Events.js";
 import { obstacles } from "../../../helpers/grid.js";
 
-export class WoodenKettle extends GameObject {
+export class WoodenMashTun extends GameObject {
   constructor(x, y, world, chunkId, overlay, objectData) {
     super({
       position: new Vector2(x, y),
@@ -36,7 +39,7 @@ export class WoodenKettle extends GameObject {
   } 
   ready() {
     
-    this.entityId = `woodenKettle-${generateUniqueId()}`;
+    this.entityId = `woodenMashTun-${generateUniqueId()}`;
     
     if (this.hasCollision) {
       obstacles.push(this);        
@@ -49,7 +52,7 @@ export class WoodenKettle extends GameObject {
     
     this.body = new Sprite({
       position: new Vector2(0, -64), // offset x, y    
-      resource: resources.images.woodenkettleTileset,
+      resource: resources.images.woodenmashtunTileset,
       frameSize: new Vector2(96, 96),
       hFrames: 4,
       vFrames: 2,
@@ -63,12 +66,16 @@ export class WoodenKettle extends GameObject {
       this.overlayObject.position = this.position.duplicate();
       this.overlayObject.addChild(new Sprite({
         position: new Vector2(0, -64), // offset x, y    
-        resource: resources.images.woodenkettleTileset,
+        resource: resources.images.woodenmashtunTileset,
         frameSize: new Vector2(96, 96),
         hFrames: 4,
         vFrames: 2,
         spacing: 0,
         frame: this.overlaySpriteFrame,
+        animations: new Animations({
+          mashTunMashing: new FrameIndexPattern(WOODEN_MASH_TUN_MASHING),
+          mashTunEmpty: new FrameIndexPattern(WOODEN_MASH_TUN_EMPTY),
+        })         
       }))
       this.overlayPlane.addChild(this.overlayObject)
     } 
