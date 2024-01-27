@@ -22,7 +22,7 @@ export class WoodFermenter extends GameObject {
       hFrames: 2,
       vFrames: 2,
       spacing: 0,
-      frame: 3,
+      frame: 2,
     });
     this.addChild(this.body);
        
@@ -35,7 +35,7 @@ export class WoodFermenter extends GameObject {
 
     this.hasOverlay = true;
     this.overlayPlane = overlay;
-    this.overlaySpriteFrame = 1;
+    this.overlaySpriteFrame = 0;
     this.overlayObject = null;
   } 
   ready() {
