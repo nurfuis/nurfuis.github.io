@@ -45,6 +45,7 @@ export class Player extends GameObject {
     this.width = 32;
     this.height = 32;
     this.type = 'player';
+    this.mass = 280;
     
     this.radius = 16;
     this.center = new Vector2(this.position.x + gridSize / 2, this.position.y + gridSize / 2);
@@ -78,7 +79,8 @@ export class Player extends GameObject {
       hFrames: 3,
       vFrames: 8,
       frame: 1,
-      position: new Vector2(0, -8), // offset x, y
+      scale: 2,
+      position: new Vector2(-16, -32), // offset x, y
       animations: new Animations({
         walkDown: new FrameIndexPattern(WALK_DOWN),
         walkUp: new FrameIndexPattern(WALK_UP),
@@ -109,7 +111,7 @@ export class Player extends GameObject {
       frame: 47,
       
     })
-    this.addChild(this.hitBox);
+    // this.addChild(this.hitBox);
 
     events.on("PLAYER_PICKS_UP_ITEM", this, data => {
       this.onPickUpItem(data);
@@ -117,11 +119,11 @@ export class Player extends GameObject {
   }
   onCollision(repulsionForce) {
     this.position = new Vector2(
-      Math.round(this.position.x - repulsionForce.x), 
-      math.round(this.position.y - repulsionForce.y)
+      this.position.x - repulsionForce.x / this.mass, 
+      this.position.y - repulsionForce.y / this.mass
       );
 
-    this.destinationPosition = this.position.duplicate();
+    // this.destinationPosition = this.position.duplicate();
   } 
   overlaps(other) {
     const dx = this.center.x - other.center.x;

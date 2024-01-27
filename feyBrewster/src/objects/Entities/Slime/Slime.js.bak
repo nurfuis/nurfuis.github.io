@@ -30,12 +30,13 @@ export class Slime extends GameObject {
     this.shieldTime = 0;
     
     this.body = new Sprite({
-      position: new Vector2(8, 8), // offset x, y
+      position: new Vector2(-4, -4), // offset x, y
       
       resource: resources.images.slime,
       frameSize: new Vector2(16, 16),
       hFrames: 2,
       vFrames: 2,
+      scale: 2,
       spacing: 0,
       animations: new Animations({
         idle: new FrameIndexPattern(IDLE),
@@ -57,7 +58,7 @@ export class Slime extends GameObject {
       frame: 47,
       
     })
-    this.addChild(this.hitBox);  
+    // this.addChild(this.hitBox);  
     
     this.facingDirection = IDLE;
     
@@ -69,6 +70,7 @@ export class Slime extends GameObject {
     this.hasCollision = true;
     this.width = 32;
     this.height = 32;
+    this.mass = 100;
     
     this.radius = 16;
     this.center = new Vector2(this.position.x + gridSize / 2, this.position.y + gridSize / 2);
@@ -80,8 +82,8 @@ export class Slime extends GameObject {
   }
   onCollision(repulsionForce) {
     this.position = new Vector2(
-      this.position.x + repulsionForce.x, 
-      this.position.y + repulsionForce.y
+      Math.round(this.position.x + repulsionForce.x / this.mass), 
+      Math.round(this.position.y + repulsionForce.y / this.mass)
       );
 
     // this.destinationPosition = this.position.duplicate();
