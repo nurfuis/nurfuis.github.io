@@ -26,7 +26,9 @@ import {
   ATTACK_DOWN,
 } from "./playerAnimations.js";
 
-import {obstacles} from "../../helpers/grid.js";
+import { obstacles } from "../../helpers/grid.js";
+// import { movingObjects } from "../../helpers/collisionDetection.js";
+// import { checkCollisions } from "../../helpers/collisionDetection.js";
 
 import { Katana } from "../Items/Katana/Katana.js";
 
@@ -42,6 +44,10 @@ export class Player extends GameObject {
     this.hasCollision = true;
     this.width = 32;
     this.height = 32;
+    this.type = 'player';
+    
+    this.radius = 16;
+    this.center = new Vector2(this.position.x + gridSize / 2, this.position.y + gridSize / 2);
     
     this.facingDirection = DOWN;    
     this.destinationPosition = this.position.duplicate();
@@ -61,7 +67,7 @@ export class Player extends GameObject {
     const shadow = new Sprite({
       resource: resources.images.shadow,
       frameSize: new Vector2(32,32),
-      position: new Vector2(-8, -22),
+      position: new Vector2(2, -16),
     })
     
     this.addChild(shadow);
@@ -72,7 +78,7 @@ export class Player extends GameObject {
       hFrames: 3,
       vFrames: 8,
       frame: 1,
-      position: new Vector2(-8, -22), // offset x, y
+      position: new Vector2(0, -8), // offset x, y
       animations: new Animations({
         walkDown: new FrameIndexPattern(WALK_DOWN),
         walkUp: new FrameIndexPattern(WALK_UP),
@@ -93,11 +99,41 @@ export class Player extends GameObject {
     
     this.addChild(this.body);
 
+    this.hitBox = new Sprite({
+      resource: resources.images.FeyBrewsterTileSet,
+      frameSize: new Vector2(32,32),
+      position: new Vector2(0, 0),
+      frameSize: new Vector2(gridSize,gridSize),
+      hFrames: 16,
+      vFrames: 16,
+      frame: 47,
+      
+    })
+    this.addChild(this.hitBox);
+
     events.on("PLAYER_PICKS_UP_ITEM", this, data => {
       this.onPickUpItem(data);
     })
   }
-  
+  onCollision(repulsionForce) {
+    this.position = new Vector2(
+      this.position.x + repulsionForce.x, 
+      this.position.y + repulsionForce.y
+      );
+
+    this.destinationPosition = this.position.duplicate();
+  } 
+  overlaps(other) {
+    const dx = this.center.x - other.center.x;
+    const dy = this.center.y - other.center.y;
+    return Math.sqrt(dx * dx + dy * dy) <= this.radius + other.radius;
+  }
+  distanceTo(other) {
+    const dx = this.center.x - other.center.x;
+    const dy = this.center.y - other.center.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    return distance;
+  } 
   setPosition(x, y, world) {
     this.position = new Vector2(x, y);
     this.destinationPosition = this.position.duplicate();
@@ -107,20 +143,27 @@ export class Player extends GameObject {
   spawn(x, y, world, plane) {
     if (this.canSpawn && !this.isSpawned) {
       this.setPosition(x, y, world);
-
+  
       plane.addChild(this);
       
       this.isSpawned = true;
       
-      if (this.hasCollision) {
-        obstacles.push(this);        
-      }
+      // if (this.hasCollision) {
+        // movingObjects.push(this);
+      // }
     }      
     console.log(this.entityId + " has spawned at " + this.position.x + "," + this.position.y + "," + this.currentWorld);
   }
   
+  despawn() {
+    for (let i = obstacles.length - 1; i >= 0; i--) { // Iterate backwards to avoid index issues
+      if (obstacles[i].owner === this) {
+        obstacles.splice(i, 1); 
+      }
+    }
+  }  
   ready() {
-    // ...
+  
   }
   
   step(delta, root) {
@@ -136,8 +179,10 @@ export class Player extends GameObject {
       this.workOnItemPickUp(delta);
       return;
     }
-    
+       
     const distance = moveTowards(this, this.destinationPosition, 1) // destination, speed
+    this.center = new Vector2(this.position.x + gridSize / 2, this.position.y + gridSize / 2);
+    
     const hasArrived = distance < 1;
     if (hasArrived) {
       this.tryMove(delta, root)
@@ -151,7 +196,13 @@ export class Player extends GameObject {
     }
     this.lastX = this.position.x;
     this.lastY = this.position.y;
-    events.emit("PLAYER_POSITION", { x: this.position.x, y: this.position.y, world: this.currentWorld })
+    events.emit("PLAYER_POSITION", { 
+      x: this.position.x, 
+      y: this.position.y, 
+      world: this.currentWorld,
+      center: this.center,
+      radius: this.radius,    
+    })
   }
   
   tryMove(delta, root) {
@@ -204,9 +255,7 @@ export class Player extends GameObject {
     if (collisionCheck.collisionDetected === false) {
       this.destinationPosition.x = nextX;
       this.destinationPosition.y = nextY;    
-    } else {
-    	console.log(collisionCheck);
-    }
+    } 
     this.facingDirection = input.direction ?? this.facingDirection;
   };   
   
@@ -312,25 +361,5 @@ export class Player extends GameObject {
     }
   }
   
-  placeCollider() {
-    obstacles.push({ id: `${this.colliderPosition.x},${this.colliderPosition.y},${this.currentWorld}`, owner: this });
-    console.log(obstacles);
-  }
-  
-  clearColliders() {
-    for (let i = obstacles.length - 1; i >= 0; i--) { // Iterate backwards to avoid index issues
-      if (obstacles[i].owner === this) {
-        obstacles.splice(i, 1); 
-      }
-    }
-  }
-  
-  removeCollider() {
-    for (let i = obstacles.length - 1; i >= 0; i--) { // Iterate backwards to avoid index issues
-      if (obstacles[i].id === `${this.colliderPositionLast.x},${this.colliderPositionLast.y},${this.currentWorld}` && obstacles[i].owner === this) {
-        obstacles.splice(i, 1); // Remove only the matched element
-        break; // Stop iterating once found
-      }
-    }
-  }  
+ 
 }

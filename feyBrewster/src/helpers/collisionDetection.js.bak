@@ -1,0 +1,17 @@
+export const movingObjects = [];
+
+
+export function checkCollisions(collider) {
+  if (movingObjects.length <= 1) { return }
+  
+  for (let i = 0; i < movingObjects.length; i++) {
+    const collidee = movingObjects[i]
+    if (collidee != collider) { 
+    
+      const distance = collidee.distanceTo(collider)
+    
+      console.log(distance)
+    }    
+  }
+}
+

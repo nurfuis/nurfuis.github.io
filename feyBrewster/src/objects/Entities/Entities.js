@@ -5,7 +5,9 @@ import { iterateChunkTiles } from "../../helpers/iterateChunkTiles.js";
 
 import { Slime } from "./Slime/Slime.js";
 import { Spark } from "./Spark/Spark.js";
-import { WoodFermenter } from "./Equipment/woodFermenter.js";
+import { WoodenFermenter } from "./Equipment/WoodenFermenter.js";
+import { WoodenKettle } from "./Equipment/WoodenKettle.js";
+import { WoodenMashTun } from "./Equipment/WoodenMashTun.js";
 
 export class Entities extends GameObject {
   constructor() {
@@ -43,10 +45,18 @@ export class Entities extends GameObject {
 							let spark = new Spark(entityX, entityY, world, chunkId);
 							this.addChild(spark);
 							break;
-						case "woodFermenter":
-							let woodFermenter = new WoodFermenter(entityX, entityY, world, chunkId, overlay, entityObject);
-							this.addChild(woodFermenter);
-							break;              
+						case "woodenFermenter":
+							let woodenFermenter = new WoodenFermenter(entityX, entityY, world, chunkId, overlay, entityObject);
+							this.addChild(woodenFermenter);
+							break;
+						case "woodenKettle":
+							let woodenKettle = new WoodenKettle(entityX, entityY, world, chunkId, overlay, entityObject);
+							this.addChild(woodenKettle);
+							break; 
+						case "woodenMashTun":
+							let woodenMashTun= new WoodenMashTun(entityX, entityY, world, chunkId, overlay, entityObject);
+							this.addChild(woodenMashTun);
+							break;               
 					}
 				}      	      	      	      
       }    

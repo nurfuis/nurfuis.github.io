@@ -65,67 +65,103 @@
                  "height":96,
                  "id":1,
                  "name":"woodFermenter",
+                 "properties":[
+                        {
+                         "name":"facingDirection",
+                         "type":"string",
+                         "value":"DOWN"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":64,
-                 "x":416,
-                 "y":98
+                 "x":415.272727272727,
+                 "y":99.0909090909091
                 }, 
                 {
                  "height":96,
                  "id":2,
                  "name":"woodFermenter",
+                 "properties":[
+                        {
+                         "name":"facingDirection",
+                         "type":"string",
+                         "value":"DOWN"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":64,
-                 "x":352,
-                 "y":98
+                 "x":347.090909090909,
+                 "y":99.6363636363636
                 }, 
                 {
                  "height":96,
                  "id":3,
                  "name":"woodFermenter",
+                 "properties":[
+                        {
+                         "name":"facingDirection",
+                         "type":"string",
+                         "value":"DOWN"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":64,
-                 "x":288,
-                 "y":98
+                 "x":275.636363636364,
+                 "y":96.3636363636363
                 }, 
                 {
                  "height":96,
                  "id":4,
                  "name":"woodFermenter",
+                 "properties":[
+                        {
+                         "name":"facingDirection",
+                         "type":"string",
+                         "value":"UP"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":64,
-                 "x":286,
-                 "y":234
+                 "x":269.818181818182,
+                 "y":200.909090909091
                 }, 
                 {
                  "height":96,
                  "id":5,
                  "name":"woodFermenter",
+                 "properties":[
+                        {
+                         "name":"facingDirection",
+                         "type":"string",
+                         "value":"UP"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":64,
-                 "x":352,
-                 "y":234
+                 "x":343.090909090909,
+                 "y":212.181818181818
                 }, 
                 {
                  "height":96,
                  "id":6,
                  "name":"woodFermenter",
+                 "properties":[
+                        {
+                         "name":"facingDirection",
+                         "type":"string",
+                         "value":"UP"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":64,
-                 "x":416,
-                 "y":234
+                 "x":413.636363636364,
+                 "y":202.727272727273
                 }],
          "opacity":1,
          "type":"objectgroup",

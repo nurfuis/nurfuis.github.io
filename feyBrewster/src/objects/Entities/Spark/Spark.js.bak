@@ -44,15 +44,19 @@ export class Spark extends GameObject {
    
     this.facingDirection = IDLE;
     
-    this.currentWorld = 'world';
+    this.currentWorld = world;
     this.destinationPosition = this.position.duplicate();
 
      // Collision tile
     this.entityId = null;
-    this.colliderPosition = null;
-    this.colliderPositionLast = null;
-    this.isAlive = true;   
-    this.isMoving = true;
+    
+    this.hasCollision = true;
+    this.width = 32;
+    this.height = 32;   
+
+
+    this.isAlive = true; 
+    
     this.type = 'entity';
     this.chunkId = chunkId;
   }

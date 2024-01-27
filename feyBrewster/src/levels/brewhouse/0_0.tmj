@@ -60,7 +60,18 @@
          "draworder":"topdown",
          "id":3,
          "name":"entities",
-         "objects":[],
+         "objects":[
+                {
+                 "height":0,
+                 "id":2,
+                 "name":"slime",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":167,
+                 "y":327.5
+                }],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
@@ -161,7 +172,7 @@
          "y":0
         }],
  "nextlayerid":8,
- "nextobjectid":2,
+ "nextobjectid":7,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.10.2",

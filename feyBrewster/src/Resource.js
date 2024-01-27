@@ -23,6 +23,9 @@ class Resources {
       woodFermenter: "./public/sprites/wood-fermenter.png",
       FeyBrewsterTileSet: "./public/sprites/FeyBrewsterTileSet.png",
       woodenfvTileset: "./public/sprites/woodenfvTileset.png",
+      woodenkettleTileset: "./public/sprites/woodenkettleTileset.png",
+      woodenmashtunTileset: "./public/sprites/woodenmashtunTileset.png",
+      
     };
 
     this.images = {};

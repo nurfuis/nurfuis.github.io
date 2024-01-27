@@ -10,6 +10,8 @@ import { SceneManager } from "./src/SceneManager.js"; // stage manager
 import { GameInterface } from "./src/GameInterface.js"; 
 import { Inventory } from "./src/objects/Inventory/Inventory.js"; // 
 import { Player } from "./src/objects/Player/Player.js"; 
+import { Entities } from "./src/objects/Entities/Entities.js"; 
+import { Foreground } from "./src/objects/Foreground.js"; 
 
 const playerOne = new Player();
 const playerList = [playerOne];
@@ -39,7 +41,40 @@ const inventory = new Inventory();
 const gameInterface = new GameInterface();
 
 const update = (delta) => {
-  mainScene.stepEntry(delta, mainScene); 
+  mainScene.stepEntry(delta, mainScene);
+  let sceneTree = mainScene.children;
+  let entities = sceneTree.filter(instance => instance instanceof Entities);
+  let foreground = sceneTree.filter(instance => instance instanceof Foreground);
+  let player = foreground[0].children[0]
+  for (let i = 0; i < entities[0].children.length; i++) {
+    
+    if (entities[0].children[i].type === 'entity') {
+      
+      const entity = entities[0].children[i]
+      
+      const dx = entity.center.x.toFixed(2) - player.center.x.toFixed(2);
+      const dy = entity.center.y.toFixed(2) - player.center.y.toFixed(2);
+    
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      const collisionVectorNormalized = {
+        x: dx / distance,
+        y: dy / distance
+      }
+      
+      const repulsionForce = {
+        x: collisionVectorNormalized.x * 3,
+        y: collisionVectorNormalized.y * 3
+      }
+      
+      if (distance <= entity.radius + player.radius) {
+        console.log(repulsionForce)
+        // player.onCollision(repulsionForce);
+        // entity.onCollision(repulsionForce);       
+      }
+
+    }
+  } 
 };
 
 const draw = () => {

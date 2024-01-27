@@ -49,58 +49,54 @@ export class Spark extends GameObject {
 
      // Collision tile
     this.entityId = null;
-    this.colliderPosition = null;
-    this.colliderPositionLast = null;
-    this.isAlive = true;   
-    this.isMoving = true;
+    
+    this.hasCollision = true;
+    this.width = 32;
+    this.height = 32;   
+
+
+    this.isAlive = true; 
+    
     this.type = 'entity';
     this.chunkId = chunkId;
   }
   ready() {
     this.entityId = `spark-${generateUniqueId()}`;
-    // console.log(this.entityId, 'spawned at', this.position.x, this.position.y, this.currentWorld);
-  }
+    if (this.hasCollision) {
+            obstacles.push(this);        
+          }    
+      }
   despawn() {
-    // console.log(this.entityId);
     for (let i = obstacles.length - 1; i >= 0; i--) { // Iterate backwards to avoid index issues
       if (obstacles[i].owner === this) {
         obstacles.splice(i, 1); 
       }
     }
-    this.destroy();
-  }      
+  }     
   step(delta, root) { 
     if (this.isAlive === false) {
       this.deSpawn();
       return;
     };
+    
     if (this.shieldTime > 0) {
       this.workOnEnergyShield(delta);
       return;
     }
+    
     if (!this.parent) {
       console.log(this.parent);
     }
+    
     const distance = moveTowards(this, this.destinationPosition, .9);
-    // const removeCollider = distance < 16;
     const hasArrived = distance < 1;
-    
-    
-    // if (removeCollider){
-      // this.removeOldCollider();      
-    // }
 
     if (hasArrived) {
-      // Collision tile
-      // if (this.isMoving) {
-        // this.isMoving = false;
-       
-      // }      
+ 
       this.tryMove(delta)
     }    
   } 
   tryMove(delta) { 
-    // Create a movement sequence array
     const sequence = [
       { direction: LEFT, steps: 2 },
       { direction: LEFT, steps: 2 },      
@@ -151,17 +147,9 @@ export class Spark extends GameObject {
       
       this.currentStep++;     
       
-      if (isSpaceFree(nextX, nextY, this.currentWorld, this).collisionDetected === false) {
+      if (isSpaceFree(nextX, nextY, this).collisionDetected === false) {
         this.destinationPosition.x = nextX;
-        this.destinationPosition.y = nextY;
-        
-        // Collision tile
-        this.isMoving = true;
-        this.colliderPositionLast = this.colliderPosition;
-        
-        this.colliderPosition = new Vector2(nextX, nextY); ; 
-        this.place();
-        this.removeOldCollider();        
+        this.destinationPosition.y = nextY;       
       }
     }
     // Update facing direction   
@@ -193,16 +181,4 @@ export class Spark extends GameObject {
 
     }
   }
-  place() {
-    obstacles.push({ id: `${this.colliderPosition.x},${this.colliderPosition.y},${this.currentWorld}`, owner: this });    
-  }
-  removeOldCollider() {
-    if (this.colliderPositionLast) {
-      for (let i = obstacles.length - 1; i >= 0; i--) { // Iterate backwards to avoid index issues
-        if (obstacles[i].id === `${this.colliderPositionLast.x},${this.colliderPositionLast.y},${this.currentWorld}` && obstacles[i].owner === this) {
-          obstacles.splice(i, 1); // Remove only the matched element
-        }
-      }            
-    }      
-  }  
 }

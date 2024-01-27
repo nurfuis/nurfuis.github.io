@@ -13,6 +13,8 @@ import { moveTowards } from "../../../helpers/moveTowards.js";
 import { events } from "../../../Events.js";
 import { isSpaceFree } from "../../../helpers/grid.js";
 import { obstacles } from "../../../helpers/grid.js";
+import { movingObjects } from "../../../helpers/collisionDetection.js";
+import { checkCollisions } from "../../../helpers/collisionDetection.js";
 
 import {
   IDLE,
@@ -26,8 +28,9 @@ export class Slime extends GameObject {
     });
     this.shieldImage = null;
     this.shieldTime = 0;
+    
     this.body = new Sprite({
-      position: new Vector2(0, -8), // offset x, y
+      position: new Vector2(8, 8), // offset x, y
       
       resource: resources.images.slime,
       frameSize: new Vector2(16, 16),
@@ -41,34 +44,85 @@ export class Slime extends GameObject {
       }),      
     })
     this.body.animations.play('idle');
+    
     this.addChild(this.body);
-   
+    
+    this.hitBox = new Sprite({
+      resource: resources.images.FeyBrewsterTileSet,
+      frameSize: new Vector2(32,32),
+      position: new Vector2(0, 0),
+      frameSize: new Vector2(gridSize,gridSize),
+      hFrames: 16,
+      vFrames: 16,
+      frame: 47,
+      
+    })
+    this.addChild(this.hitBox);  
+    
     this.facingDirection = IDLE;
     
-    this.currentWorld = 'world';
+    this.currentWorld = world;
     this.destinationPosition = this.position.duplicate();
 
-     // Collision tile
     this.entityId = null;
-    this.colliderPosition = null;
-    this.colliderPositionLast = null;
+
+    this.hasCollision = true;
+    this.width = 32;
+    this.height = 32;
+    
+    this.radius = 16;
+    this.center = new Vector2(this.position.x + gridSize / 2, this.position.y + gridSize / 2);
+    
     this.isAlive = true;   
-    this.isMoving = true;
+
     this.type = 'entity';
     this.chunkId = chunkId;
   }
+  onCollision(repulsionForce) {
+    this.position = new Vector2(
+      this.position.x + repulsionForce.x, 
+      this.position.y + repulsionForce.y
+      );
+
+    this.destinationPosition = this.position.duplicate();
+  }  
+  overlaps(other) {
+    const dx = this.center.x - other.center.x;
+    const dy = this.center.y - other.center.y;
+    return Math.sqrt(dx * dx + dy * dy) <= this.radius + other.radius;
+  }
+  
+  distanceTo(other) {
+    const dx = this.center.x - other.center.x;
+    const dy = this.center.y - other.center.y;
+    
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    return distance;
+  }
+  
   ready() {
     this.entityId = `slime-${generateUniqueId()}`;
-    // console.log(this.entityId, 'spawned at', this.position.x, this.position.y, this.currentWorld);
-  }
+    
+    // events.on("PLAYER_POSITION", this, pos => {
+      // const playerCenter = pos.center
+      // const playerRadius = pos.radius
+      
+      // const dx = this.center.x.toFixed(2) - playerCenter.x.toFixed(2);
+      // const dy = this.center.y.toFixed(2) - playerCenter.y.toFixed(2);
+    
+      // const distance = Math.sqrt(dx * dx + dy * dy);
+      // console.log(distance.toFixed(2));
+      
+    // })
+    
+  }    
+           
   despawn() {
-    // console.log(this.entityId);
     for (let i = obstacles.length - 1; i >= 0; i--) { // Iterate backwards to avoid index issues
       if (obstacles[i].owner === this) {
         obstacles.splice(i, 1); 
       }
     }
-    this.destroy();
   }      
   step(delta, root) { 
     if (this.isAlive === false) {
@@ -79,29 +133,18 @@ export class Slime extends GameObject {
       this.workOnEnergyShield(delta);
       return;
     }
-    if (!this.parent) {
-      console.log(this.parent);
-    }
+
     const distance = moveTowards(this, this.destinationPosition, .5);
-    // const removeCollider = distance < 16;
+    this.center = new Vector2(this.position.x + gridSize / 2, this.position.y + gridSize / 2);    
+    
     const hasArrived = distance < 1;
     
-    
-    // if (removeCollider){
-      // this.removeOldCollider();      
-    // }
-
-    if (hasArrived) {
-      // Collision tile
-      // if (this.isMoving) {
-        // this.isMoving = false;
-       
-      // }      
+    if (hasArrived) {      
       this.tryMove(delta)
     }    
   } 
+  
   tryMove(delta) { 
-    // Create a movement sequence array
     const sequence = [
       { direction: LEFT, steps: 2 },
       { direction: LEFT, steps: 2 },      
@@ -152,22 +195,15 @@ export class Slime extends GameObject {
       
       this.currentStep++;     
       
-      if (isSpaceFree(nextX, nextY, this.currentWorld, this).collisionDetected === false) {
+      if (isSpaceFree(nextX, nextY, this).collisionDetected === false) {
         this.destinationPosition.x = nextX;
-        this.destinationPosition.y = nextY;
-        
-        // Collision tile
-        this.isMoving = true;
-        this.colliderPositionLast = this.colliderPosition;
-        
-        this.colliderPosition = new Vector2(nextX, nextY); ; 
-        this.place();
-        this.removeOldCollider();        
+        this.destinationPosition.y = nextY;    
       }
     }
     // Update facing direction   
     this.facingDirection = currentStepData.direction ?? this.facingDirection; 
   }   
+  
   onEnergyShield() {
     // start animation 
     if (this.shieldTime > 0) {
@@ -178,12 +214,13 @@ export class Slime extends GameObject {
     this.shieldImage = new GameObject({});
     this.shieldImage.addChild(new Sprite({
       frameSize: new Vector2(32, 32),
-      scale: 1.1,
+      scale: 1,
       resource: resources.images.energyShield,
-      position: new Vector2(-10, -18)
+      position: new Vector2(8, 8)
     }))
     this.addChild(this.shieldImage) 
   }
+  
   workOnEnergyShield(delta) {
     this.shieldTime -= delta;
     this.body.animations.play("shield");
@@ -193,17 +230,5 @@ export class Slime extends GameObject {
       this.body.animations.play('idle');
 
     }
-  }
-  place() {
-    obstacles.push({ id: `${this.colliderPosition.x},${this.colliderPosition.y},${this.currentWorld}`, owner: this });    
-  }
-  removeOldCollider() {
-    if (this.colliderPositionLast) {
-      for (let i = obstacles.length - 1; i >= 0; i--) { // Iterate backwards to avoid index issues
-        if (obstacles[i].id === `${this.colliderPositionLast.x},${this.colliderPositionLast.y},${this.currentWorld}` && obstacles[i].owner === this) {
-          obstacles.splice(i, 1); // Remove only the matched element
-        }
-      }            
-    }      
   }  
 }
