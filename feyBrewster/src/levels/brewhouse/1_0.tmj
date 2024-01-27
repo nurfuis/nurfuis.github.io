@@ -62,7 +62,7 @@
          "name":"entities",
          "objects":[
                 {
-                 "height":96,
+                 "height":32,
                  "id":1,
                  "name":"woodFermenter",
                  "properties":[
@@ -74,12 +74,12 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":64,
-                 "x":416,
-                 "y":98
+                 "width":63,
+                 "x":415,
+                 "y":127.5
                 }, 
                 {
-                 "height":96,
+                 "height":32,
                  "id":2,
                  "name":"woodFermenter",
                  "properties":[
@@ -92,11 +92,11 @@
                  "type":"",
                  "visible":true,
                  "width":64,
-                 "x":352,
-                 "y":98
+                 "x":349.5,
+                 "y":127
                 }, 
                 {
-                 "height":96,
+                 "height":32,
                  "id":3,
                  "name":"woodFermenter",
                  "properties":[
@@ -109,11 +109,11 @@
                  "type":"",
                  "visible":true,
                  "width":64,
-                 "x":288,
-                 "y":98
+                 "x":284,
+                 "y":127.5
                 }, 
                 {
-                 "height":96,
+                 "height":32,
                  "id":4,
                  "name":"woodFermenter",
                  "properties":[
@@ -127,10 +127,10 @@
                  "visible":true,
                  "width":64,
                  "x":286,
-                 "y":202
+                 "y":223.5
                 }, 
                 {
-                 "height":96,
+                 "height":32,
                  "id":5,
                  "name":"woodFermenter",
                  "properties":[
@@ -143,11 +143,11 @@
                  "type":"",
                  "visible":true,
                  "width":64,
-                 "x":352,
-                 "y":202
+                 "x":351,
+                 "y":223.5
                 }, 
                 {
-                 "height":96,
+                 "height":32,
                  "id":6,
                  "name":"woodFermenter",
                  "properties":[
@@ -160,8 +160,8 @@
                  "type":"",
                  "visible":true,
                  "width":64,
-                 "x":416,
-                 "y":202
+                 "x":414.5,
+                 "y":223
                 }],
          "opacity":1,
          "type":"objectgroup",
