@@ -5,7 +5,10 @@ import { Sprite } from "../../../Sprite.js";
 import { gridSize } from "../../../helpers/grid.js";
 import { Animations } from "../../../Animations.js";
 import { FrameIndexPattern } from "../../../FrameIndexPattern.js";
-
+import {
+  WOODEN_MASH_TUN_EMPTY,  
+  WOODEN_MASH_TUN_MASHING,
+} from "./woodenAnimations.js";
 import { generateUniqueId } from "../../../helpers/nextId.js";
 import { events } from "../../../Events.js";
 import { obstacles } from "../../../helpers/grid.js";
@@ -69,6 +72,10 @@ export class WoodenMashTun extends GameObject {
         vFrames: 2,
         spacing: 0,
         frame: this.overlaySpriteFrame,
+        animations: new Animations({
+          mashTunMashing: new FrameIndexPattern(WOODEN_MASH_TUN_MASHING),
+          mashTunEmpty: new FrameIndexPattern(WOODEN_MASH_TUN_EMPTY),
+        })         
       }))
       this.overlayPlane.addChild(this.overlayObject)
     } 

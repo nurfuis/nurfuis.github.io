@@ -5,7 +5,10 @@ import { Sprite } from "../../../Sprite.js";
 import { gridSize } from "../../../helpers/grid.js";
 import { Animations } from "../../../Animations.js";
 import { FrameIndexPattern } from "../../../FrameIndexPattern.js";
-
+import {
+  WOODEN_KETTLE_EMPTY,  
+  WOODEN_KETTLE_BOILING,
+} from "./woodenAnimations.js";
 import { generateUniqueId } from "../../../helpers/nextId.js";
 import { events } from "../../../Events.js";
 import { obstacles } from "../../../helpers/grid.js";
@@ -69,6 +72,10 @@ export class WoodenKettle extends GameObject {
         vFrames: 2,
         spacing: 0,
         frame: this.overlaySpriteFrame,
+        animations: new Animations({
+          kettleBoil: new FrameIndexPattern(WOODEN_KETTLE_BOILING),
+          kettleEmpty: new FrameIndexPattern(WOODEN_KETTLE_EMPTY),
+        })          
       }))
       this.overlayPlane.addChild(this.overlayObject)
     } 
