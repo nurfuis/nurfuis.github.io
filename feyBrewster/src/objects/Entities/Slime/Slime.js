@@ -92,7 +92,8 @@ export class Slime extends GameObject {
     
     if (isSpaceFree(pushedX, pushedY, this).collisionDetected === false) {
       this.position.x = pushedX;
-      this.position.y = pushedY;    
+      this.position.y = pushedY; 
+      this.destinationPosition = this.position.duplicate();      
     }
   }
   
