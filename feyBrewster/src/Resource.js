@@ -13,18 +13,13 @@ class Resources {
       granny: "./public/sprites/granny-sheet.png",
       slime: "./public/sprites/slime-sheet.png",
       energyShield: "./public/sprites/energy-shield.png",
-      brewhouseBackground1: "./public/sprites/brewhouse-background1.png",
-      brewhouseBackground2: "./public/sprites/brewhouse-background2.png",
       katana: "./public/sprites/katana.png",
       shroud: "./public/sprites/shroud.png",
       spark: "./public/sprites/spark-sheet.png",
-      FullTileSet1: "./public/sprites/FullTileSet1.png",
-      snowTileset: "./public/sprites/snow.png",
-      woodFermenter: "./public/sprites/wood-fermenter.png",
-      FeyBrewsterTileSet: "./public/sprites/FeyBrewsterTileSet.png",
-      woodenfvTileset: "./public/sprites/woodenfvTileset.png",
-      woodenkettleTileset: "./public/sprites/woodenkettleTileset.png",
-      woodenmashtunTileset: "./public/sprites/woodenmashtunTileset.png",
+      feyBrewsterTileSet: "./public/sprites/FeyBrewsterTileSet.png",
+      woodenFermentationVesselTileset: "./public/sprites/woodenfvTileset.png",
+      woodenKettleTileset: "./public/sprites/woodenkettleTileset.png",
+      woodenMashTunTileset: "./public/sprites/woodenmashtunTileset.png",
       
     };
 
