@@ -63,13 +63,27 @@ const update = (delta) => {
       }
       
       const repulsionForce = {
-        x: collisionVectorNormalized.x * 300,
-        y: collisionVectorNormalized.y * 300
+        x: Math.round(collisionVectorNormalized.x * player.mass),
+        y: Math.round(collisionVectorNormalized.y * player.mass)
+      }
+      
+      const dx2 = player.center.x.toFixed(2) - entity.center.x.toFixed(2);
+      const dy2 = player.center.y.toFixed(2) - entity.center.y.toFixed(2);
+
+      const distance2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+      
+       const collisionVectorNormalized2 = {
+        x: dx2 / distance2,
+        y: dy2 / distance2
+      }     
+      const repulsionForce2 = {
+        x: Math.round(collisionVectorNormalized2.x * entity.mass),
+        y: Math.round(collisionVectorNormalized2.y * entity.mass)
       }
       
       if (distance <= entity.radius + player.radius) {
         // console.log(repulsionForce)
-        player.onCollision(repulsionForce);
+        player.onCollision(repulsionForce2);
         entity.onCollision(repulsionForce);       
       }
 
