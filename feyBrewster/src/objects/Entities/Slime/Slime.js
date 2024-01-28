@@ -192,8 +192,13 @@ export class Slime extends GameObject {
       const input = currentStepData;      
       
       // grid snapping
-      let multiplierX = Math.floor(this.destinationPosition.x / gridSize); 
-      let multiplierY = Math.floor(this.destinationPosition.y / gridSize);
+      let multiplierX = this.destinationPosition.x % gridSize < gridSize / 2
+        ? Math.floor(this.destinationPosition.x / gridSize)
+        : Math.ceil(this.destinationPosition.x / gridSize);
+
+      let multiplierY = this.destinationPosition.y % gridSize < gridSize / 2
+        ? Math.floor(this.destinationPosition.y / gridSize)
+        : Math.ceil(this.destinationPosition.y / gridSize);
       
       let nextX = multiplierX * gridSize;
       let nextY = multiplierY * gridSize;    
