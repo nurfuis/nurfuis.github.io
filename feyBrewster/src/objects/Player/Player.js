@@ -45,7 +45,7 @@ export class Player extends GameObject {
     this.width = 32;
     this.height = 32;
     this.type = 'player';
-    this.mass = 220;
+    this.mass = 200;
     
     this.radius = 16;
     this.center = new Vector2(this.position.x + gridSize / 2, this.position.y + gridSize / 2);
@@ -63,7 +63,7 @@ export class Player extends GameObject {
     this.attackImage = null;
     
     this.idleTime = 0;
-    this.idleAction = 10000;
+    this.idleAction = 200;
   
     const shadow = new Sprite({
       resource: resources.images.shadow,
@@ -118,13 +118,15 @@ export class Player extends GameObject {
     })
   }
   onCollision(repulsionForce) {
-    this.position = new Vector2(
-      this.position.x + repulsionForce.x / this.mass, 
-      this.position.y + repulsionForce.y / this.mass
-      );
-
-    // this.destinationPosition = this.position.duplicate();
-  } 
+    const pushedX = this.position.x + repulsionForce.x / this.mass;
+    const pushedY = this.position.y + repulsionForce.y / this.mass;
+    
+    if (isSpaceFree(pushedX, pushedY, this).collisionDetected === false) {
+      this.position.x = pushedX;
+      this.position.y = pushedY;
+      this.destinationPosition = this.position.duplicate();
+    }
+  }
   overlaps(other) {
     const dx = this.center.x - other.center.x;
     const dy = this.center.y - other.center.y;
@@ -229,8 +231,15 @@ export class Player extends GameObject {
       return;
     }
      
-    let nextX = this.destinationPosition.x;
-    let nextY = this.destinationPosition.y;
+    // let nextX = this.destinationPosition.x;
+    // let nextY = this.destinationPosition.y;
+    
+    // grid snapping
+    let multiplierX = Math.floor(this.destinationPosition.x / gridSize); 
+    let multiplierY = Math.floor(this.destinationPosition.y / gridSize);
+    
+    let nextX = multiplierX * gridSize;
+    let nextY = multiplierY * gridSize;
     
     if (input.direction == DOWN) {
       nextY += gridSize;
