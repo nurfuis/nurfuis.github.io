@@ -45,7 +45,7 @@ export class Player extends GameObject {
     this.width = 32;
     this.height = 32;
     this.type = 'player';
-    this.mass = 300;
+    this.mass = 220;
     
     this.radius = 16;
     this.center = new Vector2(this.position.x + gridSize / 2, this.position.y + gridSize / 2);
@@ -119,8 +119,8 @@ export class Player extends GameObject {
   }
   onCollision(repulsionForce) {
     this.position = new Vector2(
-      this.position.x - repulsionForce.x / this.mass, 
-      this.position.y - repulsionForce.y / this.mass
+      this.position.x + repulsionForce.x / this.mass, 
+      this.position.y + repulsionForce.y / this.mass
       );
 
     // this.destinationPosition = this.position.duplicate();

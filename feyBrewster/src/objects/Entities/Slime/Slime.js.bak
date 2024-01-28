@@ -70,8 +70,8 @@ export class Slime extends GameObject {
     this.hasCollision = true;
     this.width = 32;
     this.height = 32;
-    this.mass = 100;
-    
+    this.mass = 440;
+    this.speed = 1;
     this.radius = 16;
     this.center = new Vector2(this.position.x + gridSize / 2, this.position.y + gridSize / 2);
     
@@ -80,13 +80,16 @@ export class Slime extends GameObject {
     this.type = 'entity';
     this.chunkId = chunkId;
   }
+  
   onCollision(repulsionForce) {
-    this.position = new Vector2(
-      Math.round(this.position.x + repulsionForce.x / this.mass), 
-      Math.round(this.position.y + repulsionForce.y / this.mass)
-      );
+    const pushedX = this.position.x + repulsionForce.x / this.mass;
+    const pushedY = this.position.y + repulsionForce.y / this.mass;
+    
+    if (isSpaceFree(pushedX, pushedY, this).collisionDetected === false) {
+      this.position.x = pushedX;
+      this.position.y = pushedY;    
+    }
 
-    // this.destinationPosition = this.position.duplicate();
   }  
   overlaps(other) {
     const dx = this.center.x - other.center.x;
@@ -136,7 +139,7 @@ export class Slime extends GameObject {
       return;
     }
 
-    const distance = moveTowards(this, this.destinationPosition, .5);
+    const distance = moveTowards(this, this.destinationPosition, this.speed);
     this.center = new Vector2(this.position.x + gridSize / 2, this.position.y + gridSize / 2);    
     
     const hasArrived = distance < 1;
