@@ -45,7 +45,7 @@ export class WoodenMashTun extends GameObject {
     
     this.body = new Sprite({
       position: new Vector2(0, -64), // offset x, y    
-      resource: resources.images.woodenmashtunTileset,
+      resource: resources.images.woodenMashTunTileset,
       frameSize: new Vector2(96, 96),
       hFrames: 4,
       vFrames: 2,
@@ -59,7 +59,7 @@ export class WoodenMashTun extends GameObject {
       this.overlayObject.position = this.position.duplicate();
       this.overlayObject.addChild(new Sprite({
         position: new Vector2(0, -64), // offset x, y    
-        resource: resources.images.woodenmashtunTileset,
+        resource: resources.images.woodenMashTunTileset,
         frameSize: new Vector2(96, 96),
         hFrames: 4,
         vFrames: 2,
