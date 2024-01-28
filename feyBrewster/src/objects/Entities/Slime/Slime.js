@@ -22,15 +22,17 @@ import {
 } from "./slimeAnimations.js";
 
 export class Slime extends GameObject {
-  constructor(x, y, world, chunkId) {
+  constructor(x, y, world, chunkId, objectData) {
     super({
       position: new Vector2(x, y),
     });
+    this.objectData = objectData;
+    
     this.shieldImage = null;
     this.shieldTime = 0;
     
     this.body = new Sprite({
-      position: new Vector2(-4, -4), // offset x, y
+      position: new Vector2(0, -4), // offset x, y
       
       resource: resources.images.slime,
       frameSize: new Vector2(16, 16),
@@ -70,10 +72,13 @@ export class Slime extends GameObject {
     this.hasCollision = true;
     this.width = 32;
     this.height = 32;
-    this.mass = 140;
     this.speed = 1;
     this.radius = 16;
     this.center = new Vector2(this.position.x + gridSize / 2, this.position.y + gridSize / 2);
+    this.mass = 500;
+    
+    this.maxHealth = null;
+    this.attackPower = null;
     
     this.isAlive = true;   
 
@@ -89,8 +94,8 @@ export class Slime extends GameObject {
       this.position.x = pushedX;
       this.position.y = pushedY;    
     }
-
-  }  
+  }
+  
   overlaps(other) {
     const dx = this.center.x - other.center.x;
     const dy = this.center.y - other.center.y;
@@ -105,20 +110,31 @@ export class Slime extends GameObject {
     return distance;
   }
   
+  setProperties(){
+    for (let i = 0; i < this.objectData.properties.length; i++) {
+      const property = this.objectData.properties[i];
+      switch(property.name){
+        case "mass":
+          this.mass = property.value;
+          break;
+        
+        case "maxHealth":
+          this.maxHealth = property.value;
+          break;
+        
+        case "attackPower":
+          this.attackPower = property.value;
+          break; 
+      }       
+    }
+  }
+  
   ready() {
     this.entityId = `slime-${generateUniqueId()}`;
-    
-    // events.on("PLAYER_POSITION", this, pos => {
-      // const playerCenter = pos.center
-      // const playerRadius = pos.radius
+    if (this.objectData.properties) {
+      this.setProperties();
       
-      // const dx = this.center.x.toFixed(2) - playerCenter.x.toFixed(2);
-      // const dy = this.center.y.toFixed(2) - playerCenter.y.toFixed(2);
-    
-      // const distance = Math.sqrt(dx * dx + dy * dy);
-      // console.log(distance.toFixed(2));
-      
-    // })
+    }
     
   }    
            
