@@ -40,55 +40,55 @@ const inventory = new Inventory();
 
 const gameInterface = new GameInterface();
 
+const rays = [];
+const playerColor = '#ffffff';
+const entityColor = '#007bff'; 
+const collisionColor = '#ffc107';
+ 
+export function visualizeRaycast(startX, startY, endX, endY, collision, object) {
+  const ray = {
+    startTime: Date.now(), // Store starting time
+    startX,
+    startY,
+    endX,
+    endY,
+    collision,
+    type: object.type // Store object type for color selection
+  };
+  rays.push(ray);
+}
+
+function updateRays() {
+  for (let i = rays.length - 1; i >= 0; i--) {
+    const ray = rays[i];
+    const elapsedTime = Date.now() - ray.startTime;
+    const alpha = Math.max(0, 1 - elapsedTime / 2000); // Fade out over 2 seconds
+
+    ctx.beginPath();
+    ctx.moveTo(ray.startX, ray.startY);
+    ctx.lineTo(ray.endX, ray.endY);
+    ctx.lineWidth = 2;
+
+    // Set color based on object type
+    ctx.strokeStyle = ray.type === 'player' ? playerColor : entityColor;
+    ctx.strokeStyle = `rgba(${ctx.strokeStyle.replace('#', '')}, ${alpha})`; // Apply fading alpha
+
+    ctx.stroke();
+
+    if (ray.collision) {
+      ctx.fillStyle = `rgba(${collisionColor.replace('#', '')}, ${alpha})`; // Green with fading alpha
+      ctx.beginPath();
+      ctx.arc(ray.collision.x, ray.collision.y, 5, 0, Math.PI * 2, true);
+      ctx.fill();
+    }
+
+    if (alpha === 0) {
+      rays.splice(i, 1); // Remove fully faded rays
+    }
+  }
+}
 const update = (delta) => {
   mainScene.stepEntry(delta, mainScene);
-  let sceneTree = mainScene.children;
-  let entities = sceneTree.filter(instance => instance instanceof Entities);
-  let foreground = sceneTree.filter(instance => instance instanceof Foreground);
-  let player = foreground[0].children[0]
-  for (let i = 0; i < entities[0].children.length; i++) {
-    
-    if (entities[0].children[i].type === 'entity') {
-      
-      const entity = entities[0].children[i]
-      
-      const dx = entity.center.x.toFixed(2) - player.center.x.toFixed(2);
-      const dy = entity.center.y.toFixed(2) - player.center.y.toFixed(2);
-    
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      
-      const collisionVectorNormalized = {
-        x: dx / distance,
-        y: dy / distance
-      }
-      
-      const repulsionForce = {
-        x: Math.round(collisionVectorNormalized.x * player.mass),
-        y: Math.round(collisionVectorNormalized.y * player.mass)
-      }
-      
-      const dx2 = player.center.x.toFixed(2) - entity.center.x.toFixed(2);
-      const dy2 = player.center.y.toFixed(2) - entity.center.y.toFixed(2);
-
-      const distance2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
-      
-       const collisionVectorNormalized2 = {
-        x: dx2 / distance2,
-        y: dy2 / distance2
-      }     
-      const repulsionForce2 = {
-        x: Math.round(collisionVectorNormalized2.x * entity.mass),
-        y: Math.round(collisionVectorNormalized2.y * entity.mass)
-      }
-      
-      if (distance <= entity.radius + player.radius) {
-        // console.log(repulsionForce)
-        player.onCollision(repulsionForce2);
-        entity.onCollision(repulsionForce);       
-      }
-
-    }
-  } 
 };
 
 const draw = () => {
@@ -100,6 +100,7 @@ const draw = () => {
   ctx.translate(camera.position.x, camera.position.y);
 
   mainScene.draw(ctx, 0, 0);
+  updateRays();
 
   ctx.restore();
    
