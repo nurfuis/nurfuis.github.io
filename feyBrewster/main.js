@@ -76,7 +76,7 @@ function updateRays() {
     ctx.stroke();
 
     if (ray.collision) {
-      ctx.fillStyle = 'red'; // Green with fading alpha
+      ctx.fillStyle = ray.type === 'player' ? 'red' : 'yellow';
       ctx.beginPath();
       ctx.arc(ray.collision.x, ray.collision.y, 5, 0, Math.PI * 2, true);
       ctx.fill();
@@ -100,7 +100,8 @@ const draw = () => {
   ctx.translate(camera.position.x, camera.position.y);
 
   mainScene.draw(ctx, 0, 0);
-  updateRays();
+
+  if (gameInterface.debugDisplay) {updateRays()};
 
   ctx.restore();
    
@@ -116,6 +117,8 @@ const draw = () => {
     const formattedTime = now.toLocaleTimeString("en-US", {
       hour12: true, // Use 24-hour format
     });
+    
+    
     const fps = gameLoop.fps;  
     ctx.font = "12px handjet";
     
