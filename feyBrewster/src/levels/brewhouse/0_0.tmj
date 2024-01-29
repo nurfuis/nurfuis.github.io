@@ -108,7 +108,7 @@
                         {
                          "name":"mass",
                          "type":"string",
-                         "value":"225"
+                         "value":"250"
                         }, 
                         {
                          "name":"maxHealth",
@@ -126,6 +126,12 @@
                  "height":0,
                  "id":11,
                  "name":"slime",
+                 "properties":[
+                        {
+                         "name":"mass",
+                         "type":"string",
+                         "value":"1000"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
