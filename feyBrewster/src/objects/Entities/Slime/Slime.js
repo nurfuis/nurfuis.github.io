@@ -1,4 +1,3 @@
-// Slime.js
 import { resources } from "../../../Resource.js";
 import { GameObject } from "../../../GameObject.js";
 import { Vector2 } from "../../../Vector2.js";
@@ -14,6 +13,7 @@ import { events } from "../../../Events.js";
 import { isSpaceFree } from "../../../helpers/grid.js";
 import { obstacles } from "../../../helpers/grid.js";
 import { movingObjects } from "../../../helpers/collisionDetection.js";
+import { visualizeRaycast } from "../../../../main.js";
 
 import {
   IDLE,
@@ -72,9 +72,12 @@ export class Slime extends GameObject {
     this.width = 32;
     this.height = 32;
     this.speed = 1;
+    this.friction = .1;    
+    
+    
     this.radius = 16;
     this.center = new Vector2(this.position.x + gridSize / 2, this.position.y + gridSize / 2);
-    this.mass = 500;
+    this.mass = 100;
     
     this.maxHealth = null;
     this.attackPower = null;
@@ -83,6 +86,68 @@ export class Slime extends GameObject {
 
     this.type = 'entity';
     this.chunkId = chunkId;
+  }
+  distanceSquared(x1, y1, x2, y2) {
+    return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+  }  
+  
+  lineSegmentIntersection(x1, y1, dx1, dy1, x2, y2, dx2, dy2) {
+    // console.log(dy2, dx1, dx2, dy1)
+    const denominator = (dy2 * dx1) - (dx2 * dy1);
+    // console.log(this.entityId,denominator)
+    if (denominator === 0) {
+      return null; // No intersection
+    }
+
+    const t = ((x2 - x1) * dy2 + (y1 - y2) * dx2) / denominator;
+    const u = ((x2 - x1) * dy1 + (y1 - y2) * dx1) / denominator;
+    // console.log(this.entityId, t.toFixed(2), u.toFixed(2))
+
+    if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
+      const intersectionX = Math.round(x1 + (t * dx1));
+      const intersectionY = Math.round(y1 + (t * dy1));
+      console.log(this.entityId, { x: intersectionX, y: intersectionY })
+      return { x: intersectionX, y: intersectionY };
+    } else {
+      return null; // No intersection within segments
+    }
+  }  
+
+  raycast(startX, startY, endX, endY) {
+    // console.log(this.entityId, startX, startY, endX, endY)
+    
+    let closestHit;   
+    
+    const dX = Math.round(endX - startX);
+    const dY = Math.round(endY - startY);
+    // console.log(this.entityId, dX, dY)
+
+    for (let i = obstacles.length - 1; i >= 0; i--) {
+      const obstacle = obstacles[i];
+      const obstacleX1 = obstacle.minX();
+      const obstacleY1 = obstacle.minY();
+      const obstacleX2 = obstacle.maxX();
+      const obstacleY2 = obstacle.maxY();
+      const intersection = this.lineSegmentIntersection(startX, startY, dX, dY, obstacleX1, obstacleY1, obstacleX2, obstacleY2);
+
+      if (intersection && (!closestHit || this.distanceSquared(startX, startY, intersection.x, intersection.y) < this.distanceSquared(startX, startY, closestHit.x, closestHit.y))) {
+        closestHit = intersection;
+      }
+    }
+    return closestHit;
+  } 
+  
+  minX() {
+    return this.position.x;
+  }
+  minY () {
+    return this.position.y;
+  }
+  maxX() {
+    return this.position.x + this.width;
+  }
+  maxY() {
+    return this.position.y + this.height;
   }
   
   distanceTo(other) {
@@ -97,27 +162,46 @@ export class Slime extends GameObject {
     const dy = this.center.y - other.center.y;
   
     const distance = Math.sqrt(dx * dx + dy * dy);
+    const penetrationDepth = this.radius + other.radius - distance;    
     
     const collisionVectorNormalized = {
       x: dx / distance,
       y: dy / distance
     }
     
+    const forceMultiplier = penetrationDepth * (this.speed + other.speed)    
+    
     return {
-      x: Math.round(collisionVectorNormalized.x * other.mass),
-      y: Math.round(collisionVectorNormalized.y * other.mass)
-    }       
+      x: collisionVectorNormalized.x * forceMultiplier * other.mass * (1 - this.friction),
+      y: collisionVectorNormalized.y * forceMultiplier * other.mass * (1 - this.friction)
+    }    
   }
   
   onCollision(repulsionForce) {
-    const pushedX = this.position.x + repulsionForce.x / this.mass;
-    const pushedY = this.position.y + repulsionForce.y / this.mass;
-    
-    if (isSpaceFree(pushedX, pushedY, this).collisionDetected === false) {
-      this.position.x = pushedX;
-      this.position.y = pushedY;
-      this.updateHitboxCenter();  
-      this.destinationPosition = this.position.duplicate();
+    const pushedX = Math.round(this.position.x + repulsionForce.x / this.mass);
+    const pushedY = Math.round(this.position.y + repulsionForce.y / this.mass);
+
+    // Raycast to check for collisions along the push path
+    const raycastHit = this.raycast(this.position.x, this.position.y, pushedX, pushedY);
+    visualizeRaycast(this.position.x, this.position.y, pushedX, pushedX, raycastHit, this);
+
+    if (raycastHit) {
+      // Collision detected, move to the collision point instead
+      // console.log(this.entityId, raycastHit.x, raycastHit.y)
+      // this.position.x = Math.round(raycastHit.x);
+      // this.position.y = Math.round(raycastHit.y);
+      this.destinationPosition = this.position.duplicate();   
+      // this.updateHitboxCenter();
+    } else {
+      // No collision, move to the pushed coordinates
+      if (isSpaceFree(pushedX, pushedY, this).collisionDetected === false) {
+        this.position.x = pushedX;
+        this.position.y = pushedY;
+        console.log(this.entityId,pushedX,pushedY)
+        this.destinationPosition = this.position.duplicate();
+        // console.log(this.entityId, this.destinationPosition)
+        this.updateHitboxCenter();
+      }
     }
   }
   
@@ -140,8 +224,8 @@ export class Slime extends GameObject {
   }
   
   updateHitboxCenter() {
-    this.center.x = this.position.x + gridSize / 2; 
-    this.center.y = this.position.y + gridSize / 2;       
+    this.center.x = Math.round(this.position.x + gridSize / 2); 
+    this.center.y = Math.round(this.position.y + gridSize / 2);       
   } 
   
   setPosition(x, y, world) {
