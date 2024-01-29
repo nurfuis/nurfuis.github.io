@@ -1,15 +1,3 @@
-// Player.js
-import {Animations} from "../../Animations.js";
-import {events} from "../../Events.js";
-import {FrameIndexPattern} from "../../FrameIndexPattern.js";
-import {GameObject} from "../../GameObject.js";
-import {DOWN, LEFT, RIGHT, UP} from "../../Input.js";
-import {resources} from "../../Resource.js";
-import {Sprite} from "../../Sprite.js";
-import {Vector2} from "../../Vector2.js";
-import {gridSize} from "../../helpers/grid.js";
-import {isSpaceFree} from "../../helpers/grid.js";
-import {moveTowards} from "../../helpers/moveTowards.js";
 import {
   PICK_UP_DOWN,
   STAND_DOWN,
@@ -25,12 +13,28 @@ import {
   ATTACK_RIGHT,
   ATTACK_DOWN,
 } from "./playerAnimations.js";
+import { Katana } from "../Items/Katana/Katana.js";
+
+import { GameObject } from "../../GameObject.js";
+import { Vector2 } from "../../Vector2.js";
+
+import { Sprite } from "../../Sprite.js";
+import { Animations } from "../../Animations.js";
+import { FrameIndexPattern } from "../../FrameIndexPattern.js";
+
+import { events } from "../../Events.js";
+import { resources } from "../../Resource.js";
+
+import { DOWN, LEFT, RIGHT, UP } from "../../Input.js";
+
+import { moveTowards } from "../../helpers/moveTowards.js";
+
+import { movingObjects } from "../../helpers/collisionDetection.js";
 
 import { obstacles } from "../../helpers/grid.js";
-// import { movingObjects } from "../../helpers/collisionDetection.js";
-// import { checkCollisions } from "../../helpers/collisionDetection.js";
+import { gridSize } from "../../helpers/grid.js";
+import { isSpaceFree } from "../../helpers/grid.js";
 
-import { Katana } from "../Items/Katana/Katana.js";
 
 export class Player extends GameObject {
   constructor() {
@@ -40,18 +44,21 @@ export class Player extends GameObject {
     this.isSpawned = false;
     this.canSpawn = true;
     this.currentWorld = null;
-        
+    
+    this.type = 'player';
+    
     this.hasCollision = true;
     this.width = 32;
     this.height = 32;
-    this.type = 'player';
+
     this.mass = 200;
+    this.speed = 2;
     
     this.radius = 16;
     this.center = new Vector2(this.position.x + gridSize / 2, this.position.y + gridSize / 2);
+    this.destinationPosition = this.position.duplicate();
     
     this.facingDirection = DOWN;    
-    this.destinationPosition = this.position.duplicate();
     
     this.itemPickUpTime = 0;
     this.itemPickUpShell = null;
@@ -117,6 +124,31 @@ export class Player extends GameObject {
       this.onPickUpItem(data);
     })
   }
+  
+  distanceTo(other) {
+    const dx = this.center.x - other.center.x;
+    const dy = this.center.y - other.center.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    return distance;
+  }
+  
+  calculateRepulsionForce(other) {
+    const dx = this.center.x - other.center.x;
+    const dy = this.center.y - other.center.y;
+  
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    
+    const collisionVectorNormalized = {
+      x: dx / distance,
+      y: dy / distance
+    }
+    
+    return {
+      x: Math.round(collisionVectorNormalized.x * other.mass),
+      y: Math.round(collisionVectorNormalized.y * other.mass)
+    }       
+  }
+  
   onCollision(repulsionForce) {
     const pushedX = this.position.x + repulsionForce.x / this.mass;
     const pushedY = this.position.y + repulsionForce.y / this.mass;
@@ -124,20 +156,34 @@ export class Player extends GameObject {
     if (isSpaceFree(pushedX, pushedY, this).collisionDetected === false) {
       this.position.x = pushedX;
       this.position.y = pushedY;
+      this.updateHitboxCenter();  
       this.destinationPosition = this.position.duplicate();
     }
   }
+  
   overlaps(other) {
     const dx = this.center.x - other.center.x;
     const dy = this.center.y - other.center.y;
     return Math.sqrt(dx * dx + dy * dy) <= this.radius + other.radius;
   }
-  distanceTo(other) {
-    const dx = this.center.x - other.center.x;
-    const dy = this.center.y - other.center.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    return distance;
+  
+  checkCollisions(otherObjects) {
+    if (otherObjects.length <= 1) { return };
+    
+    for (let i = otherObjects.length -1; i >= 0; i-- ) {
+      const other = otherObjects[i];
+      
+      if (this.overlaps(other) && this != other) {
+        this.onCollision(this.calculateRepulsionForce(other))
+      }       
+    }   
+  }
+  
+  updateHitboxCenter() {
+    this.center.x = this.position.x + gridSize / 2; 
+    this.center.y = this.position.y + gridSize / 2;       
   } 
+  
   setPosition(x, y, world) {
     this.position = new Vector2(x, y);
     this.destinationPosition = this.position.duplicate();
@@ -147,16 +193,20 @@ export class Player extends GameObject {
   spawn(x, y, world, plane) {
     if (this.canSpawn && !this.isSpawned) {
       this.setPosition(x, y, world);
-  
+      
       plane.addChild(this);
       
-      this.isSpawned = true;
       
-      // if (this.hasCollision) {
-        // movingObjects.push(this);
-      // }
-    }      
-    console.log(this.entityId + " has spawned at " + this.position.x + "," + this.position.y + "," + this.currentWorld);
+      if (this.hasCollision) {
+        this.updateHitboxCenter();
+        movingObjects.push(this);
+      }
+      
+      this.isSpawned = true;    
+
+    }
+    console.log(this.type + " has spawned at " + this.position.x + "," + this.position.y + "," + this.currentWorld);
+
   }
   
   despawn() {
@@ -165,7 +215,8 @@ export class Player extends GameObject {
         obstacles.splice(i, 1); 
       }
     }
-  }  
+  }
+  
   ready() {
   
   }
@@ -183,9 +234,11 @@ export class Player extends GameObject {
       this.workOnItemPickUp(delta);
       return;
     }
-       
-    const distance = moveTowards(this, this.destinationPosition, 2) // destination, speed
-    this.center = new Vector2(this.position.x + gridSize / 2, this.position.y + gridSize / 2);
+    
+    const distance = moveTowards(this, this.destinationPosition, this.speed);    
+    this.updateHitboxCenter();
+    this.checkCollisions(movingObjects);       
+
     
     const hasArrived = distance < 1;
     if (hasArrived) {
@@ -230,13 +283,14 @@ export class Player extends GameObject {
       this.clickBehavior();
       return;
     }
-     
-    // let nextX = this.destinationPosition.x;
-    // let nextY = this.destinationPosition.y;
-    
-    // grid snapping
-    let multiplierX = Math.floor(this.destinationPosition.x / gridSize); 
-    let multiplierY = Math.floor(this.destinationPosition.y / gridSize);
+
+    let multiplierX = this.destinationPosition.x % gridSize < gridSize / 2
+      ? Math.floor(this.destinationPosition.x / gridSize)
+      : Math.ceil(this.destinationPosition.x / gridSize);
+
+    let multiplierY = this.destinationPosition.y % gridSize < gridSize / 2
+      ? Math.floor(this.destinationPosition.y / gridSize)
+      : Math.ceil(this.destinationPosition.y / gridSize);
     
     let nextX = multiplierX * gridSize;
     let nextY = multiplierY * gridSize;
