@@ -224,7 +224,7 @@ export class Player extends GameObject {
     const pushedY = Math.round(this.position.y + repulsionForce.y / this.mass);
 
     // Raycast to check for collisions along the push path
-    const raycastHit = this.raycast(this.position.x.toFixed(2), this.position.y.toFixed(2), pushedX.toFixed(2), pushedY.toFixed(2));
+    const raycastHit = this.raycast(this.position.x, this.position.y, pushedX, pushedY);
     visualizeRaycast(this.position.x, this.position.y, pushedX, pushedX, raycastHit, this);
 
     if (raycastHit) {
@@ -238,6 +238,8 @@ export class Player extends GameObject {
       if (isSpaceFree(pushedX, pushedY, this).collisionDetected === false) {
         this.position.x = pushedX;
         this.position.y = pushedY;
+        console.log(this.type,pushedX,pushedY)
+        
         this.destinationPosition = this.position.duplicate();
         this.updateHitboxCenter();
       }
