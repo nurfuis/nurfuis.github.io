@@ -47,7 +47,7 @@ export class Player extends GameObject {
     this.currentWorld = null;
     
     this.type = 'player';
-    
+    this.entityId = 'player1';
     this.hasCollision = true;
     this.width = 32;
     this.height = 32;
@@ -211,7 +211,7 @@ export class Player extends GameObject {
       y: dy / distance
     }
     
-    const forceMultiplier = penetrationDepth * (this.speed + other.speed)    
+    const forceMultiplier = penetrationDepth;   
     
     return {
       x: collisionVectorNormalized.x * forceMultiplier * other.mass * (1 - this.friction),
@@ -225,23 +225,24 @@ export class Player extends GameObject {
 
     // Raycast to check for collisions along the push path
     const raycastHit = this.raycast(this.position.x, this.position.y, pushedX, pushedY);
-    visualizeRaycast(this.position.x, this.position.y, pushedX, pushedX, raycastHit, this);
+    visualizeRaycast(this.center.x, this.center.y, pushedX, pushedX, raycastHit, this);
 
     if (raycastHit) {
-      // Collision detected, move to the collision point instead
-      // this.position.x = Math.round(raycastHit.x);
-      // this.position.y = Math.round(raycastHit.y);
-      // this.destinationPosition = this.position.duplicate();   
-      // this.updateHitboxCenter();
+      console.log('raycast hit', this.entityId, raycastHit.x, raycastHit.y)
+      
+      this.position = new Vector2(Math.round(raycastHit.x), Math.round(raycastHit.y));
+      this.destinationPosition = this.position.duplicate();   
+      this.updateHitboxCenter();
     } else {
-      // No collision, move to the pushed coordinates
       if (isSpaceFree(pushedX, pushedY, this).collisionDetected === false) {
-        this.position.x = pushedX;
-        this.position.y = pushedY;
-        console.log(this.type,pushedX,pushedY)
+        this.position = new Vector2(pushedX, pushedY);
+        this.destinationPosition = this.position.duplicate();        
+        this.updateHitboxCenter();        
         
-        this.destinationPosition = this.position.duplicate();
-        this.updateHitboxCenter();
+        console.log('pushed coords', this.entityId,pushedX,pushedY)
+
+        console.log('velocity', this.entityId, this.destinationPosition)
+
       }
     }
   }
@@ -265,8 +266,7 @@ export class Player extends GameObject {
   }
   
   updateHitboxCenter() {
-    this.center.x = this.position.x + gridSize / 2; 
-    this.center.y = this.position.y + gridSize / 2;       
+    this.center = new Vector2(Math.round(this.position.x + gridSize / 2), Math.round(this.position.y + gridSize / 2));
   } 
   
   setPosition(x, y, world) {
