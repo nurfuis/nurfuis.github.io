@@ -20,7 +20,19 @@ export class Wall extends GameObject{
     this.hasCollision = true;
     this.width = gridSize;
     this.height = gridSize;    
-  } 
+  }
+  minX() {
+    return this.position.x;
+  }
+  minY () {
+    return this.position.y;
+  }
+  maxX() {
+    return this.position.x + this.width;
+  }
+  maxY() {
+    return this.position.y + this.height;
+  }  
   ready() {
     if (this.hasCollision) {
       obstacles.push(this);        
