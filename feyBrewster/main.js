@@ -76,7 +76,7 @@ function updateRays() {
     ctx.stroke();
 
     if (ray.collision) {
-      ctx.fillStyle = `rgba(${collisionColor.replace('#', '')}, ${alpha})`; // Green with fading alpha
+      ctx.fillStyle = 'red'; // Green with fading alpha
       ctx.beginPath();
       ctx.arc(ray.collision.x, ray.collision.y, 5, 0, Math.PI * 2, true);
       ctx.fill();
