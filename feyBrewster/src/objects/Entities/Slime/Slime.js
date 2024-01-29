@@ -14,7 +14,6 @@ import { events } from "../../../Events.js";
 import { isSpaceFree } from "../../../helpers/grid.js";
 import { obstacles } from "../../../helpers/grid.js";
 import { movingObjects } from "../../../helpers/collisionDetection.js";
-import { checkCollisions } from "../../../helpers/collisionDetection.js";
 
 import {
   IDLE,
@@ -86,14 +85,39 @@ export class Slime extends GameObject {
     this.chunkId = chunkId;
   }
   
+  distanceTo(other) {
+    const dx = this.center.x - other.center.x;
+    const dy = this.center.y - other.center.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    return distance;
+  }
+  
+  calculateRepulsionForce(other) {
+    const dx = this.center.x - other.center.x;
+    const dy = this.center.y - other.center.y;
+  
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    
+    const collisionVectorNormalized = {
+      x: dx / distance,
+      y: dy / distance
+    }
+    
+    return {
+      x: Math.round(collisionVectorNormalized.x * other.mass),
+      y: Math.round(collisionVectorNormalized.y * other.mass)
+    }       
+  }
+  
   onCollision(repulsionForce) {
     const pushedX = this.position.x + repulsionForce.x / this.mass;
     const pushedY = this.position.y + repulsionForce.y / this.mass;
     
     if (isSpaceFree(pushedX, pushedY, this).collisionDetected === false) {
       this.position.x = pushedX;
-      this.position.y = pushedY; 
-      this.destinationPosition = this.position.duplicate();      
+      this.position.y = pushedY;
+      this.updateHitboxCenter();  
+      this.destinationPosition = this.position.duplicate();
     }
   }
   
@@ -103,13 +127,28 @@ export class Slime extends GameObject {
     return Math.sqrt(dx * dx + dy * dy) <= this.radius + other.radius;
   }
   
-  distanceTo(other) {
-    const dx = this.center.x - other.center.x;
-    const dy = this.center.y - other.center.y;
+  checkCollisions(otherObjects) {
+    if (otherObjects.length <= 1) { return };
     
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    return distance;
+    for (let i = otherObjects.length -1; i >= 0; i-- ) {
+      const other = otherObjects[i];
+      
+      if (this.overlaps(other) && this != other) {
+        this.onCollision(this.calculateRepulsionForce(other))
+      }       
+    }   
   }
+  
+  updateHitboxCenter() {
+    this.center.x = this.position.x + gridSize / 2; 
+    this.center.y = this.position.y + gridSize / 2;       
+  } 
+  
+  setPosition(x, y, world) {
+    this.position = new Vector2(x, y);
+    this.destinationPosition = this.position.duplicate();
+    this.currentWorld = world;
+  };
   
   setProperties(){
     for (let i = 0; i < this.objectData.properties.length; i++) {
@@ -133,10 +172,11 @@ export class Slime extends GameObject {
   ready() {
     this.entityId = `slime-${generateUniqueId()}`;
     if (this.objectData.properties) {
-      this.setProperties();
-      
+      this.setProperties();      
     }
-    
+    if (this.hasCollision) {
+      movingObjects.push(this);
+    }    
   }    
            
   despawn() {
@@ -145,7 +185,8 @@ export class Slime extends GameObject {
         obstacles.splice(i, 1); 
       }
     }
-  }      
+  }
+  
   step(delta, root) { 
     if (this.isAlive === false) {
       this.deSpawn();
@@ -156,8 +197,9 @@ export class Slime extends GameObject {
       return;
     }
 
-    const distance = moveTowards(this, this.destinationPosition, this.speed);
-    this.center = new Vector2(this.position.x + gridSize / 2, this.position.y + gridSize / 2);    
+    const distance = moveTowards(this, this.destinationPosition, this.speed);    
+    this.updateHitboxCenter();
+    this.checkCollisions(movingObjects);    
     
     const hasArrived = distance < 1;
     
