@@ -87,5 +87,17 @@ export class WoodenFermenter extends GameObject {
       }
     }
     this.destroy();
-  }   
+  }
+  minX() {
+    return this.position.x;
+  }
+  minY () {
+    return this.position.y;
+  }
+  maxX() {
+    return this.position.x + this.width;
+  }
+  maxY() {
+    return this.position.y + this.height;
+  }  
 }
