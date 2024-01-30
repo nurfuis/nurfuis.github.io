@@ -25,10 +25,34 @@ export class Slime extends GameObject {
     super({
       position: new Vector2(x, y),
     });
-    this.objectData = objectData;
+    this.currentWorld = world;      
+    this.chunkId = chunkId;    
+    this.objectData = objectData;    
+    
+    this.type = 'entity';
+    this.entityId = null;
+
+    this.isAlive = true;   
+    
+    this.hasCollision = true;
+    this.width = 32;
+    this.height = 32;
+    
+    this.speed = 1;
+    this.mass = 100;
+    
+    this.radius = 16;
+    this.center = new Vector2(this.position.x + gridSize / 2, this.position.y + gridSize / 2);
+   
+    this.destinationPosition = this.position.duplicate();
+    
+    this.maxHealth = null;
+    this.attackPower = null;    
+    
+    this.facingDirection = IDLE;    
     
     this.shieldImage = null;
-    this.shieldTime = 0;
+    this.shieldTime = 0;     
     
     this.body = new Sprite({
       position: new Vector2(0, -4), // offset x, y
@@ -59,75 +83,74 @@ export class Slime extends GameObject {
       frame: 47,
       
     })
-    // this.addChild(this.hitBox);  
-    
-    this.facingDirection = IDLE;
-    
-    this.currentWorld = world;
-    this.destinationPosition = this.position.duplicate();
-
-    this.entityId = null;
-
-    this.hasCollision = true;
-    this.width = 32;
-    this.height = 32;
-    this.speed = 1;
-    this.friction = .1;    
-    
-    
-    this.radius = 16;
-    this.center = new Vector2(this.position.x + gridSize / 2, this.position.y + gridSize / 2);
-    this.mass = 100;
-    
-    this.maxHealth = null;
-    this.attackPower = null;
-    
-    this.isAlive = true;   
-
-    this.type = 'entity';
-    this.chunkId = chunkId;
+   // this.addChild(this.hitBox);  
   }
+  
+  minX() {
+    return this.position.x;
+  }
+  
+  minY () {
+    return this.position.y;
+  }
+  
+  maxX() {
+    return this.position.x + this.width;
+  }
+  
+  maxY() {
+    return this.position.y + this.height;
+  }
+
   distanceSquared(x1, y1, x2, y2) {
     return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
-  }  
+  }
   
+  normalizeVector(vector) {
+    const length = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
+    if (length === 0) {
+      return { x: 0, y: 0 };
+    }
+    return {
+      x: vector.x / length,
+      y: vector.y / length
+    };
+  }
+
   lineSegmentIntersection(x1, y1, dx1, dy1, x2, y2, dx2, dy2) {
-    // console.log(dy2, dx1, dx2, dy1)
     const denominator = (dy2 * dx1) - (dx2 * dy1);
-    // console.log(this.entityId,denominator)
-    if (denominator === 0) {
-      return null; // No intersection
+    if (denominator === 0) {   
+      return null; 
     }
 
     const t = ((x2 - x1) * dy2 + (y1 - y2) * dx2) / denominator;
     const u = ((x2 - x1) * dy1 + (y1 - y2) * dx1) / denominator;
-    // console.log(this.entityId, t.toFixed(2), u.toFixed(2))
 
     if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
       const intersectionX = Math.round(x1 + (t * dx1));
       const intersectionY = Math.round(y1 + (t * dy1));
-      console.log(this.entityId, { x: intersectionX, y: intersectionY })
+      
       return { x: intersectionX, y: intersectionY };
+    
     } else {
-      return null; // No intersection within segments
+      return null; 
     }
   }  
 
-  raycast(startX, startY, endX, endY) {
-    // console.log(this.entityId, startX, startY, endX, endY)
-    
+  raycast(startX, startY, endX, endY) {   
     let closestHit;   
     
-    const dX = Math.round(endX - startX);
-    const dY = Math.round(endY - startY);
-    // console.log(this.entityId, dX, dY)
+    const dX = endX - startX;
+    const dY = endY - startY;
 
     for (let i = obstacles.length - 1; i >= 0; i--) {
       const obstacle = obstacles[i];
+      
       const obstacleX1 = obstacle.minX();
       const obstacleY1 = obstacle.minY();
       const obstacleX2 = obstacle.maxX();
       const obstacleY2 = obstacle.maxY();
+      
       const intersection = this.lineSegmentIntersection(startX, startY, dX, dY, obstacleX1, obstacleY1, obstacleX2, obstacleY2);
 
       if (intersection && (!closestHit || this.distanceSquared(startX, startY, intersection.x, intersection.y) < this.distanceSquared(startX, startY, closestHit.x, closestHit.y))) {
@@ -137,95 +160,142 @@ export class Slime extends GameObject {
     return closestHit;
   } 
   
-  minX() {
-    return this.position.x;
-  }
-  minY () {
-    return this.position.y;
-  }
-  maxX() {
-    return this.position.x + this.width;
-  }
-  maxY() {
-    return this.position.y + this.height;
-  }
-  
-  distanceTo(other) {
-    const dx = this.center.x - other.center.x;
-    const dy = this.center.y - other.center.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    return distance;
+  calculateForce(target) {
+    const distance = this.distanceTo(target)
+    const desiredDistance = (gridSize * 2) / 3; // Desired distance from player
+    const forceMagnitude = Math.abs(distance - desiredDistance); // Scaled by distance difference
+    const directionVector = {
+      x: target.x - this.position.x,
+      y: target.y - this.position.y,
+    };
+
+    // Normalize direction vector (magnitude = 1)
+    const magnitude = Math.sqrt(directionVector.x * directionVector.x + directionVector.y * directionVector.y);
+    directionVector.x /= magnitude;
+    directionVector.y /= magnitude;
+
+    // Determine attraction/repulsion based on distance
+    const repulsionForce = directionVector;
+    const attractionForce = {
+      x: -repulsionForce.x,
+      y: -repulsionForce.y,
+    };
+
+    if (distance < desiredDistance) {
+      return attractionForce; // Apply attraction if closer than desired distance
+    } else {
+      return repulsionForce; // Apply repulsion if further than desired distance
+    }
   }
   
   calculateRepulsionForce(other) {
-    const dx = this.center.x - other.center.x;
-    const dy = this.center.y - other.center.y;
-  
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    const penetrationDepth = this.radius + other.radius - distance;    
+    const dx = Math.ceil(this.center.x - other.center.x);
+    const dy = Math.ceil(this.center.y - other.center.y);
+    
+    const distance = Math.sqrt(dx * dx + dy * dy).toFixed(2);
+    
+    if (Math.sqrt(dx * dx + dy * dy) < .001) {
+      const randomAngle = Math.random() * 2 * Math.PI;
+      
+      return {
+        x: Math.cos(randomAngle) * 32,
+        y: Math.sin(randomAngle) * 32
+      };
+    }
+
+    const penetrationDepth = Math.min(this.radius + other.radius - distance, this.width / 2);    
     
     const collisionVectorNormalized = {
       x: dx / distance,
       y: dy / distance
     }
-    
-    const forceMultiplier = penetrationDepth;   
+   
+    const relativeSpeed = Math.sqrt(this.speed * other.speed);    
+    const linearForce = Math.min(penetrationDepth * 12, 6);   
+    const forceCurve = Math.pow(penetrationDepth, 2) * 6;
+    const logarithmicForce = Math.log(penetrationDepth + 1) * 4;
     
     return {
-      x: Math.min(collisionVectorNormalized.x * forceMultiplier * other.mass * (1 - this.friction), gridSize),
-      y: Math.min(collisionVectorNormalized.y * forceMultiplier * other.mass * (1 - this.friction), gridSize)
-    }    
+      x: Math.max(Math.min(collisionVectorNormalized.x * linearForce * logarithmicForce * forceCurve * relativeSpeed, 100), -100).toFixed(2),
+      y: Math.max(Math.min(collisionVectorNormalized.y * linearForce * logarithmicForce * forceCurve * relativeSpeed, 100), -100).toFixed(2)
+    };      
   }
   
-  onCollision(repulsionForce) {
-    const pushedX = Math.round(this.position.x + repulsionForce.x / this.mass);
-    const pushedY = Math.round(this.position.y + repulsionForce.y / this.mass);
-
-    // Raycast to check for collisions along the push path
-    const raycastHit = this.raycast(this.position.x, this.position.y, pushedX, pushedY);
-    visualizeRaycast(this.center.x, this.center.y, pushedX, pushedX, raycastHit, this);
-
-    if (raycastHit) {
-      console.log('raycast hit', this.entityId, raycastHit.x, raycastHit.y)
-      
-      this.position = new Vector2(Math.round(raycastHit.x), Math.round(raycastHit.y));
-      this.destinationPosition = this.position.duplicate();   
-      this.updateHitboxCenter();
-    } else {
-      if (isSpaceFree(pushedX, pushedY, this).collisionDetected === false) {
-
-        this.position = new Vector2(pushedX, pushedY);
-        this.destinationPosition = this.position.duplicate();        
-        this.updateHitboxCenter();        
-        
-        console.log('pushed coords', this.entityId,pushedX,pushedY)
-
-        console.log('velocity', this.entityId, this.destinationPosition)
-
-      }
-    }
-  }
+  distanceTo(other) {
+    const dx = this.center.x - other.center.x;
+    const dy = this.center.y - other.center.y;
+    
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    
+    return distance;
+  } 
   
   overlaps(other) {
     const dx = this.center.x - other.center.x;
     const dy = this.center.y - other.center.y;
     return Math.sqrt(dx * dx + dy * dy) <= this.radius + other.radius;
   }
-  
-  checkCollisions(otherObjects) {
-    if (otherObjects.length <= 1) { return };
+   
+  onCollision(repulsionForce) {
     
-    for (let i = otherObjects.length -1; i >= 0; i-- ) {
-      const other = otherObjects[i];
-      
-      if (this.overlaps(other) && this != other) {
-        this.onCollision(this.calculateRepulsionForce(other))
-      }       
-    }   
+    const newPosition = {
+      x: Math.floor(this.position.x + repulsionForce.x / this.mass),
+      y: Math.floor(this.position.y + repulsionForce.y / this.mass)
+    };
+    
+    const raycastHit = this.raycast(this.position.x, this.position.y, newPosition.x, newPosition.y);
+    visualizeRaycast(this.center.x, this.center.y, newPosition.x + gridSize / 2, newPosition.y + gridSize / 2, raycastHit, this);
+
+    if (raycastHit) {
+      this.position = new Vector2(Math.floor(raycastHit.x), Math.floor(raycastHit.y));
+      this.destinationPosition = this.position.duplicate();   
+      this.updateHitboxCenter();
+    }
+    
+    if (!raycastHit && isSpaceFree(newPosition.x, newPosition.y, this).collisionDetected === false) {
+      this.position = new Vector2(newPosition.x, newPosition.y);
+      this.destinationPosition = this.position.duplicate();
+      this.updateHitboxCenter();
+    }
   }
   
+  checkCollisions(entities) {
+    if (entities.length <= 1) {
+      return false
+    };
+
+    let collisionDetected = false;
+
+    for (let i = entities.length - 1; i >= 0; i--) {
+      const other = entities[i];
+
+      if (this.overlaps(other) && this !== other) {
+        this.onCollision(this.calculateRepulsionForce(other));
+        
+        if (!collisionDetected) {
+          collisionDetected = true
+        };
+      }
+    }
+    return collisionDetected;
+  }
+  
+  findPlayer(entities) {
+    return entities.find(object => object.type === 'player');
+  }
+ 
+  findEntitiesWithinRadius(entities, referenceObject, radius) {
+    return entities.filter(object => {
+      const distance = Math.sqrt(
+        Math.pow(object.position.x - referenceObject.position.x, 2) +
+        Math.pow(object.position.y - referenceObject.position.y, 2)
+      );
+      return distance <= radius;
+    });
+  }  
+   
   updateHitboxCenter() {
-    this.center = new Vector2(Math.round(this.position.x + gridSize / 2), Math.round(this.position.y + gridSize / 2));
+    this.center = new Vector2(Math.floor(this.position.x + gridSize / 2), Math.floor(this.position.y + gridSize / 2));
   } 
   
   setPosition(x, y, world) {
@@ -252,6 +322,14 @@ export class Slime extends GameObject {
       }       
     }
   }
+            
+  despawn() {
+    for (let i = movingObjects.length - 1; i >= 0; i--) { 
+      if (movingObjects[i] === this) {
+        movingObjects.splice(i, 1); 
+      }
+    }
+  } 
   
   ready() {
     this.entityId = `slime-${generateUniqueId()}`;
@@ -262,62 +340,21 @@ export class Slime extends GameObject {
       movingObjects.push(this);
     }    
   }    
-           
-  despawn() {
-    for (let i = obstacles.length - 1; i >= 0; i--) { // Iterate backwards to avoid index issues
-      if (obstacles[i].owner === this) {
-        obstacles.splice(i, 1); 
-      }
-    }
-  }
-  
-  step(delta, root) { 
-    if (this.isAlive === false) {
-      this.deSpawn();
-      return;
-    };
-    if (this.shieldTime > 0) {
-      this.workOnEnergyShield(delta);
-      return;
-    }
-
-    const distance = moveTowards(this, this.destinationPosition, this.speed);    
-    this.updateHitboxCenter();
-    this.checkCollisions(movingObjects);    
-    
-    const hasArrived = distance < 1;
-    
-    if (hasArrived) {      
-      this.tryMove(delta)
-    }    
-  } 
   
   tryMove(delta) { 
     const sequence = [
-      { direction: LEFT, steps: 2 },
-      { direction: LEFT, steps: 2 },      
-      { direction: LEFT, steps: 2 }, 
-      { direction: DOWN, steps: 2 },
-      { direction: DOWN, steps: 2 },
-      { direction: DOWN, steps: 2 },      
+      { direction: LEFT, steps: 2 },  
       { direction: RIGHT, steps: 2 },
-      { direction: RIGHT, steps: 2 },
-      { direction: RIGHT, steps: 2 },     
       { direction: UP, steps: 2 },
-      { direction: UP, steps: 2 },
-      { direction: UP, steps: 2 },   
+      { direction: DOWN, steps: 2 },    
     ];
-    // Check if the sequence has finished
     if (this.currentStep === undefined || this.currentStep >= sequence.length) {
-      this.currentStep = 0; // Reset sequence on completion
+      this.currentStep = 0;
     }
-    // Get the current movement data from the sequence
     const currentStepData = sequence[this.currentStep];
-    // Handle movement based on the data
     if (currentStepData.direction) {  
       const input = currentStepData;      
       
-      // grid snapping
       let multiplierX = this.destinationPosition.x % gridSize < gridSize / 2
         ? Math.floor(this.destinationPosition.x / gridSize)
         : Math.ceil(this.destinationPosition.x / gridSize);
@@ -353,25 +390,91 @@ export class Slime extends GameObject {
         this.destinationPosition.y = nextY;    
       }
     }
-    // Update facing direction   
     this.facingDirection = currentStepData.direction ?? this.facingDirection; 
   }   
+    
+  step(delta, root) { 
+    if (this.isAlive === false) {
+      this.deSpawn();
+      return;
+    }
+    
+    if (this.shieldTime > 0) {
+      this.workOnEnergyShield(delta);
+      return;
+    }
+    
+    const rangeForNewBehavior = 5 * gridSize; // Adjust as needed
+    
+    const nearbyEntities = this.findEntitiesWithinRadius(movingObjects, this, rangeForNewBehavior);
+    const player = this.findPlayer(movingObjects);
+    const distanceToPlayer = this.distanceTo(player);
   
+    if (distanceToPlayer <= rangeForNewBehavior) {
+
+      const targetArcDistance = (Math.random() * 3 + 1) * gridSize;
+    
+      const numNearby = nearbyEntities.length;
+      const angleOffset = (Math.PI * 2) / numNearby * nearbyEntities.indexOf(this);
+      
+      const angleToPlayer = Math.atan2(player.position.y - this.position.y, player.position.x - this.position.x); // Angle relative to player
+
+      let targetAngle = angleToPlayer + angleOffset + Math.PI;
+      targetAngle = Math.max(-Math.PI, Math.min(Math.PI, targetAngle)); // Clamp targetAngle within valid range
+      
+      const attractionForce = {
+        x: Math.cos(targetAngle) * (targetArcDistance - distanceToPlayer) * 0.02, // Lower magnitude for subtle movement
+        y: Math.sin(targetAngle) * (targetArcDistance - distanceToPlayer) * 0.02,
+      };
+
+      const thresholdDistance = 0.8 * gridSize;
+      if (distanceToPlayer < thresholdDistance) {
+        attractionForce.x *= 0.2; 
+        attractionForce.y *= 0.2;
+      }
+
+      const newPosition = {
+        x: Math.floor(this.position.x + attractionForce.x),
+        y: Math.floor(this.position.y + attractionForce.y)
+      };
+      
+      if (isSpaceFree(newPosition.x, newPosition.y, this).collisionDetected === false) {
+        this.destinationPosition.x = newPosition.x;
+        this.destinationPosition.y = newPosition.y;    
+      }            
+    }
+    const distance = moveTowards(this, this.destinationPosition, this.speed);    
+    
+    this.updateHitboxCenter();
+    
+    const collisionTest = this.checkCollisions(movingObjects);
+    
+    const hasArrived = distance < 1;
+    
+    if (hasArrived) {      
+      this.tryMove(delta)
+    }    
+  } 
+  
+
+   
   onEnergyShield() {
-    // start animation 
     if (this.shieldTime > 0) {
       return;
     }
+    
     this.shieldTime = 500; // ms
     
     this.shieldImage = new GameObject({});
+    
     this.shieldImage.addChild(new Sprite({
       frameSize: new Vector2(32, 32),
       scale: 1,
       resource: resources.images.energyShield,
       position: new Vector2(8, 8)
     }))
-    this.addChild(this.shieldImage) 
+   
+   this.addChild(this.shieldImage) 
   }
   
   workOnEnergyShield(delta) {
