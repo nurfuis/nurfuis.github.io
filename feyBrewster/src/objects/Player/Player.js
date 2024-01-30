@@ -54,12 +54,12 @@ export class Player extends GameObject {
 
     this.mass = 200;
     this.speed = 2;
-    this.friction = .1;
     
     this.radius = 16;
     this.center = new Vector2(this.position.x + gridSize / 2, this.position.y + gridSize / 2);
-    this.destinationPosition = this.position.duplicate();
     
+    this.destinationPosition = this.position.duplicate();
+ 
     this.facingDirection = DOWN;    
     
     this.itemPickUpTime = 0;
@@ -127,49 +127,94 @@ export class Player extends GameObject {
     })
   }
   
-  distanceSquared(x1, y1, x2, y2) {
-    return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+  minX() {
+    return this.position.x;
+  }
+  
+  minY () {
+    return this.position.y;
+  }
+  
+  maxX() {
+    return this.position.x + this.width;
+  }
+  
+  maxY() {
+    return this.position.y + this.height;
+  }
+   
+  findPlayer(entities) {
+    return entities.find(object => object.type === 'player');
+  }
+ 
+  findEntitiesWithinRadius(entities, referenceObject, radius) {
+    return entities.filter(object => {
+      const distance = Math.sqrt(
+        Math.pow(object.position.x - referenceObject.position.x, 2) +
+        Math.pow(object.position.y - referenceObject.position.y, 2)
+      );
+      return distance <= radius;
+    });
   }  
   
+  distanceTo(other) {
+    const dx = this.center.x - other.center.x;
+    const dy = this.center.y - other.center.y;
+    
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    
+    return distance;
+  } 
+  
+  distanceSquared(x1, y1, x2, y2) {
+    return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+  }
+  
+  normalizeVector(vector) {
+    const length = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
+    if (length === 0) {
+      return { x: 0, y: 0 };
+    }
+    return {
+      x: vector.x / length,
+      y: vector.y / length
+    };
+  }
+
   lineSegmentIntersection(x1, y1, dx1, dy1, x2, y2, dx2, dy2) {
-    // console.log(dy2, dx1, dx2, dy1)
-    
     const denominator = (dy2 * dx1) - (dx2 * dy1);
-    // console.log(denominator)
-    
-    if (denominator === 0) {
-      return null; // No intersection
+    if (denominator === 0) {   
+      return null; 
     }
 
     const t = ((x2 - x1) * dy2 + (y1 - y2) * dx2) / denominator;
     const u = ((x2 - x1) * dy1 + (y1 - y2) * dx1) / denominator;
-    // console.log(t, u)    
-    
+
     if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
       const intersectionX = Math.round(x1 + (t * dx1));
       const intersectionY = Math.round(y1 + (t * dy1));
-      // console.log({ x: intersectionX, y: intersectionY })
+      
       return { x: intersectionX, y: intersectionY };
+    
     } else {
-      return null; // No intersection within segments
+      return null; 
     }
   }  
 
-  raycast(startX, startY, endX, endY) {
-    // console.log(startX, startY, endX, endY)
+  raycast(startX, startY, endX, endY) {   
+    let closestHit;   
     
-    let closestHit;
-    
-    const dX = Math.round(endX - startX);
-    const dY = Math.round(endY - startY);
-    // console.log(dX, dY)
-    
+    const dX = endX - startX;
+    const dY = endY - startY;
+
     for (let i = obstacles.length - 1; i >= 0; i--) {
       const obstacle = obstacles[i];
+      
       const obstacleX1 = obstacle.minX();
       const obstacleY1 = obstacle.minY();
       const obstacleX2 = obstacle.maxX();
       const obstacleY2 = obstacle.maxY();
+      
       const intersection = this.lineSegmentIntersection(startX, startY, dX, dY, obstacleX1, obstacleY1, obstacleX2, obstacleY2);
 
       if (intersection && (!closestHit || this.distanceSquared(startX, startY, intersection.x, intersection.y) < this.distanceSquared(startX, startY, closestHit.x, closestHit.y))) {
@@ -178,72 +223,62 @@ export class Player extends GameObject {
     }
     return closestHit;
   } 
-  
-  minX() {
-    return this.position.x;
-  }
-  minY () {
-    return this.position.y;
-  }
-  maxX() {
-    return this.position.x + this.width;
-  }
-  maxY() {
-    return this.position.y + this.height;
-  }
-  
-  distanceTo(other) {
-    const dx = this.center.x - other.center.x;
-    const dy = this.center.y - other.center.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    return distance;
-  }
-  
+
   calculateRepulsionForce(other) {
-    const dx = this.center.x - other.center.x;
-    const dy = this.center.y - other.center.y;
-  
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    const penetrationDepth = this.radius + other.radius - distance;    
+    const dx = Math.ceil(this.center.x - other.center.x);
+    const dy = Math.ceil(this.center.y - other.center.y);
+    
+    const distance = Math.sqrt(dx * dx + dy * dy).toFixed(2);    
+    console.log(distance)
+    
+    if (Math.sqrt(dx * dx + dy * dy) < .001) {
+      const randomAngle = Math.random() * 2 * Math.PI;
+      
+      return {
+        x: Math.cos(randomAngle) * 32,
+        y: Math.sin(randomAngle) * 32
+      };
+    }
+
+    const penetrationDepth = Math.min(this.radius + other.radius - distance, this.width / 2);    
     
     const collisionVectorNormalized = {
       x: dx / distance,
       y: dy / distance
     }
-    
-    const forceMultiplier = penetrationDepth;   
+   
+    const relativeSpeed = Math.sqrt(this.speed * other.speed);    
+    const linearForce = Math.min(penetrationDepth * 12, 6);   
+    const forceCurve = Math.pow(penetrationDepth, 2) * 6;
+    const logarithmicForce = Math.log(penetrationDepth + 1) * 4;
     
     return {
-      x: collisionVectorNormalized.x * forceMultiplier * other.mass * (1 - this.friction),
-      y: collisionVectorNormalized.y * forceMultiplier * other.mass * (1 - this.friction)
-    }    
+      x: Math.max(Math.min(collisionVectorNormalized.x * linearForce * logarithmicForce * forceCurve * relativeSpeed, 100), -100).toFixed(2),
+      y: Math.max(Math.min(collisionVectorNormalized.y * linearForce * logarithmicForce * forceCurve * relativeSpeed, 100), -100).toFixed(2)
+    };       
   }
   
   onCollision(repulsionForce) {
-    const pushedX = Math.round(this.position.x + repulsionForce.x / this.mass);
-    const pushedY = Math.round(this.position.y + repulsionForce.y / this.mass);
-
-    // Raycast to check for collisions along the push path
-    const raycastHit = this.raycast(this.position.x, this.position.y, pushedX, pushedY);
-    visualizeRaycast(this.center.x, this.center.y, pushedX, pushedX, raycastHit, this);
+    console.log(repulsionForce)
+    
+    const newPosition = {
+      x: Math.floor(this.position.x + repulsionForce.x / this.mass),
+      y: Math.floor(this.position.y + repulsionForce.y / this.mass)
+    };
+    
+    const raycastHit = this.raycast(this.position.x, this.position.y, newPosition.x, newPosition.y);
+    visualizeRaycast(this.center.x, this.center.y, newPosition.x + gridSize / 2, newPosition.y + gridSize / 2, raycastHit, this);
 
     if (raycastHit) {
-      console.log('raycast hit', this.entityId, raycastHit.x, raycastHit.y)
-      
-      this.position = new Vector2(Math.round(raycastHit.x), Math.round(raycastHit.y));
+      this.position = new Vector2(Math.floor(raycastHit.x), Math.floor(raycastHit.y));
       this.destinationPosition = this.position.duplicate();   
       this.updateHitboxCenter();
-    } else {
-      if (isSpaceFree(pushedX, pushedY, this).collisionDetected === false) {
-        this.position = new Vector2(pushedX, pushedY);
-        this.destinationPosition = this.position.duplicate();        
-        this.updateHitboxCenter();        
-        
-        console.log('pushed coords', this.entityId,pushedX,pushedY)
-
-        console.log('velocity', this.entityId, this.destinationPosition)
-
-      }
+    }
+    
+    if (!raycastHit && isSpaceFree(newPosition.x, newPosition.y, this).collisionDetected === false) {
+      this.position = new Vector2(newPosition.x, newPosition.y);
+      this.destinationPosition = this.position.duplicate();
+      this.updateHitboxCenter();
     }
   }
   
@@ -254,19 +289,24 @@ export class Player extends GameObject {
   }
   
   checkCollisions(otherObjects) {
-    if (otherObjects.length <= 1) { return };
-    
-    for (let i = otherObjects.length -1; i >= 0; i-- ) {
+    if (otherObjects.length <= 1) {return false};
+
+    let collisionDetected = false;
+
+    for (let i = otherObjects.length - 1; i >= 0; i--) {
       const other = otherObjects[i];
-      
-      if (this.overlaps(other) && this != other) {
-        this.onCollision(this.calculateRepulsionForce(other))
-      }       
-    }   
+
+      if (this.overlaps(other) && this !== other) {
+        this.onCollision(this.calculateRepulsionForce(other));
+        if (!collisionDetected) {collisionDetected = true};
+      }
+    }
+
+    return collisionDetected;
   }
-  
+   
   updateHitboxCenter() {
-    this.center = new Vector2(Math.round(this.position.x + gridSize / 2), Math.round(this.position.y + gridSize / 2));
+    this.center = new Vector2(Math.floor(this.position.x + gridSize / 2), Math.floor(this.position.y + gridSize / 2));
   } 
   
   setPosition(x, y, world) {
@@ -290,7 +330,7 @@ export class Player extends GameObject {
       this.isSpawned = true;    
 
     }
-    console.log(this.type + " has spawned at " + this.position.x + "," + this.position.y + "," + this.currentWorld);
+    console.log(this.entityId + " has spawned at " + this.position.x + "," + this.position.y + "," + this.currentWorld);
 
   }
   
@@ -319,13 +359,12 @@ export class Player extends GameObject {
       this.workOnItemPickUp(delta);
       return;
     }
-    this.checkCollisions(movingObjects);       
-    
+
     const distance = moveTowards(this, this.destinationPosition, this.speed);    
     this.updateHitboxCenter();
-
-    
-    const hasArrived = distance < 1;
+    const collisionTest = this.checkCollisions(movingObjects);
+   
+   const hasArrived = distance < 1;
     if (hasArrived) {
       this.tryMove(delta, root)
     }
