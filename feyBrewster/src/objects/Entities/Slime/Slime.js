@@ -31,9 +31,10 @@ export class Slime extends GameObject {
     
     this.type = 'entity';
     this.entityId = null;
-
-    this.isAlive = true;   
-    this.invisible = false;
+    this.originPosition = null;
+    
+    this.isAlive = false;   
+    this.invisible = true;
     this.respawnDelay = 10000;
     
     this.hasCollision = true;
@@ -43,7 +44,7 @@ export class Slime extends GameObject {
     this.speed = 1;
     this.mass = 100;
     
-    this.radius = 16;
+    this.radius = 18;
     this.center = new Vector2(this.position.x + gridSize / 2, this.position.y + gridSize / 2);
    
     this.destinationPosition = this.position.duplicate();
@@ -317,8 +318,9 @@ export class Slime extends GameObject {
   
   setPosition(x, y, world) {
     this.position = new Vector2(x, y);
+    this.currentWorld = world;    
     this.destinationPosition = this.position.duplicate();
-    this.currentWorld = world;
+    this.updateHitboxCenter();    
   };
   
   setProperties(){
@@ -342,7 +344,7 @@ export class Slime extends GameObject {
   
   respawn(delay) {
     setTimeout(() => {
-
+      this.setPosition(this.originPosition.x, this.originPosition.y, this.currentWorld);
       this.currentHealth = this.maxHealth; // Assuming you have a health property
 
       this.spawn();
@@ -350,23 +352,36 @@ export class Slime extends GameObject {
   }
   
   spawn() {
-    this.isAlive = true;
-    this.invisible = false;    
+    if (this.isAlive) {
+      console.log('cannot spawn living entity', this.entityId);
+      return;
+    }
     
-    if (this.hasCollision) {
-      movingObjects.push(this);
-    }     
+    this.isAlive = true;      
+    this.invisible = false;  
+    
+    if (this.hasCollision) {movingObjects.push(this)};     
 
   }
   
   despawn() {
+    if (!this.isAlive) {
+      console.log('cannot despawn entity', this.entityId);
+      return;
+    }
     
-    for (let i = movingObjects.length - 1; i >= 0; i--) { 
-      if (movingObjects[i] === this) {
-        movingObjects.splice(i, 1); 
+    if (this.hasCollision) {  
+      for (let i = movingObjects.length - 1; i >= 0; i--) { 
+        
+        if (movingObjects[i] === this) {
+          movingObjects.splice(i, 1);
+          break;
+        }
       }
     }
+    
     this.isAlive = false;
+    
     this.invisible = true;
     
     const delay = this.respawnDelay;
@@ -374,6 +389,8 @@ export class Slime extends GameObject {
     if (delay > 0) {
       this.respawn(delay);
       
+    } else {
+      this.destroy();      
     }
   }
   
@@ -393,6 +410,7 @@ export class Slime extends GameObject {
     if (this.objectData.properties) {
       this.setProperties();      
     }
+    this.originPosition = this.position.duplicate();
     
     this.spawn();
    
@@ -415,11 +433,11 @@ export class Slime extends GameObject {
       y: Math.sin(targetAngle) * (targetArcDistance - distanceToPlayer) * 0.01,
     };
 
-    const thresholdDistance = 5 * gridSize;
+    const thresholdDistance = this.sensingRadius / 2;
     
     if (distanceToPlayer < thresholdDistance) {
-      attractionForce.x *= 0.3; 
-      attractionForce.y *= 0.3;
+      attractionForce.x *= 0.8; 
+      attractionForce.y *= 0.8;
     }
 
     const newPosition = {
