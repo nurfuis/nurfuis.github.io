@@ -33,6 +33,8 @@ export class Slime extends GameObject {
     this.entityId = null;
 
     this.isAlive = true;   
+    this.invisible = false;
+    this.respawnDelay = 10000;
     
     this.hasCollision = true;
     this.width = 32;
@@ -46,8 +48,12 @@ export class Slime extends GameObject {
    
     this.destinationPosition = this.position.duplicate();
     
-    this.maxHealth = null;
-    this.attackPower = null;    
+    this.maxHealth = 100;
+    this.currentHealth = 100
+    this.attackPower = 10; 
+    
+    this.awarenessField = 5;
+    this.sensingRadius = this.awarenessField * gridSize;
     
     this.facingDirection = IDLE;    
     
@@ -58,10 +64,10 @@ export class Slime extends GameObject {
       position: new Vector2(0, -4), // offset x, y
       
       resource: resources.images.slime,
-      frameSize: new Vector2(16, 16),
+      frameSize: new Vector2(32, 32),
       hFrames: 2,
       vFrames: 2,
-      scale: 2,
+      scale: 1,
       spacing: 0,
       animations: new Animations({
         idle: new FrameIndexPattern(IDLE),
@@ -203,7 +209,7 @@ export class Slime extends GameObject {
       };
     }
 
-    const penetrationDepth = Math.min(this.radius + other.radius - distance, this.width / 2);    
+    const penetrationDepth = Math.min(this.radius + other.radius - distance, 1);    
     
     const collisionVectorNormalized = {
       x: dx / distance,
@@ -211,13 +217,15 @@ export class Slime extends GameObject {
     }
    
     const relativeSpeed = Math.sqrt(this.speed * other.speed);    
-    const linearForce = Math.min(penetrationDepth * 12, 6);   
-    const forceCurve = Math.pow(penetrationDepth, 2) * 6;
-    const logarithmicForce = Math.log(penetrationDepth + 1) * 4;
+    const linearForce = Math.min(penetrationDepth * 6, 10);   
+    const forceCurve = Math.pow(penetrationDepth, .8) * 20;
+    const logarithmicForce = Math.log(penetrationDepth + 1) * 30;
+    
+    const forceCap = this.mass;
     
     return {
-      x: Math.max(Math.min(collisionVectorNormalized.x * linearForce * logarithmicForce * forceCurve * relativeSpeed, 100), -100).toFixed(2),
-      y: Math.max(Math.min(collisionVectorNormalized.y * linearForce * logarithmicForce * forceCurve * relativeSpeed, 100), -100).toFixed(2)
+      x: Math.max(Math.min(collisionVectorNormalized.x * linearForce * logarithmicForce * forceCurve * relativeSpeed, forceCap), -forceCap).toFixed(2),
+      y: Math.max(Math.min(collisionVectorNormalized.y * linearForce * logarithmicForce * forceCurve * relativeSpeed, forceCap), -forceCap).toFixed(2)
     };      
   }
   
@@ -259,6 +267,15 @@ export class Slime extends GameObject {
     }
   }
   
+  collisionReaction(other) {    
+    if (other.type === 'player') {
+      other.slow(750, 0.3);
+      this.body.frame = 3; 
+      this.subtractHealth(2);
+      this.onEnergyShield();
+    }        
+  }
+  
   checkCollisions(entities) {
     if (entities.length <= 1) {
       return false
@@ -280,7 +297,7 @@ export class Slime extends GameObject {
     return collisionDetected;
   }
   
-  findPlayer(entities) {
+  findNearbyPlayer(entities) {
     return entities.find(object => object.type === 'player');
   }
  
@@ -322,24 +339,99 @@ export class Slime extends GameObject {
       }       
     }
   }
-            
+  
+  respawn(delay) {
+    setTimeout(() => {
+
+      this.currentHealth = this.maxHealth; // Assuming you have a health property
+
+      this.spawn();
+    }, this.respawnDelay);        
+  }
+  
+  spawn() {
+    this.isAlive = true;
+    this.invisible = false;    
+    
+    if (this.hasCollision) {
+      movingObjects.push(this);
+    }     
+
+  }
+  
   despawn() {
+    
     for (let i = movingObjects.length - 1; i >= 0; i--) { 
       if (movingObjects[i] === this) {
         movingObjects.splice(i, 1); 
       }
     }
-  } 
+    this.isAlive = false;
+    this.invisible = true;
+    
+    const delay = this.respawnDelay;
+    
+    if (delay > 0) {
+      this.respawn(delay);
+      
+    }
+  }
+  
+  subtractHealth(integer) {
+    this.currentHealth -= integer;
+    
+    console.log(this.currentHealth)
+    
+    if (this.currentHealth <= 0 && this.isAlive) {
+      this.despawn();
+    }
+  }
   
   ready() {
     this.entityId = `slime-${generateUniqueId()}`;
+    
     if (this.objectData.properties) {
       this.setProperties();      
     }
-    if (this.hasCollision) {
-      movingObjects.push(this);
-    }    
+    
+    this.spawn();
+   
   }    
+  
+  avoid(nearbyEntities, nearbyPlayer) {
+    const distanceToPlayer = this.distanceTo(nearbyPlayer);
+    const targetArcDistance = (Math.random() * 3 + 1) * gridSize;
+    
+    const numNearby = nearbyEntities.length;
+    const angleOffset = (Math.PI * 2) / numNearby * nearbyEntities.indexOf(this);
+    
+    const angleToPlayer = Math.atan2(nearbyPlayer.position.y - this.position.y, nearbyPlayer.position.x - this.position.x); // Angle relative to nearbyPlayer
+
+    let targetAngle = angleToPlayer + angleOffset + Math.PI;
+    targetAngle = Math.max(-Math.PI, Math.min(Math.PI, targetAngle));
+    
+    const attractionForce = {
+      x: Math.cos(targetAngle) * (targetArcDistance - distanceToPlayer) * 0.01, // Lower magnitude for subtle movement
+      y: Math.sin(targetAngle) * (targetArcDistance - distanceToPlayer) * 0.01,
+    };
+
+    const thresholdDistance = 5 * gridSize;
+    
+    if (distanceToPlayer < thresholdDistance) {
+      attractionForce.x *= 0.3; 
+      attractionForce.y *= 0.3;
+    }
+
+    const newPosition = {
+      x: Math.floor(this.position.x + attractionForce.x),
+      y: Math.floor(this.position.y + attractionForce.y)
+    };
+    
+    if (isSpaceFree(newPosition.x, newPosition.y, this).collisionDetected === false) {
+      this.destinationPosition.x = newPosition.x;
+      this.destinationPosition.y = newPosition.y;    
+    }    
+  }
   
   tryMove(delta) { 
     const sequence = [
@@ -394,60 +486,32 @@ export class Slime extends GameObject {
   }   
     
   step(delta, root) { 
-    if (this.isAlive === false) {
-      this.deSpawn();
-      return;
-    }
+
     
     if (this.shieldTime > 0) {
       this.workOnEnergyShield(delta);
       return;
     }
+       
+    const nearbyEntities = this.findEntitiesWithinRadius(movingObjects, this, this.sensingRadius);    
+    const nearbyPlayer = this.findNearbyPlayer(movingObjects);
     
-    const rangeForNewBehavior = 5 * gridSize; // Adjust as needed
-    
-    const nearbyEntities = this.findEntitiesWithinRadius(movingObjects, this, rangeForNewBehavior);
-    const player = this.findPlayer(movingObjects);
-    const distanceToPlayer = this.distanceTo(player);
+    const distanceToPlayer = this.distanceTo(nearbyPlayer);
   
-    if (distanceToPlayer <= rangeForNewBehavior) {
-
-      const targetArcDistance = (Math.random() * 3 + 1) * gridSize;
-    
-      const numNearby = nearbyEntities.length;
-      const angleOffset = (Math.PI * 2) / numNearby * nearbyEntities.indexOf(this);
-      
-      const angleToPlayer = Math.atan2(player.position.y - this.position.y, player.position.x - this.position.x); // Angle relative to player
-
-      let targetAngle = angleToPlayer + angleOffset + Math.PI;
-      targetAngle = Math.max(-Math.PI, Math.min(Math.PI, targetAngle)); // Clamp targetAngle within valid range
-      
-      const attractionForce = {
-        x: Math.cos(targetAngle) * (targetArcDistance - distanceToPlayer) * 0.02, // Lower magnitude for subtle movement
-        y: Math.sin(targetAngle) * (targetArcDistance - distanceToPlayer) * 0.02,
-      };
-
-      const thresholdDistance = 0.8 * gridSize;
-      if (distanceToPlayer < thresholdDistance) {
-        attractionForce.x *= 0.2; 
-        attractionForce.y *= 0.2;
-      }
-
-      const newPosition = {
-        x: Math.floor(this.position.x + attractionForce.x),
-        y: Math.floor(this.position.y + attractionForce.y)
-      };
-      
-      if (isSpaceFree(newPosition.x, newPosition.y, this).collisionDetected === false) {
-        this.destinationPosition.x = newPosition.x;
-        this.destinationPosition.y = newPosition.y;    
-      }            
+    if (distanceToPlayer <= this.sensingRadius) {
+      this.avoid(nearbyEntities, nearbyPlayer);
+      this.body.frame = 2;    
     }
+    
     const distance = moveTowards(this, this.destinationPosition, this.speed);    
     
     this.updateHitboxCenter();
     
     const collisionTest = this.checkCollisions(movingObjects);
+    
+    if (collisionTest) {
+      
+    }
     
     const hasArrived = distance < 1;
     
@@ -455,8 +519,6 @@ export class Slime extends GameObject {
       this.tryMove(delta)
     }    
   } 
-  
-
    
   onEnergyShield() {
     if (this.shieldTime > 0) {
@@ -469,9 +531,9 @@ export class Slime extends GameObject {
     
     this.shieldImage.addChild(new Sprite({
       frameSize: new Vector2(32, 32),
-      scale: 1,
+      scale: 2,
       resource: resources.images.energyShield,
-      position: new Vector2(8, 8)
+      position: new Vector2(-16, -16)
     }))
    
    this.addChild(this.shieldImage) 
