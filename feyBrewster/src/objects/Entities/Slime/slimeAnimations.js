@@ -17,7 +17,7 @@ export const SHIELD = {
   frames: [
     {
       time: 0,
-      frame: 2
+      frame: 3
     },
   ]
 }    
