@@ -486,7 +486,7 @@ export class Slime extends GameObject {
   }   
     
   step(delta, root) { 
-
+    if (!this.isAlive) {return};
     
     if (this.shieldTime > 0) {
       this.workOnEnergyShield(delta);
