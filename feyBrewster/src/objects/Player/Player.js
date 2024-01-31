@@ -53,13 +53,19 @@ export class Player extends GameObject {
     this.height = 32;
 
     this.mass = 200;
-    this.speed = 2;
     
+    this.baseSpeed = 2;
+    this.speed = this.baseSpeed;
+  
     this.radius = 16;
     this.center = new Vector2(this.position.x + gridSize / 2, this.position.y + gridSize / 2);
     
     this.destinationPosition = this.position.duplicate();
  
+    this.maxHealth = 100;
+    this.currentHealth = 100;
+    this.attackPower = 10;    
+    
     this.facingDirection = DOWN;    
     
     this.itemPickUpTime = 0;
@@ -240,7 +246,7 @@ export class Player extends GameObject {
       };
     }
 
-    const penetrationDepth = Math.min(this.radius + other.radius - distance, this.width / 2);    
+    const penetrationDepth = Math.min(this.radius + other.radius - distance, 1);    
     
     const collisionVectorNormalized = {
       x: dx / distance,
@@ -248,14 +254,16 @@ export class Player extends GameObject {
     }
    
     const relativeSpeed = Math.sqrt(this.speed * other.speed);    
-    const linearForce = Math.min(penetrationDepth * 12, 6);   
-    const forceCurve = Math.pow(penetrationDepth, 2) * 6;
-    const logarithmicForce = Math.log(penetrationDepth + 1) * 4;
+    const linearForce = Math.min(penetrationDepth * 6, 10);   
+    const forceCurve = Math.pow(penetrationDepth, .8) * 20;
+    const logarithmicForce = Math.log(penetrationDepth + 1) * 30;
+    
+    const forceCap = this.mass;
     
     return {
-      x: Math.max(Math.min(collisionVectorNormalized.x * linearForce * logarithmicForce * forceCurve * relativeSpeed, 100), -100).toFixed(2),
-      y: Math.max(Math.min(collisionVectorNormalized.y * linearForce * logarithmicForce * forceCurve * relativeSpeed, 100), -100).toFixed(2)
-    };       
+      x: Math.max(Math.min(collisionVectorNormalized.x * linearForce * logarithmicForce * forceCurve * relativeSpeed, forceCap), -forceCap).toFixed(2),
+      y: Math.max(Math.min(collisionVectorNormalized.y * linearForce * logarithmicForce * forceCurve * relativeSpeed, forceCap), -forceCap).toFixed(2)
+    }       
   }
   
   onCollision(repulsionForce) {
@@ -288,6 +296,13 @@ export class Player extends GameObject {
     return Math.sqrt(dx * dx + dy * dy) <= this.radius + other.radius;
   }
   
+  collisionReaction(other) {    
+    if (other.type === 'player') {
+      other.slow(500, 0.5);
+      this.body.frame = 3;                                   
+    }        
+  }
+  
   checkCollisions(otherObjects) {
     if (otherObjects.length <= 1) {return false};
 
@@ -298,6 +313,9 @@ export class Player extends GameObject {
 
       if (this.overlaps(other) && this !== other) {
         this.onCollision(this.calculateRepulsionForce(other));
+        
+        other.collisionReaction(this);
+        
         if (!collisionDetected) {collisionDetected = true};
       }
     }
@@ -340,6 +358,13 @@ export class Player extends GameObject {
         obstacles.splice(i, 1); 
       }
     }
+  }
+  
+  slow(duration, amount) {
+      this.speed = Math.max(0, this.speed * amount); // Apply slow effect
+      setTimeout(() => {
+          this.speed = this.baseSpeed; // Restore speed after duration
+      }, duration);
   }
   
   ready() {
