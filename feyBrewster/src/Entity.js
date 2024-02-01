@@ -87,11 +87,11 @@ export class Entity extends GameObject {
       // this.destinationPosition.x = newPosition.x;
       // this.destinationPosition.y = newPosition.y;
     // }
-  // }  
+  // }
+
   avoid(nearbyEntities, nearbyPlayer) {
     const distanceToPlayer = this.distanceTo(nearbyPlayer);
     const targetArcDistance = (Math.random() * 2 + 2) * gridSize;
-    console.log(targetArcDistance)
     
     const numNearby = nearbyEntities.length;
     const angleOffset = (Math.PI * 2) / numNearby * nearbyEntities.indexOf(this);
@@ -102,8 +102,8 @@ export class Entity extends GameObject {
     let targetAngle = angleToPlayer + angleOffset + randomOffset;
     
     const attractionForce = {
-      x: Math.cos(targetAngle) * (targetArcDistance - distanceToPlayer) * 0.5, // Lower magnitude for subtle movement
-      y: Math.sin(targetAngle) * (targetArcDistance - distanceToPlayer) * 0.5,
+      x: Math.cos(targetAngle) * (targetArcDistance - distanceToPlayer) * 0.4, // Lower magnitude for subtle movement
+      y: Math.sin(targetAngle) * (targetArcDistance - distanceToPlayer) * 0.3,
     };
 
     const thresholdDistance = this.sensingRadius / 2;
@@ -123,6 +123,55 @@ export class Entity extends GameObject {
       this.destinationPosition.y = newPosition.y;    
     }    
   }
+  
+  avoidNearbyEntities(nearbyEntities) {
+    const numNearby = nearbyEntities.length;
+
+    const averagePosition = {
+      x: 0,
+      y: 0,
+    };
+    const numAvoiding = nearbyEntities.filter(entity => entity.inAvoidState).length;
+    for (const entity of nearbyEntities) {
+      if (entity.inAvoidState) {
+        averagePosition.x += entity.position.x;
+        averagePosition.y += entity.position.y;
+      }
+    }
+    averagePosition.x /= numAvoiding;
+    averagePosition.y /= numAvoiding;
+
+    const angleToAverage = Math.atan2(
+      averagePosition.y - this.position.y,
+      averagePosition.x - this.position.x
+    );
+
+    const randomOffset = Math.random() * Math.PI / 4;
+    const targetAngle = angleToAverage + randomOffset;
+
+    const targetDistance = (Math.random() * 2 + 2) * gridSize;
+
+    const attractionForce = {
+      x: Math.cos(targetAngle) * targetDistance * 0.5,
+      y: Math.sin(targetAngle) * targetDistance * 0.5,
+    };
+    const thresholdDistance = this.sensingRadius / 2;
+    
+    if (targetDistance < thresholdDistance) {
+      attractionForce.x *= 0.5; 
+      attractionForce.y *= 0.5;
+    }
+
+    const newPosition = {
+      x: Math.floor(this.position.x + attractionForce.x),
+      y: Math.floor(this.position.y + attractionForce.y)
+    };
+    
+    if (isSpaceFree(newPosition.x, newPosition.y, this).collisionDetected === false) {
+      this.destinationPosition.x = newPosition.x;
+      this.destinationPosition.y = newPosition.y;    
+    } 
+  }  
   
   calculateRepulsionForce(other) {
     const dx = Math.ceil(this.center.x - other.center.x);
