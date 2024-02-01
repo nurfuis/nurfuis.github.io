@@ -75,8 +75,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":138,
-                 "y":329.5
+                 "x":149.5,
+                 "y":208.5
                 }, 
                 {
                  "height":0,
@@ -86,14 +86,14 @@
                         {
                          "name":"mass",
                          "type":"string",
-                         "value":"200"
+                         "value":"500"
                         }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":140.75,
-                 "y":176
+                 "x":207.75,
+                 "y":177
                 }, 
                 {
                  "height":0,
@@ -108,19 +108,19 @@
                         {
                          "name":"mass",
                          "type":"string",
-                         "value":"300"
+                         "value":"225"
                         }, 
                         {
                          "name":"maxHealth",
                          "type":"string",
-                         "value":"300"
+                         "value":"100"
                         }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":360,
-                 "y":173.5
+                 "x":330,
+                 "y":208.5
                 }, 
                 {
                  "height":0,
@@ -130,14 +130,14 @@
                         {
                          "name":"mass",
                          "type":"string",
-                         "value":"500"
+                         "value":"10"
                         }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":350.5,
-                 "y":335.5
+                 "x":265,
+                 "y":177.5
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -164,8 +164,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":256,
-                 "y":256
+                 "x":236,
+                 "y":303.5
                 }],
          "opacity":1,
          "type":"objectgroup",
