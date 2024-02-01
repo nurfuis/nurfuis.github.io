@@ -52,31 +52,65 @@ export class Entity extends GameObject {
     // ..
     
   }
-  
+  // avoid(nearbyEntities, nearbyPlayer) {
+    // const distanceToPlayer = this.distanceTo(nearbyPlayer);
+
+    // const targetArcDistance = (Math.random() * 2 + 2) * gridSize;
+
+    // const numNearby = nearbyEntities.length;
+    // const angleOffset = (Math.PI * 2) / numNearby * nearbyEntities.indexOf(this);
+
+    // const angleToPlayer = Math.atan2(nearbyPlayer.center.y - this.center.y, nearbyPlayer.center.x - this.center.x);
+
+    // const randomOffset = Math.random() * Math.PI / 4;
+    // let targetAngle = angleToPlayer + angleOffset + randomOffset;
+    // targetAngle = Math.max(-Math.PI, Math.min(Math.PI, targetAngle));
+
+    // const attractionForce = {
+      // x: Math.cos(targetAngle) * (targetArcDistance - distanceToPlayer),
+      // y: Math.sin(targetAngle) * (targetArcDistance - distanceToPlayer),
+    // };
+
+    // const thresholdDistance = this.sensingRadius / 2;
+
+    // if (distanceToPlayer < thresholdDistance) {
+      // attractionForce.x *= 0.8;
+      // attractionForce.y *= 0.8;
+    // }
+
+    // const newPosition = {
+      // x: Math.floor(this.position.x + attractionForce.x),
+      // y: Math.floor(this.position.y + attractionForce.y),
+    // };
+
+    // if (isSpaceFree(newPosition.x, newPosition.y, this).collisionDetected === false) {
+      // this.destinationPosition.x = newPosition.x;
+      // this.destinationPosition.y = newPosition.y;
+    // }
+  // }  
   avoid(nearbyEntities, nearbyPlayer) {
     const distanceToPlayer = this.distanceTo(nearbyPlayer);
-    const multiplier = Math.max(1, this.position.x / gridSize * 0.5);
-    const targetArcDistance = (Math.random() * 3 + 1) * gridSize * multiplier; 
+    const targetArcDistance = (Math.random() * 2 + 2) * gridSize;
+    console.log(targetArcDistance)
     
     const numNearby = nearbyEntities.length;
     const angleOffset = (Math.PI * 2) / numNearby * nearbyEntities.indexOf(this);
     
     const angleToPlayer = Math.atan2(nearbyPlayer.position.y - this.position.y, nearbyPlayer.position.x - this.position.x); // Angle relative to nearbyPlayer
 
-    const randomOffset = Math.random() < 0.95 ? Math.random() * Math.PI / 4 : Math.PI / 4;
-    let targetAngle = angleToPlayer + angleOffset + Math.PI + randomOffset;    
-    targetAngle = Math.max(-Math.PI, Math.min(Math.PI, targetAngle));
+    const randomOffset = Math.random() * Math.PI / 4;;
+    let targetAngle = angleToPlayer + angleOffset + randomOffset;
     
     const attractionForce = {
-      x: Math.cos(targetAngle) * (targetArcDistance - distanceToPlayer) * 0.01, // Lower magnitude for subtle movement
-      y: Math.sin(targetAngle) * (targetArcDistance - distanceToPlayer) * 0.01,
+      x: Math.cos(targetAngle) * (targetArcDistance - distanceToPlayer) * 0.5, // Lower magnitude for subtle movement
+      y: Math.sin(targetAngle) * (targetArcDistance - distanceToPlayer) * 0.5,
     };
 
     const thresholdDistance = this.sensingRadius / 2;
     
     if (distanceToPlayer < thresholdDistance) {
-      attractionForce.x *= 0.8; 
-      attractionForce.y *= 0.8;
+      attractionForce.x *= 0.5; 
+      attractionForce.y *= 0.5;
     }
 
     const newPosition = {
@@ -344,10 +378,10 @@ export class Entity extends GameObject {
       const entityRadius = entity.radius;
 
       const distanceToCenter = Math.sqrt(Math.pow(startX - entityCenterX, 2) + Math.pow(startY - entityCenterY, 2));
+      const rayLength = Math.sqrt(Math.pow(startX - endX, 2) + Math.pow(startY - endY, 2)) 
+      console.log(distanceToCenter,rayLength - entityRadius )
 
-      if (distanceToCenter <= gridSize * 2 && this != entity) {
-        console.log(distanceToCenter)
-        
+      if (distanceToCenter <= rayLength - entityRadius && this != entity) {
         closestHit = { x: entityCenterX, y: entityCenterY }; // Set intersection point to entity center
         entity.subtractHealth(this.attackPower * 100);
         console.log(this.entityId, 'collided with', entity);
