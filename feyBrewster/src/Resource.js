@@ -20,6 +20,7 @@ class Resources {
       woodenFermentationVesselTileset: "./public/sprites/woodenfvTileset.png",
       woodenKettleTileset: "./public/sprites/woodenkettleTileset.png",
       woodenMashTunTileset: "./public/sprites/woodenmashtunTileset.png",
+      broom: "./public/sprites/broom-sheet.png",
       
     };
 
