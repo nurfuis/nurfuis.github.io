@@ -189,15 +189,25 @@ export class Slime extends Entity {
     }
 
     const nearbyEntities = this.findEntitiesWithinRadius(this, this.sensingRadius);
+    let anyNearbyAvoiding = false;
+    for (const entity of nearbyEntities) {
+      if (entity.inAvoidState) {
+        anyNearbyAvoiding = true;
+        break;
+      }
+    }   
     const nearbyPlayer = this.findNearbyPlayer();
-
     const distanceToPlayer = this.distanceTo(nearbyPlayer);
 
     if (distanceToPlayer <= this.sensingRadius) {
+      this.inAvoidState = true;
       this.avoid(nearbyEntities, nearbyPlayer);
       this.body.frame = 2;
-
-      this.inAvoidState = true;
+    } else if (nearbyEntities.length > 0 && anyNearbyAvoiding) {
+      this.avoidNearbyEntities(nearbyEntities);
+      this.body.frame = 2;
+      this.inAvoidState = false;
+     
     } else {
       this.inAvoidState = false;
     }
