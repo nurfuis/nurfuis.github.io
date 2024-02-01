@@ -1,3 +1,16 @@
+import { Entity } from "../../Entity.js";
+import { Vector2 } from "../../Vector2.js";
+import { events } from "../../Events.js";
+import { resources } from "../../Resource.js";
+import { Sprite } from "../../Sprite.js";
+import { Animations } from "../../Animations.js";
+import { FrameIndexPattern } from "../../FrameIndexPattern.js";
+import { DOWN, LEFT, RIGHT, UP } from "../../Input.js";
+
+import { gridSize } from "../../helpers/grid.js";
+import { isSpaceFree } from "../../helpers/grid.js";
+import { visualizeRaycast } from "../../../main.js";
+
 import {
   PICK_UP_DOWN,
   STAND_DOWN,
@@ -14,79 +27,65 @@ import {
   ATTACK_DOWN,
 } from "./playerAnimations.js";
 import { Katana } from "../Items/Katana/Katana.js";
+import { Broom } from "../Items/Broom/Broom.js";
 
-import { GameObject } from "../../GameObject.js";
-import { Vector2 } from "../../Vector2.js";
-
-import { Sprite } from "../../Sprite.js";
-import { Animations } from "../../Animations.js";
-import { FrameIndexPattern } from "../../FrameIndexPattern.js";
-
-import { events } from "../../Events.js";
-import { resources } from "../../Resource.js";
-
-import { DOWN, LEFT, RIGHT, UP } from "../../Input.js";
-
-import { moveTowards } from "../../helpers/moveTowards.js";
-
-import { movingObjects } from "../../helpers/collisionDetection.js";
-
-import { obstacles } from "../../helpers/grid.js";
-import { gridSize } from "../../helpers/grid.js";
-import { isSpaceFree } from "../../helpers/grid.js";
-
-import { visualizeRaycast } from "../../../main.js";
-
-export class Player extends GameObject {
+export class Player extends Entity {
   constructor() {
     super({
       position: new Vector2(0, 0)
-    });    
-    this.isSpawned = false;
-    this.canSpawn = true;
-    this.currentWorld = null;
-    
+    });
+    this.isAlive = false;   
+    this.invisible = true;       
+    this.respawnDelay = 10000;
+      
     this.type = 'player';
-    this.entityId = 'player1';
+    
     this.hasCollision = true;
     this.width = 32;
-    this.height = 32;
-
-    this.mass = 200;
-    
-    this.baseSpeed = 2;
-    this.speed = this.baseSpeed;
-  
+    this.height = 32;    
     this.radius = 16;
-    this.center = new Vector2(this.position.x + gridSize / 2, this.position.y + gridSize / 2);
     
-    this.destinationPosition = this.position.duplicate();
- 
-    this.maxHealth = 100;
-    this.currentHealth = 100;
-    this.attackPower = 10;    
-    
+    this.mass = 200;
+    this.baseSpeed = 2;
+    this.speed = this.baseSpeed;    
     this.facingDirection = DOWN;    
     
+    this.maxHealth = 100;
+    this.currentHealth = 100;
+    
+    this.attackPower = 10;    
+
+    this.awarenessField = 5;
+    this.sensingRadius = this.awarenessField * gridSize;
+
     this.itemPickUpTime = 0;
     this.itemPickUpShell = null;
     
-    this.teleportCooldown = 0;
-    this.teleportEffect = null;
-    
     this.attackTime = 0;
-    this.attackImage = null;
+    this.attackWith = null;
     
     this.idleTime = 0;
     this.idleAction = 200;
-  
+    
+      
     const shadow = new Sprite({
       resource: resources.images.shadow,
       frameSize: new Vector2(32,32),
       position: new Vector2(2, -16),
-    })
-    
+    })    
     this.addChild(shadow);
+    
+    this.emptyHandRight = new Sprite({  
+      resource: resources.images.air,
+      frameSize: new Vector2(gridSize,gridSize),
+      position: new Vector2(0, 0),
+      frameSize: new Vector2(gridSize,gridSize),
+      hFrames: 1,
+      vFrames: 1,
+      frame: 0,      
+    })          
+    this.equipmentSpriteBelow = this.emptyHandRight;
+    this.addChild(this.equipmentSpriteBelow);
     
     this.body = new Sprite({
       resource: resources.images.player,
@@ -112,404 +111,25 @@ export class Player extends GameObject {
         attackDown: new FrameIndexPattern(ATTACK_DOWN),        
 
       })
-    })
-    
+    })    
     this.addChild(this.body);
-
-    this.hitBox = new Sprite({
-      resource: resources.images.FeyBrewsterTileSet,
-      frameSize: new Vector2(32,32),
+    
+    this.emptyHandLeft = new Sprite({  
+      resource: resources.images.air,
+      frameSize: new Vector2(gridSize,gridSize),
       position: new Vector2(0, 0),
       frameSize: new Vector2(gridSize,gridSize),
-      hFrames: 16,
-      vFrames: 16,
-      frame: 47,
-      
-    })
-    // this.addChild(this.hitBox);
+      hFrames: 1,
+      vFrames: 1,
+      frame: 0,      
+    })         
+    this.equipmentSpriteAbove = this.emptyHandLeft;
+    this.addChild(this.equipmentSpriteAbove);
 
     events.on("PLAYER_PICKS_UP_ITEM", this, data => {
       this.onPickUpItem(data);
     })
-  }
-  
-  minX() {
-    return this.position.x;
-  }
-  
-  minY () {
-    return this.position.y;
-  }
-  
-  maxX() {
-    return this.position.x + this.width;
-  }
-  
-  maxY() {
-    return this.position.y + this.height;
-  }
-   
-  findPlayer(entities) {
-    return entities.find(object => object.type === 'player');
-  }
- 
-  findEntitiesWithinRadius(entities, referenceObject, radius) {
-    return entities.filter(object => {
-      const distance = Math.sqrt(
-        Math.pow(object.position.x - referenceObject.position.x, 2) +
-        Math.pow(object.position.y - referenceObject.position.y, 2)
-      );
-      return distance <= radius;
-    });
   }  
-  
-  distanceTo(other) {
-    const dx = this.center.x - other.center.x;
-    const dy = this.center.y - other.center.y;
-    
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    
-    return distance;
-  } 
-  
-  distanceSquared(x1, y1, x2, y2) {
-    return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
-  }
-  
-  normalizeVector(vector) {
-    const length = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
-    if (length === 0) {
-      return { x: 0, y: 0 };
-    }
-    return {
-      x: vector.x / length,
-      y: vector.y / length
-    };
-  }
-
-  lineSegmentIntersection(x1, y1, dx1, dy1, x2, y2, dx2, dy2) {
-    const denominator = (dy2 * dx1) - (dx2 * dy1);
-    if (denominator === 0) {   
-      return null; 
-    }
-
-    const t = ((x2 - x1) * dy2 + (y1 - y2) * dx2) / denominator;
-    const u = ((x2 - x1) * dy1 + (y1 - y2) * dx1) / denominator;
-
-    if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
-      const intersectionX = Math.round(x1 + (t * dx1));
-      const intersectionY = Math.round(y1 + (t * dy1));
-      
-      return { x: intersectionX, y: intersectionY };
-    
-    } else {
-      return null; 
-    }
-  }  
-
-  raycast(startX, startY, endX, endY) {   
-    let closestHit;   
-    
-    const dX = endX - startX;
-    const dY = endY - startY;
-
-    for (let i = obstacles.length - 1; i >= 0; i--) {
-      const obstacle = obstacles[i];
-      
-      const obstacleX1 = obstacle.minX();
-      const obstacleY1 = obstacle.minY();
-      const obstacleX2 = obstacle.maxX();
-      const obstacleY2 = obstacle.maxY();
-      
-      const intersection = this.lineSegmentIntersection(startX, startY, dX, dY, obstacleX1, obstacleY1, obstacleX2, obstacleY2);
-
-      if (intersection && (!closestHit || this.distanceSquared(startX, startY, intersection.x, intersection.y) < this.distanceSquared(startX, startY, closestHit.x, closestHit.y))) {
-        closestHit = intersection;
-      }
-    }
-    return closestHit;
-  } 
-
-  calculateRepulsionForce(other) {
-    const dx = Math.ceil(this.center.x - other.center.x);
-    const dy = Math.ceil(this.center.y - other.center.y);
-    
-    const distance = Math.sqrt(dx * dx + dy * dy).toFixed(2);    
-    console.log(distance)
-    
-    if (Math.sqrt(dx * dx + dy * dy) < .001) {
-      const randomAngle = Math.random() * 2 * Math.PI;
-      
-      return {
-        x: Math.cos(randomAngle) * 32,
-        y: Math.sin(randomAngle) * 32
-      };
-    }
-
-    const penetrationDepth = Math.min(this.radius + other.radius - distance, 1);    
-    
-    const collisionVectorNormalized = {
-      x: dx / distance,
-      y: dy / distance
-    }
-   
-    const relativeSpeed = Math.sqrt(this.speed * other.speed);    
-    const linearForce = Math.min(penetrationDepth * 6, 10);   
-    const forceCurve = Math.pow(penetrationDepth, .8) * 20;
-    const logarithmicForce = Math.log(penetrationDepth + 1) * 30;
-    
-    const forceCap = this.mass;
-    
-    return {
-      x: Math.max(Math.min(collisionVectorNormalized.x * linearForce * logarithmicForce * forceCurve * relativeSpeed, forceCap), -forceCap).toFixed(2),
-      y: Math.max(Math.min(collisionVectorNormalized.y * linearForce * logarithmicForce * forceCurve * relativeSpeed, forceCap), -forceCap).toFixed(2)
-    }       
-  }
-  
-  onCollision(repulsionForce) {
-    console.log(repulsionForce)
-    
-    const newPosition = {
-      x: Math.floor(this.position.x + repulsionForce.x / this.mass),
-      y: Math.floor(this.position.y + repulsionForce.y / this.mass)
-    };
-    
-    const raycastHit = this.raycast(this.position.x, this.position.y, newPosition.x, newPosition.y);
-    visualizeRaycast(this.center.x, this.center.y, newPosition.x + gridSize / 2, newPosition.y + gridSize / 2, raycastHit, this);
-
-    if (raycastHit) {
-      this.position = new Vector2(Math.floor(raycastHit.x), Math.floor(raycastHit.y));
-      this.destinationPosition = this.position.duplicate();   
-      this.updateHitboxCenter();
-    }
-    
-    if (!raycastHit && isSpaceFree(newPosition.x, newPosition.y, this).collisionDetected === false) {
-      this.position = new Vector2(newPosition.x, newPosition.y);
-      this.destinationPosition = this.position.duplicate();
-      this.updateHitboxCenter();
-    }
-  }
-  
-  overlaps(other) {
-    const dx = this.center.x - other.center.x;
-    const dy = this.center.y - other.center.y;
-    return Math.sqrt(dx * dx + dy * dy) <= this.radius + other.radius;
-  }
-  
-  collisionReaction(other) {    
-    if (other.type === 'player') {
-      other.slow(500, 0.5);
-      this.body.frame = 3;                                   
-    }        
-  }
-  
-  checkCollisions(otherObjects) {
-    if (otherObjects.length <= 1) {return false};
-
-    let collisionDetected = false;
-
-    for (let i = otherObjects.length - 1; i >= 0; i--) {
-      const other = otherObjects[i];
-
-      if (this.overlaps(other) && this !== other) {
-        this.onCollision(this.calculateRepulsionForce(other));
-        
-        other.collisionReaction(this);
-        
-        if (!collisionDetected) {collisionDetected = true};
-      }
-    }
-
-    return collisionDetected;
-  }
-   
-  updateHitboxCenter() {
-    this.center = new Vector2(Math.floor(this.position.x + gridSize / 2), Math.floor(this.position.y + gridSize / 2));
-  } 
-  
-  setPosition(x, y, world) {
-    this.position = new Vector2(x, y);
-    this.destinationPosition = this.position.duplicate();
-    this.currentWorld = world;
-  };
-  
-  spawn(x, y, world, plane) {
-    if (this.canSpawn && !this.isSpawned) {
-      this.setPosition(x, y, world);
-      
-      plane.addChild(this);
-      
-      
-      if (this.hasCollision) {
-        this.updateHitboxCenter();
-        movingObjects.push(this);
-      }
-      
-      this.isSpawned = true;    
-
-    }
-    console.log(this.entityId + " has spawned at " + this.position.x + "," + this.position.y + "," + this.currentWorld);
-
-  }
-  
-  despawn() {
-    for (let i = obstacles.length - 1; i >= 0; i--) { // Iterate backwards to avoid index issues
-      if (obstacles[i].owner === this) {
-        obstacles.splice(i, 1); 
-      }
-    }
-  }
-  
-  slow(duration, amount) {
-      this.speed = Math.max(0, this.speed * amount); // Apply slow effect
-      setTimeout(() => {
-          this.speed = this.baseSpeed; // Restore speed after duration
-      }, duration);
-  }
-  
-  ready() {
-  
-  }
-  
-  step(delta, root) {
-    if (this.teleportCooldown > 0) {
-      this.workOnTeleport(delta);
-      return;
-    }    
-    if (this.attackTime > 0) {
-      this.workOnSwordAttack(delta);
-      return;
-    }  
-    if (this.itemPickUpTime > 0) {
-      this.workOnItemPickUp(delta);
-      return;
-    }
-
-    const distance = moveTowards(this, this.destinationPosition, this.speed);    
-    this.updateHitboxCenter();
-    const collisionTest = this.checkCollisions(movingObjects);
-   
-   const hasArrived = distance < 1;
-    if (hasArrived) {
-      this.tryMove(delta, root)
-    }
-    this.tryEmitPosition()
-  }
-  
-  tryEmitPosition() {
-    if (this.lastX == this.position.x && this.lastY == this.position.y) {
-      return;
-    }
-    this.lastX = this.position.x;
-    this.lastY = this.position.y;
-    events.emit("PLAYER_POSITION", { 
-      x: this.position.x, 
-      y: this.position.y, 
-      world: this.currentWorld,
-      center: this.center,
-      radius: this.radius,    
-    })
-  }
-  
-  tryMove(delta, root) {
-    const {input} = root;
-
-    if (input.key) {
-      if (input.key === 'F1' && this.currentWorld != 'tutorialMap') {
-        this.teleport(-128, 96, 'tutorialMap');
-      }
-      if (input.key === 'F2' && this.currentWorld != 'brewhouse2') {
-        this.teleport(96, 96, 'brewhouse2'); 
-      }
-    };  
-    
-    if (!input.direction && !input.isClicking) {    
-      this.idleBehavior(delta);
-      return;
-    }
-    
-    if (input.isClicking && !input.isTextFocused) {      
-      this.clickBehavior();
-      return;
-    }
-
-    let multiplierX = this.destinationPosition.x % gridSize < gridSize / 2
-      ? Math.floor(this.destinationPosition.x / gridSize)
-      : Math.ceil(this.destinationPosition.x / gridSize);
-
-    let multiplierY = this.destinationPosition.y % gridSize < gridSize / 2
-      ? Math.floor(this.destinationPosition.y / gridSize)
-      : Math.ceil(this.destinationPosition.y / gridSize);
-    
-    let nextX = multiplierX * gridSize;
-    let nextY = multiplierY * gridSize;
-    
-    if (input.direction == DOWN) {
-      nextY += gridSize;
-      this.body.animations.play("walkDown")
-    }
-    
-    if (input.direction == UP) {
-      nextY -= gridSize;
-      this.body.animations.play("walkUp")
-    }
-    
-    if (input.direction == LEFT) {
-      nextX -= gridSize;
-      this.body.animations.play("walkLeft")
-    }
-    
-    if (input.direction == RIGHT) {
-      nextX += gridSize;
-      this.body.animations.play("walkRight")
-    }
-    
-    const collisionCheck = isSpaceFree(nextX, nextY, this);
-    
-    if (collisionCheck.collisionDetected === false) {
-      this.destinationPosition.x = nextX;
-      this.destinationPosition.y = nextY;    
-    } 
-    this.facingDirection = input.direction ?? this.facingDirection;
-  };   
-  
-  teleport(x, y, world) {
-    if (this.teleportCooldown > 0) {
-      return this.teleportCooldown;
-    }
-    this.clearColliders();
-    this.isSpawned = false;
-    this.parent.removeChild(this);
-    this.teleportCooldown = 500;
-    // this.teleportEffect = new GameObject({});
-    // this.teleportEffect.addChild(new Sprite({
-      // resource: resources.images.shroud,
-      // position: new Vector2(-1000, -560),
-      // frameSize: new Vector2(2000, 1125),
-    // }))
-    // this.addChild(this.teleportEffect);    
-    // for (let i = obstacles.length - 1; i >= 0; i--) { // Iterate backwards to avoid index issues
-      // if (obstacles[i].owner === this) {
-        // obstacles.splice(i, 1); 
-      // }
-    // }     
-    this.destinationPosition.x = x;
-    this.destinationPosition.y = y;
-    this.position.x = x;
-    this.position.y = y;
-    this.currentWorld = world;
-    this.facingDirection = DOWN;    
-    events.emit("TEXT_OUTPUT", { details: world})       
-    events.emit("PLAYER_POSITION", { x: x, y: y, world: world, reason: "teleport" })     
-  }
-  
-  workOnTeleport(delta) {
-    this.teleportCooldown -= delta;
-    // if (this.teleportCooldown <= 0) {
-      // this.teleportEffect.destroy();
-    // }
-  }  
-  
   idleBehavior(delta) {
     if (this.idleTime < this.idleAction ) {
       this.idleTime += delta;
@@ -522,26 +142,67 @@ export class Player extends GameObject {
     if (this.facingDirection === DOWN) {this.body.animations.play("standDown")}
   }
   
-  clickBehavior() {
-    if (this.facingDirection === LEFT) {this.onSwordAttack(LEFT)}
-    if (this.facingDirection === UP) {this.onSwordAttack(UP)}
-    if (this.facingDirection === RIGHT) {this.onSwordAttack(RIGHT)}
-    if (this.facingDirection === DOWN) {this.onSwordAttack(DOWN)}    
+  doClickBehavior() {
+    if (this.facingDirection === LEFT) {this.doAttack(LEFT)}
+    if (this.facingDirection === UP) {this.doAttack(UP)}
+    if (this.facingDirection === RIGHT) {this.doAttack(RIGHT)}
+    if (this.facingDirection === DOWN) {this.doAttack(DOWN)}    
   }
   
-  onSwordAttack(direction) {
-    // start animation 
+  doAttack(direction) {
     if (this.attackTime > 0) {
       return;
     }
-    this.attackTime = 250; // ms
+    this.attackTime = 350; // ms
+    this.attackWith = new Broom(this.position.x, this.position.y, this.currentWorld, this.facingDirection)  
     
-    this.attackImage = new Katana(this.position.x, this.position.y, this.currentWorld, direction);
+    let newPosition = { x: this.center.x, y: this.center.y };
+    switch (direction) {
+      case 'UP':
+        newPosition.y -= gridSize *2;
+        break;
+      case 'RIGHT':
+        newPosition.x += gridSize *2;
+        break;
+      case 'DOWN':
+        newPosition.y += gridSize *2;
+        break;
+      case 'LEFT':
+        newPosition.x -= gridSize *2;
+        break;
+    }
+    if (direction === 'UP' || direction === 'DOWN') {
     
-    this.addChild(this.attackImage);
+      const raycastHitA = this.dynamicRaycast(this.center.x, this.center.y, newPosition.x, newPosition.y);
+      visualizeRaycast(this.center.x, this.center.y, newPosition.x, newPosition.y, raycastHitA, this);
+
+      const raycastHitB = this.dynamicRaycast(this.center.x, this.center.y, newPosition.x + gridSize * 0.7, newPosition.y);
+      visualizeRaycast(this.center.x, this.center.y, newPosition.x + gridSize * 0.7, newPosition.y, raycastHitB, this);
+      
+      const raycastHitC = this.dynamicRaycast(this.center.x, this.center.y, newPosition.x - gridSize * 0.7, newPosition.y);
+      visualizeRaycast(this.center.x, this.center.y, newPosition.x - gridSize * 0.7, newPosition.y, raycastHitC, this);    
+    }
+    if (direction === 'LEFT' || direction === 'RIGHT') {
+    
+      const raycastHitA = this.dynamicRaycast(this.center.x, this.center.y, newPosition.x, newPosition.y);
+      visualizeRaycast(this.center.x, this.center.y, newPosition.x, newPosition.y, raycastHitA, this);
+
+      const raycastHitB = this.dynamicRaycast(this.center.x, this.center.y, newPosition.x, newPosition.y + gridSize * 0.7);
+      visualizeRaycast(this.center.x, this.center.y, newPosition.x, newPosition.y + gridSize * 0.7, raycastHitB, this);
+      
+      const raycastHitC = this.dynamicRaycast(this.center.x, this.center.y, newPosition.x, newPosition.y - gridSize * 0.7);
+      visualizeRaycast(this.center.x, this.center.y, newPosition.x, newPosition.y - gridSize * 0.7, raycastHitC, this);    
+    }    
+    
+    
+    if (direction === 'RIGHT' || direction === 'UP') {
+      this.equipmentSpriteBelow.addChild(this.attackWith); 
+    } else {
+       this.equipmentSpriteAbove.addChild(this.attackWith);      
+    }
   } 
   
-  workOnSwordAttack(delta) {
+  isAttacking(delta) {
     this.attackTime -= delta;
     
     if (this.facingDirection === LEFT) {this.body.animations.play( 'attackLeft' )}
@@ -550,7 +211,7 @@ export class Player extends GameObject {
     if (this.facingDirection === DOWN) {this.body.animations.play( 'attackDown' )}    
     
     if (this.attackTime <= 0) {
-      this.attackImage.destroy();
+      this.attackWith.destroy();
     } 
   }      
   
@@ -573,7 +234,111 @@ export class Player extends GameObject {
     if (this.itemPickUpTime <= 0) {
       this.itemPickUpShell.destroy();
     }
-  }
+  }   
   
- 
+  tryEmitPosition() {
+    if (this.lastX == this.position.x && this.lastY == this.position.y) {
+      return;
+    }
+    this.lastX = this.position.x;
+    this.lastY = this.position.y;
+    
+    events.emit("PLAYER_POSITION", { 
+      x: this.position.x, 
+      y: this.position.y, 
+      world: this.currentWorld,
+      center: this.center,
+      radius: this.radius,    
+    })
+  }  
+  
+  tryMove(delta, root) {
+    const {input} = root; 
+    
+    if (!input.direction && !input.isClicking) {    
+      this.idleBehavior(delta);
+      return;
+    }
+    
+    if (input.isClicking && !input.isTextFocused) {      
+      this.doClickBehavior();
+      return;
+    }
+
+    let snapToGridX = this.destinationPosition.x % gridSize < gridSize / 2
+      ? Math.floor(this.destinationPosition.x / gridSize)
+      : Math.ceil(this.destinationPosition.x / gridSize);
+
+    let snapToGridY = this.destinationPosition.y % gridSize < gridSize / 2
+      ? Math.floor(this.destinationPosition.y / gridSize)
+      : Math.ceil(this.destinationPosition.y / gridSize);
+    
+    let nextX = snapToGridX * gridSize;
+    let nextY = snapToGridY * gridSize;
+    
+    if (input.direction == DOWN) {
+      nextY += gridSize;
+      this.body.animations.play("walkDown")
+    }
+    
+    if (input.direction == UP) {
+      nextY -= gridSize;
+      this.body.animations.play("walkUp")
+    }
+    
+    if (input.direction == LEFT) {
+      nextX -= gridSize;
+      this.body.animations.play("walkLeft")
+    }
+    
+    if (input.direction == RIGHT) {
+      nextX += gridSize;
+      this.body.animations.play("walkRight")
+    }
+    
+    if (isSpaceFree(nextX, nextY, this).collisionDetected === false) {
+      this.destinationPosition.x = nextX;
+      this.destinationPosition.y = nextY;    
+    }
+    this.facingDirection = input.direction ?? this.facingDirection;
+  };   
+  
+  step(delta, root) {
+    
+    if (this.attackTime > 0) {
+      this.isAttacking(delta);
+      return;
+    }  
+    if (this.itemPickUpTime > 0) {
+      this.workOnItemPickUp(delta);
+      return;
+    }
+
+    const distance = this.moveTowards(this, this.destinationPosition, this.speed);    
+           
+    const collidees = this.returnOverlappingEntities();
+    
+    if (collidees.length > 0) {     
+      for (let i = collidees.length - 1; i >= 0; i--) {
+        const collidee = collidees[i];
+        this.onCollision(this.calculateRepulsionForce(collidee));
+
+        collidee.reflexAction(this);       
+        
+      }
+    }
+        
+    const hasArrived = distance < 1;
+    
+    if (hasArrived) {
+      this.tryMove(delta, root)
+    }
+    
+    this.tryEmitPosition()
+  }
+     
+  ready() {
+
+  }
+   
 }
