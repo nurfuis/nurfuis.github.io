@@ -86,7 +86,7 @@
                         {
                          "name":"mass",
                          "type":"string",
-                         "value":"500"
+                         "value":"200"
                         }],
                  "rotation":0,
                  "type":"",
@@ -108,12 +108,12 @@
                         {
                          "name":"mass",
                          "type":"string",
-                         "value":"250"
+                         "value":"300"
                         }, 
                         {
                          "name":"maxHealth",
                          "type":"string",
-                         "value":"100"
+                         "value":"300"
                         }],
                  "rotation":0,
                  "type":"",
@@ -130,7 +130,7 @@
                         {
                          "name":"mass",
                          "type":"string",
-                         "value":"1000"
+                         "value":"500"
                         }],
                  "rotation":0,
                  "type":"",

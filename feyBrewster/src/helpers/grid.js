@@ -10,7 +10,6 @@ export const isSpaceFree = (posX, posY, collider) => {
   for (let i = 0; i < obstacles.length; i++) {
     const collidee = obstacles[i];
 
-    // Calculate bounding areas for both collider and collidee
     const colliderX1 = posX;
     const colliderX2 = colliderX1 + collider.width;
     const colliderY1 = posY;
@@ -24,7 +23,6 @@ export const isSpaceFree = (posX, posY, collider) => {
     if (collidee == collider) {
       return { collisionDetected: false };
     }
-
     
     if (    
       colliderX1 >= collideeX1 && 
@@ -34,6 +32,7 @@ export const isSpaceFree = (posX, posY, collider) => {
       ) {
       return { collisionDetected: true, collider: collider, collidee: collidee };
     }
+    
     if (    
       collideeX1 >= colliderX1 && 
       collideeX1 < colliderX2 &&
@@ -41,10 +40,7 @@ export const isSpaceFree = (posX, posY, collider) => {
       collideeY1 < colliderY2
       ) {
       return { collisionDetected: true, collider: collider, collidee: collidee };
-    }    
-    
-    
+    }        
   }
-
   return { collisionDetected: false };
 };

@@ -38,8 +38,9 @@ export class Entities extends GameObject {
 				if (entityObject) {
 					switch(entityObject.name) {
 						case "slime":
-							let slime = new Slime(entityX, entityY, world, chunkId, entityObject);
-							this.addChild(slime);
+							let slime = new Slime(chunkId, entityObject);
+							slime.joinWorld(entityX, entityY, world, this);
+              slime.spawn();
 							break;
 						case "spark":
 							let spark = new Spark(entityX, entityY, world, chunkId);

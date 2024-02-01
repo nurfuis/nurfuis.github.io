@@ -62,7 +62,11 @@
     <property name="maxHealth" value="100"/>
    </properties>
   </object>
-  <object id="11" name="slime" x="350.5" y="335.5"/>
+  <object id="11" name="slime" x="350.5" y="335.5">
+   <properties>
+    <property name="mass" value="10"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup id="4" name="foreground">
   <object id="1" name="spawnLocation" x="256" y="256">

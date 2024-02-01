@@ -93,44 +93,37 @@ export class SceneManager {
     });
     
     events.on("REMOVE_CHUNK", this, (chunk) => {
-      this.removeChunk(chunk.x, chunk.y, chunk.world, chunk.owner);
+      this.removeChunk(chunk.x, chunk.y, chunk.world);
     });
     
     events.on("SPAWN_ZONE_READY", this, (position) => {
-      console.log('spawning player in', position.world);
       for (let i = 0; i < this.playerList.length; i++) {
         const player = this.playerList[i];
-        player.spawn(position.x, position.y, position.world, this.foreground);
+        player.joinWorld(position.x, position.y, position.world, this.foreground);
+        player.spawn();
       }
       console.log('mainScene',this.mainScene);
     });
     
     events.on("PLAYER_POSITION", this, (position) => {
-      this.updateVisibleArea(position.x, position.y, position.world, position.reason);
-
-      if (position.reason === "teleport") {
-        this.closeCurtain();
-      }
+      this.updateVisibleArea(position.x, position.y, position.world);
     });
   }
   
   closeCurtain() {
-    const teleportEffect = new GameObject({});
+    const curtainEffect = new GameObject({});
 
-    // Create and add the sprite as a child
     const sprite = new Sprite({
       resource: resources.images.shroud,
       position: new Vector2(-1000, -560),
       frameSize: new Vector2(2000, 1125),
     });
-    teleportEffect.addChild(sprite);
+    curtainEffect.addChild(sprite);
 
-    // Add the teleportEffect as a child to this object
-    this.curtain.addChild(teleportEffect);
+    this.curtain.addChild(curtainEffect);
 
-    // Remove the teleportEffect after 500ms using a timeout
     setTimeout(() => {
-      this.curtain.removeChild(teleportEffect);
+      this.curtain.removeChild(curtainEffect);
     }, 500);
   }
   
@@ -143,17 +136,15 @@ export class SceneManager {
       const chunkX = chunk.x;
       const chunkY = chunk.y;
       const world = chunk.world;
-      const owner = chunkId;
       events.emit("REMOVE_CHUNK", {
         x: chunkX,
         y: chunkY,
         world: world,
-        owner: owner
       });
     }
   }
 
-  updateVisibleArea(x, y, world, reason) {
+  updateVisibleArea(x, y, world) {
     const {chunkX, chunkY } = this.worldToChunkCoords(x, y);
 
     if (this.currentWorld != world) {
@@ -285,74 +276,12 @@ export class SceneManager {
     });
   }  
   
-  async loadXMLChunkData(chunkX, chunkY, world, fileName) {
-    const chunkId = this.getChunkId(chunkX, chunkY, world);
-    const xmlFile = `./src/levels/${world}/${fileName}`;
-
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", xmlFile);
-    xhr.onload = function() {
-      if (xhr.status === 200) {
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(xhr.responseText, "text/xml");
-
-        const chunkData = {
-          width: parseInt(xmlDoc.documentElement.getAttribute("width")),
-          height: parseInt(xmlDoc.documentElement.getAttribute("height")),
-          tileWidth: parseInt(xmlDoc.documentElement.getAttribute("tilewidth")),
-          tileHeight: parseInt(xmlDoc.documentElement.getAttribute("tileheight")),
-          nextLayerId: parseInt(xmlDoc.documentElement.getAttribute("nextlayerid")),
-          nextObjectId: parseInt(xmlDoc.documentElement.getAttribute("nextobjectid")),
-          
-          tilesets: [],
-          layers: [],
-          objects: [],
-        };
-
-        xmlDoc.querySelectorAll("tileset").forEach((tilesetElement) => {
-          chunkData.tilesets.push({
-            firstgid: parseInt(tilesetElement.getAttribute("firstgid")),
-            source: tilesetElement.getAttribute("source"),
-          });
-        });
-
-        chunkData.layers.push({
-          id: parseInt(xmlDoc.querySelector("layer[name='tiles']").getAttribute("id")),
-          name: xmlDoc.querySelector("layer[name='tiles']").getAttribute("name"),
-          width: parseInt(xmlDoc.querySelector("layer[name='tiles']").getAttribute("width")),
-          height: parseInt(xmlDoc.querySelector("layer[name='tiles']").getAttribute("height")),
-          data: xmlDoc.querySelector("layer[name='tiles'] data").textContent.trim().split(",").map(Number),
-        });
-
-        xmlDoc.querySelectorAll("objectgroup object").forEach((objectElement) => {
-          chunkData.objects.push({
-            id: parseInt(objectElement.getAttribute("id")),
-            type: objectElement.getAttribute("type"),
-            x: parseInt(objectElement.getAttribute("x")),
-            y: parseInt(objectElement.getAttribute("y")),
-            width: parseInt(objectElement.getAttribute("width")),
-            height: parseInt(objectElement.getAttribute("height")),
-            properties: {}, // Add properties if needed
-          });
-        });
-
-        // Do something with the chunkData object
-        console.log(xmlDoc.documentElement); // For now, just log it
-        
-        console.log(chunkData); // For now, just log it
-      } else {
-        console.error("Error fetching XML:", xhr.statusText);
-      }
-    };
-    xhr.send();
-  }
-  
   async loadChunkData(chunkX, chunkY, world, file) {
     const chunkId = this.getChunkId(chunkX, chunkY, world);
     
     let fileName = file; 
     
-    if (fileName.endsWith(".tmx")) {
+    if (fileName.endsWith(".tmx")) { // hack for tiled
     	fileName = fileName.replace(".tmx", ".tmj");
     }
     
