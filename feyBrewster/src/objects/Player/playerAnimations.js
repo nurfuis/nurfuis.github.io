@@ -53,7 +53,7 @@ export const PICK_UP_DOWN = {
   ]
 }
 export const ATTACK_LEFT = {
-  duration: 250,
+  duration: 350,
   frames: [
     {
       time: 0,
@@ -64,18 +64,18 @@ export const ATTACK_LEFT = {
       frame: 10
     },
     {
-      time: 100,
+      time: 250,
       frame: 9
     },
     {
-      time: 150,
+      time: 300,
       frame: 10
     },    
    
   ]
 }
 export const ATTACK_UP = {
-  duration: 250,
+  duration: 350,
   frames: [
     {
       time: 0,
@@ -86,18 +86,18 @@ export const ATTACK_UP = {
       frame: 7
     },
     {
-      time: 100,
+      time: 250,
       frame: 6
     },
     {
-      time: 150,
+      time: 300,
       frame: 7
     },    
    
   ]
 }
 export const ATTACK_RIGHT = {
-  duration: 250,
+  duration: 350,
   frames: [
     {
       time: 0,
@@ -108,11 +108,11 @@ export const ATTACK_RIGHT = {
       frame: 4
     },
     {
-      time: 100,
+      time: 250,
       frame: 5
     },
     {
-      time: 150,
+      time: 300,
       frame: 4
     },    
    
@@ -130,11 +130,11 @@ export const ATTACK_DOWN = {
       frame: 1
     },
     {
-      time: 100,
+      time: 250,
       frame: 0
     },
     {
-      time: 150,
+      time: 300,
       frame: 1
     },    
    
