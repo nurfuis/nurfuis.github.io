@@ -47,7 +47,8 @@ export class Slime extends Entity {
     
     this.awarenessField = 5;
     this.sensingRadius = this.awarenessField * gridSize;
-   
+    this.inAvoidState = false;   
+    
     this.shieldImage = null;
     this.shieldTime = 0;     
     
@@ -179,35 +180,38 @@ export class Slime extends Entity {
     this.facingDirection = currentStepData.direction ?? this.facingDirection; 
   }   
     
-  step(delta, root) { 
-    if (!this.isAlive) {return};
-    
+  step(delta, root) {
+    if (!this.isAlive) { return; }
+
     if (this.shieldTime > 0) {
       this.workOnEnergyShield(delta);
       return;
     }
-       
-    const nearbyEntities = this.findEntitiesWithinRadius(this, this.sensingRadius);    
+
+    const nearbyEntities = this.findEntitiesWithinRadius(this, this.sensingRadius);
     const nearbyPlayer = this.findNearbyPlayer();
-    
+
     const distanceToPlayer = this.distanceTo(nearbyPlayer);
-  
+
     if (distanceToPlayer <= this.sensingRadius) {
       this.avoid(nearbyEntities, nearbyPlayer);
-      this.body.frame = 2;    
+      this.body.frame = 2;
+
+      this.inAvoidState = true;
+    } else {
+      this.inAvoidState = false;
     }
-    
-    const distance = this.moveTowards(this, this.destinationPosition, this.speed);    
-        
+
+    const distance = this.moveTowards(this, this.destinationPosition, this.speed);
+
     const collisionTest = this.runDynamicCollisionCheck();
-    
-    
+
     const hasArrived = distance < 1;
-    
-    if (hasArrived) {      
-      this.tryMove(delta)
-    }    
-  } 
+
+    if (hasArrived && !this.inAvoidState) {
+      this.tryMove(delta);
+    }
+  }
   
   ready() { 
     if (this.objectData.properties) {
