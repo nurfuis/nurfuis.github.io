@@ -157,42 +157,154 @@ export class Player extends Entity {
     this.attackWith = new Broom(this.position.x, this.position.y, this.currentWorld, this.facingDirection)  
     
     let newPosition = { x: this.center.x, y: this.center.y };
+    const range = gridSize * 2.4;
+    const spread = gridSize * 0.6;
+    const reach = gridSize * 0.6;
+    
     switch (direction) {
       case 'UP':
-        newPosition.y -= gridSize *2;
+        newPosition.y -= range;
+        
+        const raycastHitA = this.dynamicRaycast(this.center.x, 
+                                                this.center.y, 
+                                                newPosition.x, 
+                                                newPosition.y);
+        visualizeRaycast( this.center.x, 
+                          this.center.y, 
+                          newPosition.x, 
+                          newPosition.y + this.radius, 
+                          raycastHitA, 
+                          this);
+
+        const raycastHitB = this.dynamicRaycast(this.center.x, 
+                                                this.center.y, 
+                                                newPosition.x + spread, 
+                                                newPosition.y + reach);
+        visualizeRaycast( this.center.x, 
+                          this.center.y, 
+                          newPosition.x + spread, 
+                          newPosition.y + reach, 
+                          raycastHitB, 
+                          this);
+        
+        const raycastHitC = this.dynamicRaycast(this.center.x, 
+                                                this.center.y, 
+                                                newPosition.x - spread, 
+                                                newPosition.y + reach);
+        visualizeRaycast( this.center.x, 
+                          this.center.y, 
+                          newPosition.x - spread, 
+                          newPosition.y + reach, 
+                          raycastHitC, 
+                          this);              
         break;
       case 'RIGHT':
-        newPosition.x += gridSize *2;
+        newPosition.x += range;
+        const raycastHitD = this.dynamicRaycast(this.center.x, 
+                                                this.center.y, 
+                                                newPosition.x, 
+                                                newPosition.y);
+        visualizeRaycast( this.center.x, 
+                          this.center.y, 
+                          newPosition.x - this.radius, 
+                          newPosition.y, 
+                          raycastHitD, 
+                          this);
+
+        const raycastHitE = this.dynamicRaycast(this.center.x, 
+                                                this.center.y, 
+                                                newPosition.x - reach, 
+                                                newPosition.y + spread);
+        visualizeRaycast( this.center.x, 
+                          this.center.y, 
+                          newPosition.x - reach, 
+                          newPosition.y + spread, 
+                          raycastHitE, 
+                          this);
+        
+        const raycastHitF = this.dynamicRaycast(this.center.x, 
+                                                this.center.y, 
+                                                newPosition.x - reach, 
+                                                newPosition.y - spread);
+        visualizeRaycast( this.center.x, 
+                          this.center.y, 
+                          newPosition.x  - reach, 
+                          newPosition.y - spread, 
+                          raycastHitF, 
+                          this);                 
         break;
       case 'DOWN':
-        newPosition.y += gridSize *2;
+        newPosition.y += range;
+        const raycastHitG = this.dynamicRaycast(this.center.x, 
+                                                this.center.y, 
+                                                newPosition.x, 
+                                                newPosition.y);
+        visualizeRaycast( this.center.x, 
+                          this.center.y, 
+                          newPosition.x,
+                          newPosition.y - this.radius, 
+                          raycastHitG, 
+                          this);
+
+        const raycastHitH = this.dynamicRaycast(this.center.x, 
+                                                this.center.y, 
+                                                newPosition.x + spread, 
+                                                newPosition.y - reach);
+        visualizeRaycast( this.center.x, 
+                          this.center.y, 
+                          newPosition.x + spread, 
+                          newPosition.y - reach, 
+                          raycastHitH, 
+                          this);
+        
+        const raycastHitI = this.dynamicRaycast(this.center.x, 
+                                                this.center.y, 
+                                                newPosition.x - spread, 
+                                                newPosition.y - reach);
+        visualizeRaycast( this.center.x, 
+                          this.center.y, 
+                          newPosition.x - spread, 
+                          newPosition.y - reach, 
+                          raycastHitI, 
+                          this);          
         break;
       case 'LEFT':
-        newPosition.x -= gridSize *2;
+        newPosition.x -= range;
+        const raycastHitJ = this.dynamicRaycast(this.center.x, 
+                                                this.center.y, 
+                                                newPosition.x, 
+                                                newPosition.y);
+        visualizeRaycast( this.center.x, 
+                          this.center.y, 
+                          newPosition.x + this.radius, 
+                          newPosition.y, 
+                          raycastHitJ, 
+                          this);
+
+        const raycastHitK = this.dynamicRaycast(this.center.x, 
+                                                this.center.y, 
+                                                newPosition.x + reach, 
+                                                newPosition.y + spread);
+        visualizeRaycast( this.center.x, 
+                          this.center.y, 
+                          newPosition.x + reach, 
+                          newPosition.y + spread, 
+                          raycastHitK, 
+                          this);
+        
+        const raycastHitL = this.dynamicRaycast(this.center.x, 
+                                                this.center.y, 
+                                                newPosition.x + reach, 
+                                                newPosition.y - spread);
+        visualizeRaycast( this.center.x, 
+                          this.center.y, 
+                          newPosition.x + reach, 
+                          newPosition.y - spread, 
+                          raycastHitL, 
+                          this);                         
         break;
     }
-    if (direction === 'UP' || direction === 'DOWN') {
-    
-      const raycastHitA = this.dynamicRaycast(this.center.x, this.center.y, newPosition.x, newPosition.y);
-      visualizeRaycast(this.center.x, this.center.y, newPosition.x, newPosition.y, raycastHitA, this);
-
-      const raycastHitB = this.dynamicRaycast(this.center.x, this.center.y, newPosition.x + gridSize * 0.7, newPosition.y);
-      visualizeRaycast(this.center.x, this.center.y, newPosition.x + gridSize * 0.7, newPosition.y, raycastHitB, this);
-      
-      const raycastHitC = this.dynamicRaycast(this.center.x, this.center.y, newPosition.x - gridSize * 0.7, newPosition.y);
-      visualizeRaycast(this.center.x, this.center.y, newPosition.x - gridSize * 0.7, newPosition.y, raycastHitC, this);    
-    }
-    if (direction === 'LEFT' || direction === 'RIGHT') {
-    
-      const raycastHitA = this.dynamicRaycast(this.center.x, this.center.y, newPosition.x, newPosition.y);
-      visualizeRaycast(this.center.x, this.center.y, newPosition.x, newPosition.y, raycastHitA, this);
-
-      const raycastHitB = this.dynamicRaycast(this.center.x, this.center.y, newPosition.x, newPosition.y + gridSize * 0.7);
-      visualizeRaycast(this.center.x, this.center.y, newPosition.x, newPosition.y + gridSize * 0.7, raycastHitB, this);
-      
-      const raycastHitC = this.dynamicRaycast(this.center.x, this.center.y, newPosition.x, newPosition.y - gridSize * 0.7);
-      visualizeRaycast(this.center.x, this.center.y, newPosition.x, newPosition.y - gridSize * 0.7, raycastHitC, this);    
-    }    
+  
     
     
     if (direction === 'RIGHT' || direction === 'UP') {
