@@ -10,7 +10,7 @@ export const SWING_LEFT = {
       frame: 2
     },
     {
-      time: 200,
+      time: 250,
       frame: 1
     }    
    
@@ -28,7 +28,7 @@ export const SWING_UP = {
       frame: 1
     },
     {
-      time: 200,
+      time: 250,
       frame: 0
     }    
    
@@ -46,7 +46,7 @@ export const SWING_RIGHT = {
       frame: 0
     },
     {
-      time: 200,
+      time: 250,
       frame: 3
     }    
    
@@ -64,7 +64,7 @@ export const SWING_DOWN = {
       frame: 3
     },
     {
-      time: 200,
+      time: 250,
       frame: 2
     }   
    
