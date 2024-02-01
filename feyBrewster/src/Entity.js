@@ -91,7 +91,7 @@ export class Entity extends GameObject {
 
   avoid(nearbyEntities, nearbyPlayer) {
     const distanceToPlayer = this.distanceTo(nearbyPlayer);
-    const targetArcDistance = (Math.random() * 2 + 2) * gridSize;
+    const targetArcDistance = (Math.random() * 1 + 2) * gridSize;
     
     const numNearby = nearbyEntities.length;
     const angleOffset = (Math.PI * 2) / numNearby * nearbyEntities.indexOf(this);
@@ -102,8 +102,8 @@ export class Entity extends GameObject {
     let targetAngle = angleToPlayer + angleOffset + randomOffset;
     
     const attractionForce = {
-      x: Math.cos(targetAngle) * (targetArcDistance - distanceToPlayer) * 0.4, // Lower magnitude for subtle movement
-      y: Math.sin(targetAngle) * (targetArcDistance - distanceToPlayer) * 0.3,
+      x: Math.cos(targetAngle) * (targetArcDistance - distanceToPlayer) * 0.5, // Lower magnitude for subtle movement
+      y: Math.sin(targetAngle) * (targetArcDistance - distanceToPlayer) * 0.5,
     };
 
     const thresholdDistance = this.sensingRadius / 2;
