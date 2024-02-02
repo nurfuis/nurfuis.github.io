@@ -10,8 +10,6 @@ import { SceneManager } from "./src/SceneManager.js"; // stage manager
 import { GameInterface } from "./src/GameInterface.js"; 
 import { Inventory } from "./src/objects/Inventory/Inventory.js"; // 
 import { Player } from "./src/objects/Player/Player.js"; 
-import { Entities } from "./src/objects/Entities/Entities.js"; 
-import { Foreground } from "./src/objects/Foreground.js"; 
 
 const playerOne = new Player();
 const playerList = [playerOne];
@@ -40,53 +38,6 @@ const inventory = new Inventory();
 
 const gameInterface = new GameInterface();
 
-const rays = [];
-const playerColor = '#ffffff';
-const entityColor = '#007bff'; 
-const collisionColor = '#ffc107';
- 
-export function visualizeRaycast(startX, startY, endX, endY, collision, object) {
-  const ray = {
-    startTime: Date.now(), // Store starting time
-    startX,
-    startY,
-    endX,
-    endY,
-    collision,
-    type: object.type // Store object type for color selection
-  };
-  rays.push(ray);
-}
-
-function updateRays() {
-  for (let i = rays.length - 1; i >= 0; i--) {
-    const ray = rays[i];
-    const elapsedTime = Date.now() - ray.startTime;
-    const alpha = Math.max(0, 1 - elapsedTime / 2000); // Fade out over 2 seconds
-
-    ctx.beginPath();
-    ctx.moveTo(ray.startX, ray.startY);
-    ctx.lineTo(ray.endX, ray.endY);
-    ctx.lineWidth = 2;
-
-    // Set color based on object type
-    ctx.strokeStyle = ray.type === 'player' ? playerColor : entityColor;
-    ctx.strokeStyle = `rgba(${ctx.strokeStyle.replace('#', '')}, ${alpha})`; // Apply fading alpha
-
-    ctx.stroke();
-
-    if (ray.collision) {
-      ctx.fillStyle = ray.type === 'player' ? 'red' : 'yellow';
-      ctx.beginPath();
-      ctx.arc(ray.collision.x, ray.collision.y, 5, 0, Math.PI * 2, true);
-      ctx.fill();
-    }
-
-    if (alpha === 0) {
-      rays.splice(i, 1); // Remove fully faded rays
-    }
-  }
-}
 const update = (delta) => {
   mainScene.stepEntry(delta, mainScene);
 };
@@ -100,8 +51,6 @@ const draw = () => {
   ctx.translate(camera.position.x, camera.position.y);
 
   mainScene.draw(ctx, 0, 0);
-
-  if (gameInterface.debugDisplay) {updateRays()};
 
   ctx.restore();
    
@@ -117,8 +66,6 @@ const draw = () => {
     const formattedTime = now.toLocaleTimeString("en-US", {
       hour12: true, // Use 24-hour format
     });
-    
-    
     const fps = gameLoop.fps;  
     ctx.font = "12px handjet";
     

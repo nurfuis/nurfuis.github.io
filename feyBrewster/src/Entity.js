@@ -1,13 +1,19 @@
 import { GameObject } from "./GameObject.js";
+import {events} from "./Events.js";
+
 import { Vector2 } from "./Vector2.js";
 import { DOWN, LEFT, RIGHT, UP } from "./Input.js";
-import { visualizeRaycast } from "../main.js";
+
 
 import { generateUniqueId } from "./helpers/nextId.js";
 import { gridSize } from "./helpers/grid.js";
 import { movingObjects } from "./helpers/collisionDetection.js";
 import { obstacles } from "./helpers/grid.js";
 import { isSpaceFree } from "./helpers/grid.js";
+
+const rays = [];
+const playerColor = '#ffffff';
+const entityColor = '#007bff';
 
 export class Entity extends GameObject {
   constructor() {
@@ -16,7 +22,6 @@ export class Entity extends GameObject {
     });
     this.originWorld = null;
     this.currentWorld = null;
-    
     this.originPosition = this.position.duplicate();
     this.destinationPosition = this.position.duplicate();    
     
@@ -52,42 +57,6 @@ export class Entity extends GameObject {
     // ..
     
   }
-  // avoid(nearbyEntities, nearbyPlayer) {
-    // const distanceToPlayer = this.distanceTo(nearbyPlayer);
-
-    // const targetArcDistance = (Math.random() * 2 + 2) * gridSize;
-
-    // const numNearby = nearbyEntities.length;
-    // const angleOffset = (Math.PI * 2) / numNearby * nearbyEntities.indexOf(this);
-
-    // const angleToPlayer = Math.atan2(nearbyPlayer.center.y - this.center.y, nearbyPlayer.center.x - this.center.x);
-
-    // const randomOffset = Math.random() * Math.PI / 4;
-    // let targetAngle = angleToPlayer + angleOffset + randomOffset;
-    // targetAngle = Math.max(-Math.PI, Math.min(Math.PI, targetAngle));
-
-    // const attractionForce = {
-      // x: Math.cos(targetAngle) * (targetArcDistance - distanceToPlayer),
-      // y: Math.sin(targetAngle) * (targetArcDistance - distanceToPlayer),
-    // };
-
-    // const thresholdDistance = this.sensingRadius / 2;
-
-    // if (distanceToPlayer < thresholdDistance) {
-      // attractionForce.x *= 0.8;
-      // attractionForce.y *= 0.8;
-    // }
-
-    // const newPosition = {
-      // x: Math.floor(this.position.x + attractionForce.x),
-      // y: Math.floor(this.position.y + attractionForce.y),
-    // };
-
-    // if (isSpaceFree(newPosition.x, newPosition.y, this).collisionDetected === false) {
-      // this.destinationPosition.x = newPosition.x;
-      // this.destinationPosition.y = newPosition.y;
-    // }
-  // }
 
   avoid(nearbyEntities, nearbyPlayer) {
     const distanceToPlayer = this.distanceTo(nearbyPlayer);
@@ -117,11 +86,35 @@ export class Entity extends GameObject {
       x: Math.floor(this.position.x + attractionForce.x),
       y: Math.floor(this.position.y + attractionForce.y)
     };
-    
+    // const raycastHitA = this.raycast(this.position.x, this.position.y, newPosition.x, newPosition.y);
+    // this.visualizeRaycast( this.position.x, 
+                      // this.position.y, 
+                      // newPosition.x, 
+                      // newPosition.y, 
+                      // raycastHitA, 
+                      // this);
+    // const raycastHitB = this.raycast(this.center.x, this.center.y, newPosition.x, newPosition.y);
+    // this.visualizeRaycast( this.center.x, 
+                      // this.center.y, 
+                      // newPosition.x - this.radius, 
+                      // newPosition.y - this.radius, 
+                      // raycastHitB, 
+                      // this); 
+    // const raycastHitC = this.raycast(this.position.x + this.width, this.position.y + this.height, newPosition.x, newPosition.y);
+    // this.visualizeRaycast( this.position.x + this.width, 
+                      // this.position.y + this.height, 
+                      // newPosition.x, 
+                      // newPosition.y, 
+                      // raycastHitC, 
+                      // this); 
+
+    // const raycastHitF = this.targetRaycast(this.position.x, this.position.y, newPosition.x, newPosition.y);
+                
+                      
     if (isSpaceFree(newPosition.x, newPosition.y, this).collisionDetected === false) {
       this.destinationPosition.x = newPosition.x;
       this.destinationPosition.y = newPosition.y;    
-    }    
+    }
   }
   
   avoidNearbyEntities(nearbyEntities) {
@@ -176,10 +169,9 @@ export class Entity extends GameObject {
   calculateRepulsionForce(other) {
     const dx = Math.ceil(this.center.x - other.center.x);
     const dy = Math.ceil(this.center.y - other.center.y);
-    
     const distance = Math.sqrt(dx * dx + dy * dy).toFixed(2);    
     
-    if (Math.sqrt(dx * dx + dy * dy) < .001) {
+    if (distance < .001) {
       const randomAngle = Math.random() * 2 * Math.PI;
       
       return {
@@ -188,8 +180,8 @@ export class Entity extends GameObject {
       };
     }
 
-    const penetrationDepth = Math.min(this.radius + other.radius - distance, 1);    
-    
+    const penetrationDepth = this.radius + other.radius - distance;    
+
     const collisionVectorNormalized = {
       x: dx / distance,
       y: dy / distance
@@ -244,6 +236,27 @@ export class Entity extends GameObject {
 
     return collisionDetected;
   }  
+  
+  runStaticCollisionCheck() { // execute some default collision events
+    let collisionDetected = false;
+    
+    if (obstacles.length <= 0) {return collisionDetected};
+
+    for (let i = obstacles.length - 1; i >= 0; i--) {
+      const other = obstacles[i];
+
+      if (this.overlaps(other) && this !== other) {
+        
+        this.onCollision(this.calculateRepulsionForce(other));
+        
+        // other.reflexAction(this);
+        
+        if (!collisionDetected) {collisionDetected = true};
+      }
+    }
+
+    return collisionDetected;
+  }   
   
   despawn() {
     if (!this.isAlive) {
@@ -392,7 +405,7 @@ export class Entity extends GameObject {
     };
     
     const raycastHit = this.raycast(this.position.x, this.position.y, newPosition.x, newPosition.y);
-    visualizeRaycast(this.center.x, this.center.y, newPosition.x + gridSize / 2, newPosition.y + gridSize / 2, raycastHit, this);
+    this.visualizeRaycast(this.center.x, this.center.y, newPosition.x + gridSize / 2, newPosition.y + gridSize / 2, raycastHit, this);
 
     if (raycastHit) {
       this.setPosition(Math.floor(raycastHit.x), Math.floor(raycastHit.y), this.currentWorld);      
@@ -413,36 +426,156 @@ export class Entity extends GameObject {
     return Math.sqrt(dx * dx + dy * dy) <= this.radius + other.radius;
   }
   
+  // dynamicRaycast(startX, startY, endX, endY) {
+    // let closestHit;   
+    
+    // const dX = endX - startX;
+    // const dY = endY - startY;
+    
+    // console.log('dx',dX,'dy', dY)
+    
+    // for (let i = 0; i < movingObjects.length; i++) {
+      // const entity = movingObjects[i];
+      
+      // const entityX1 = entity.minX();
+      // const entityY1 = entity.minY();
+      // const entityX2 = entity.maxX();
+      // const entityY2 = entity.maxY();
+      
+      // const intersection = this.lineSegmentIntersection(startX, startY, dX, dY, entityX1, entityY1, entityX2, entityY2);
+      
+      // if (this.entityId != entity.entityId && intersection && (!closestHit || this.distanceSquared(startX, startY, intersection.x, intersection.y) < this.distanceSquared(startX, startY, closestHit.x, closestHit.y))) {
+        // console.log(this.entityId,' at ',this.center,' hit location',intersection,entity.entityId,'was damaged at',entity.position)
+        // console.log('intersection off by x:',entity.position.x - intersection.x,'intersection off by y:', entity.position.y - intersection.y)
+        // entity.onEnergyShield();
+        // entity.subtractHealth(1);
+        // closestHit = intersection;
+      // }
+    // }
+    // return closestHit;
+  // }
+  
+  circleIntersection(rayStartX, rayStartY, rayDX, rayDY, circleCenterX, circleCenterY, circleRadius) {
+    const a = rayDY;
+    const b = -rayDX;
+    const c = -a * rayStartX - b * rayStartY;
+
+    const dx = rayStartX - circleCenterX;
+    const dy = rayStartY - circleCenterY;
+    const distanceFromCenter = Math.sqrt(dx * dx + dy * dy);
+
+    if (distanceFromCenter > this.radius * 4) {
+      return null;
+    }
+    const discriminant = (a * circleCenterX + b * circleCenterY + c) ** 2 - (a ** 2 + b ** 2) * (circleRadius ** 2 - distanceFromCenter ** 2);
+
+    if (discriminant < 0) {
+      return null;
+    }
+
+    const t1 = (-a * circleCenterX - b * circleCenterY - c + Math.sqrt(discriminant)) / (a ** 2 + b ** 2);
+    const t2 = (-a * circleCenterX - b * circleCenterY - c - Math.sqrt(discriminant)) / (a ** 2 + b ** 2);
+    
+    let t = null;
+    if (t1 >= 0 && t1 <= 1) {
+      t = t1;
+    } else if (t2 >= 0 && t2 <= 1) {
+      t = t2;
+    }
+
+    if (t === null) {
+      return null;
+    }
+
+    const intersectionX = rayStartX + t * rayDX;
+    const intersectionY = rayStartY + t * rayDY;
+
+    return { x: intersectionX, y: intersectionY };
+  }
+  
   dynamicRaycast(startX, startY, endX, endY) {
-    let closestHit;
+    let closestHit = {collision: false, position: null, entity: null};
 
     const dX = endX - startX;
     const dY = endY - startY;
+        
+    const filteredMovingObjects = movingObjects
+      .filter((entity) => entity !== this)
+      .filter((entity) => {
+        const facing = this.facingDirection;
 
-    for (let i = movingObjects.length - 1; i >= 0; i--) {
-      const entity = movingObjects[i];
+        switch (facing) {
+          case "UP":
+            return entity.center.y < this.center.y;
+          case "DOWN":
+            return entity.center.y > this.center.y;
+          case "LEFT":
+            return entity.center.x < this.center.x;
+          case "RIGHT":
+            return entity.center.x > this.center.x;
+          default:
+            console.warn("Invalid facing direction:", facing);
+            return false; 
+        }
+      });
+    
+    for (let i = 0; i < filteredMovingObjects.length; i++) {
+      const entity = filteredMovingObjects[i];
 
       const entityCenterX = entity.center.x;
       const entityCenterY = entity.center.y;
       const entityRadius = entity.radius;
 
-      const distanceToCenter = Math.sqrt(Math.pow(startX - entityCenterX, 2) + Math.pow(startY - entityCenterY, 2));
-      const rayLength = Math.sqrt(Math.pow(startX - endX, 2) + Math.pow(startY - endY, 2)) 
-      console.log(distanceToCenter,rayLength - entityRadius )
+      const intersection = this.circleIntersection(
+        startX,
+        startY,
+        dX,
+        dY,
+        entityCenterX,
+        entityCenterY,
+        entityRadius
+      );
 
-      if (distanceToCenter <= rayLength - entityRadius && this != entity) {
-        closestHit = { x: entityCenterX, y: entityCenterY }; // Set intersection point to entity center
-        entity.subtractHealth(this.attackPower * 100);
-        console.log(this.entityId, 'collided with', entity);
-        break; // Exit loop after first intersection
+      if (
+        intersection &&
+        (!closestHit.collision ||
+          this.distanceSquared(startX, startY, intersection.x, intersection.y) <
+            this.distanceSquared(startX, startY, closestHit.x, closestHit.y))
+      ) {
+       
+        closestHit = {collision: true, position: intersection, entity: entity};
+        
       }
     }
 
     return closestHit;
   }
   
+  targetRaycast(startX, startY, endX, endY) {   
+    let targetHit = null;   
+    
+    const dX = endX - startX;
+    const dY = endY - startY;
+
+    for (let i = obstacles.length - 1; i >= 0; i--) {
+      const obstacle = obstacles[i];
+      
+      const obstacleX1 = obstacle.minX();
+      const obstacleY1 = obstacle.minY();
+      const obstacleX2 = obstacle.maxX();
+      const obstacleY2 = obstacle.maxY();
+      
+      const intersection = this.lineSegmentIntersection(startX, startY, dX, dY, obstacleX1, obstacleY1, obstacleX2, obstacleY2);
+
+      if (intersection && (!targetHit || this.distanceSquared(startX, startY, intersection.x, intersection.y) < this.distanceSquared(startX, startY, targetHit.x, targetHit.y))) {
+        targetHit = obstacle;
+      }
+    }
+    return targetHit;
+  } 
+  
   raycast(startX, startY, endX, endY) {   
-    let closestHit;   
+    let closestHit = null;   
     
     const dX = endX - startX;
     const dY = endY - startY;
@@ -529,5 +662,51 @@ export class Entity extends GameObject {
     this.center.x = Math.floor(this.position.x + this.width / 2);
     this.center.y = Math.floor(this.position.y + this.height / 2);
   }
+  
+  visualizeRaycast(startX, startY, endX, endY, collision, object) {
+    if (!this.debug) {return};
+    const ray = {
+      startTime: Date.now(), // Store starting time
+      startX,
+      startY,
+      endX,
+      endY,
+      collision,
+      type: object.type // Store object type for color selection
+    };
+    rays.push(ray);
+  }
+  updateRays(ctx) {
+    for (let i = rays.length - 1; i >= 0; i--) {
+      const ray = rays[i];
+      const elapsedTime = Date.now() - ray.startTime;
+      const alpha = Math.max(0, 1 - elapsedTime / 2000); // Fade out over 2 seconds
 
+      ctx.beginPath();
+      ctx.moveTo(ray.startX, ray.startY);
+      ctx.lineTo(ray.endX, ray.endY);
+      ctx.lineWidth = 16;
+
+      // Set color based on object type
+      ctx.strokeStyle = ray.type === 'player' ? playerColor : entityColor;
+      ctx.strokeStyle = `rgba(${ctx.strokeStyle.replace('#', '')}, ${alpha})`; // Apply fading alpha
+
+      ctx.stroke();
+
+      if (ray.collision) {
+        ctx.fillStyle = ray.type === 'player' ? 'red' : 'yellow';
+        ctx.beginPath();
+        ctx.arc(ray.collision.x, ray.collision.y, 8, 0, Math.PI * 2, true);
+        ctx.fill();
+      }
+
+      if (alpha === 0) {
+        rays.splice(i, 1); // Remove fully faded rays
+      }
+    }
+  }
+  drawImage(ctx) {
+    this.updateRays(ctx)   
+  }
+    
 }

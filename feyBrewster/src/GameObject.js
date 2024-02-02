@@ -1,4 +1,3 @@
-// GameObject.js
 import {Vector2} from "./Vector2.js";
 import {events} from "./Events.js";
 
@@ -9,19 +8,22 @@ export class GameObject {
     this.parent = null;
     this.hasReadyBeenCalled = false;
     this.invisible = false;
+    this.debug = false;
+    
   }
-  
+  debugLog(...args) {
+    if (this.debug) {
+      console.log(`[DEBUG] ${new Date().toLocaleTimeString()}:`, ...args);
+    }
+  }  
   stepEntry(delta, root) {
-    // call updates on all children
     this.children.forEach((child) => child.stepEntry(delta, root));
   
-    // call ready on first frame
     if (!this.hasReadyBeenCalled) {
       this.hasReadyBeenCalled = true;
       this.ready();
     }
     
-    // call implimented step code
     this.step(delta, root);
   }
   
@@ -49,17 +51,19 @@ export class GameObject {
   drawImage(ctx, drawPosX, drawPosY) {
     // ...
   }
-  // Remove from tree
+  
   destroy() {
     this.children.forEach(child => {
       child.destroy();
     })
     this.parent.removeChild(this)
   }
+  
   addChild(gameObject) {
     gameObject.parent = this;
     this.children.push(gameObject);
   }
+  
   removeChild(gameObject) {
     events.unsubscribe(gameObject)
     this.children = this.children.filter(g => {

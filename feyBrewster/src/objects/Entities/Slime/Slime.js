@@ -33,7 +33,7 @@ export class Slime extends Entity {
     this.hasCollision = true;
     this.width = 32;
     this.height = 32;    
-    this.radius = 18; 
+    this.radius = 16; 
 
     this.mass = 100;      
     this.baseSpeed = 1;
@@ -93,8 +93,6 @@ export class Slime extends Entity {
     if (other.type === 'player') {
       other.slow(750, 0.3);
       this.body.frame = 3; 
-      this.subtractHealth(2);
-      this.onEnergyShield();
     }        
   }
   

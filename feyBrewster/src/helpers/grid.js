@@ -10,37 +10,27 @@ export const isSpaceFree = (posX, posY, collider) => {
   for (let i = 0; i < obstacles.length; i++) {
     const collidee = obstacles[i];
 
-    const colliderX1 = posX;
-    const colliderX2 = colliderX1 + collider.width;
-    const colliderY1 = posY;
-    const colliderY2 = colliderY1 + collider.height;
+    // Calculate AABB corners for collider and collidee:
+    const colliderLeft = posX;
+    const colliderRight = colliderLeft + collider.width;
+    const colliderTop = posY;
+    const colliderBottom = colliderTop + collider.height;
 
-    const collideeX1 = collidee.position.x;
-    const collideeX2 = collideeX1 + collidee.width;
-    const collideeY1 = collidee.position.y;
-    const collideeY2 = collideeY1 + collidee.height;
+    const collideeLeft = collidee.position.x;
+    const collideeRight = collideeLeft + collidee.width;
+    const collideeTop = collidee.position.y;
+    const collideeBottom = collideeTop + collidee.height;
 
-    if (collidee == collider) {
-      return { collisionDetected: false };
-    }
-    
-    if (    
-      colliderX1 >= collideeX1 && 
-      colliderX1 < collideeX2 && 
-      colliderY1 >= collideeY1 &&
-      colliderY1 < collideeY2 
-      ) {
+    // AABB collision check:
+    if (
+      colliderRight > collideeLeft &&
+      colliderLeft < collideeRight &&
+      colliderBottom > collideeTop &&
+      colliderTop < collideeBottom
+    ) {
       return { collisionDetected: true, collider: collider, collidee: collidee };
     }
-    
-    if (    
-      collideeX1 >= colliderX1 && 
-      collideeX1 < colliderX2 &&
-      collideeY1 >= colliderY1 &&
-      collideeY1 < colliderY2
-      ) {
-      return { collisionDetected: true, collider: collider, collidee: collidee };
-    }        
   }
+
   return { collisionDetected: false };
 };

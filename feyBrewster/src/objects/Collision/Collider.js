@@ -18,8 +18,12 @@ export class Wall extends GameObject{
     this.tileSets = tileSets;
     
     this.hasCollision = true;
-    this.width = gridSize;
-    this.height = gridSize;    
+    this.width = 32;
+    this.height = 32;
+    this.center = null;     
+    this.radius = 16;
+    this.speed = 1;
+    this.mass = 1000;
   }
   minX() {
     return this.position.x;
@@ -34,6 +38,7 @@ export class Wall extends GameObject{
     return this.position.y + this.height;
   }  
   ready() {
+    this.center = new Vector2(this.position.x + this.width / 2, this.position.y + this.height / 2)    
     if (this.hasCollision) {
       obstacles.push(this);        
     }  

@@ -9,7 +9,6 @@ import { DOWN, LEFT, RIGHT, UP } from "../../Input.js";
 
 import { gridSize } from "../../helpers/grid.js";
 import { isSpaceFree } from "../../helpers/grid.js";
-import { visualizeRaycast } from "../../../main.js";
 
 import {
   PICK_UP_DOWN,
@@ -35,9 +34,9 @@ export class Player extends Entity {
       position: new Vector2(0, 0)
     });
     this.isAlive = false;   
-    this.invisible = true;       
+    this.invisible = true;
+    
     this.respawnDelay = 10000;
-      
     this.type = 'player';
     
     this.hasCollision = true;
@@ -58,11 +57,14 @@ export class Player extends Entity {
     this.awarenessField = 5;
     this.sensingRadius = this.awarenessField * gridSize;
 
+    this.equippedMainhand = null;
+    this.equippedOffhand = null;
+    
     this.itemPickUpTime = 0;
     this.itemPickUpShell = null;
     
     this.attackTime = 0;
-    this.attackWith = null;
+    this.attackWeapon = null;
     
     this.idleTime = 0;
     this.idleAction = 200;
@@ -75,7 +77,7 @@ export class Player extends Entity {
     })    
     this.addChild(shadow);
     
-    this.emptyHandRight = new Sprite({  
+    this.equipHandB = new Sprite({  
       resource: resources.images.air,
       frameSize: new Vector2(gridSize,gridSize),
       position: new Vector2(0, 0),
@@ -84,7 +86,7 @@ export class Player extends Entity {
       vFrames: 1,
       frame: 0,      
     })          
-    this.equipmentSpriteBelow = this.emptyHandRight;
+    this.equipmentSpriteBelow = this.equipHandB;
     this.addChild(this.equipmentSpriteBelow);
     
     this.body = new Sprite({
@@ -114,7 +116,7 @@ export class Player extends Entity {
     })    
     this.addChild(this.body);
     
-    this.emptyHandLeft = new Sprite({  
+    this.equipHandA = new Sprite({  
       resource: resources.images.air,
       frameSize: new Vector2(gridSize,gridSize),
       position: new Vector2(0, 0),
@@ -123,9 +125,12 @@ export class Player extends Entity {
       vFrames: 1,
       frame: 0,      
     })         
-    this.equipmentSpriteAbove = this.emptyHandLeft;
+    this.equipmentSpriteAbove = this.equipHandA;
     this.addChild(this.equipmentSpriteAbove);
-
+    
+    events.on("TOGGLE_DEBUG", this, () => {
+      this.debug = this.debug ? false : true;
+    })
     events.on("PLAYER_PICKS_UP_ITEM", this, data => {
       this.onPickUpItem(data);
     })
@@ -143,174 +148,264 @@ export class Player extends Entity {
   }
   
   doClickBehavior() {
-    if (this.facingDirection === LEFT) {this.doAttack(LEFT)}
-    if (this.facingDirection === UP) {this.doAttack(UP)}
-    if (this.facingDirection === RIGHT) {this.doAttack(RIGHT)}
-    if (this.facingDirection === DOWN) {this.doAttack(DOWN)}    
+    if (this.facingDirection === LEFT) {this.doSweepAttack(LEFT)}
+    if (this.facingDirection === UP) {this.doSweepAttack(UP)}
+    if (this.facingDirection === RIGHT) {this.doSweepAttack(RIGHT)}
+    if (this.facingDirection === DOWN) {this.doSweepAttack(DOWN)}    
   }
   
-  doAttack(direction) {
+  doSweepAttack(direction) {
     if (this.attackTime > 0) {
       return;
     }
-    this.attackTime = 350; // ms
-    this.attackWith = new Broom(this.position.x, this.position.y, this.currentWorld, this.facingDirection)  
+
+    this.attackWeapon = new Broom(this.position.x, this.position.y, this.currentWorld, this.facingDirection)  
+
+    this.attackTime = 350; // TODO set this property from the item being used
+    const range = this.radius * 4;    
+    const spread = this.radius * 2;
+    const reach = this.radius * 2;   
+    const facingOffset = this.radius * 0.5;
     
+    let damagedEntities = [];
     let newPosition = { x: this.center.x, y: this.center.y };
-    const range = gridSize * 2.4;
-    const spread = gridSize * 0.6;
-    const reach = gridSize * 0.6;
     
     switch (direction) {
       case 'UP':
         newPosition.y -= range;
         
         const raycastHitA = this.dynamicRaycast(this.center.x, 
-                                                this.center.y, 
+                                                this.center.y - facingOffset, 
                                                 newPosition.x, 
                                                 newPosition.y);
-        visualizeRaycast( this.center.x, 
-                          this.center.y, 
-                          newPosition.x, 
-                          newPosition.y + this.radius, 
-                          raycastHitA, 
-                          this);
+        
+        if (raycastHitA.collision) {
+          this.visualizeRaycast(this.center.x, 
+                                this.center.y - facingOffset, 
+                                // newPosition.x, 
+                                // newPosition.y,
+                                raycastHitA.position.x, 
+                                raycastHitA.position.y,                                
+                                raycastHitA.position, 
+                                this);          
+          damagedEntities.push(raycastHitA.entity);                                                  
+        }                        
 
         const raycastHitB = this.dynamicRaycast(this.center.x, 
-                                                this.center.y, 
-                                                newPosition.x + spread, 
+                                                this.center.y - facingOffset, 
+                                                newPosition.x - spread, 
                                                 newPosition.y + reach);
-        visualizeRaycast( this.center.x, 
-                          this.center.y, 
-                          newPosition.x + spread, 
-                          newPosition.y + reach, 
-                          raycastHitB, 
-                          this);
+        
+        if (raycastHitB.collision) {        
+          this.visualizeRaycast(this.center.x, 
+                                this.center.y - facingOffset, 
+                                // newPosition.x - spread, 
+                                // newPosition.y + reach,
+                                raycastHitB.position.x, 
+                                raycastHitB.position.y,                                 
+                                raycastHitB.position, 
+                                this);
+          damagedEntities.push(raycastHitB.entity);
+        }
         
         const raycastHitC = this.dynamicRaycast(this.center.x, 
-                                                this.center.y, 
-                                                newPosition.x - spread, 
+                                                this.center.y - facingOffset, 
+                                                newPosition.x + spread, 
                                                 newPosition.y + reach);
-        visualizeRaycast( this.center.x, 
-                          this.center.y, 
-                          newPosition.x - spread, 
-                          newPosition.y + reach, 
-                          raycastHitC, 
-                          this);              
+        
+        if (raycastHitC.collision) {                                                
+          this.visualizeRaycast(this.center.x, 
+                                this.center.y - facingOffset, 
+                                // newPosition.x + spread, 
+                                // newPosition.y + reach, 
+                                raycastHitC.position.x, 
+                                raycastHitC.position.y,                                 
+                                raycastHitC.position, 
+                                this);
+          damagedEntities.push(raycastHitC.entity);                      
+        }
         break;
+      
       case 'RIGHT':
         newPosition.x += range;
-        const raycastHitD = this.dynamicRaycast(this.center.x, 
+        
+        const raycastHitD = this.dynamicRaycast(this.center.x + facingOffset, 
                                                 this.center.y, 
                                                 newPosition.x, 
                                                 newPosition.y);
-        visualizeRaycast( this.center.x, 
-                          this.center.y, 
-                          newPosition.x - this.radius, 
-                          newPosition.y, 
-                          raycastHitD, 
-                          this);
-
-        const raycastHitE = this.dynamicRaycast(this.center.x, 
-                                                this.center.y, 
-                                                newPosition.x - reach, 
-                                                newPosition.y + spread);
-        visualizeRaycast( this.center.x, 
-                          this.center.y, 
-                          newPosition.x - reach, 
-                          newPosition.y + spread, 
-                          raycastHitE, 
-                          this);
         
-        const raycastHitF = this.dynamicRaycast(this.center.x, 
+        if (raycastHitD.collision) {          
+          this.visualizeRaycast(this.center.x + facingOffset, 
+                                this.center.y, 
+                                // newPosition.x, 
+                                // newPosition.y,
+                                raycastHitD.position.x, 
+                                raycastHitD.position.y,                                 
+                                raycastHitD.position, 
+                                this);
+          damagedEntities.push(raycastHitD.entity);
+        }
+        
+        const raycastHitE = this.dynamicRaycast(this.center.x + facingOffset, 
                                                 this.center.y, 
                                                 newPosition.x - reach, 
                                                 newPosition.y - spread);
-        visualizeRaycast( this.center.x, 
-                          this.center.y, 
-                          newPosition.x  - reach, 
-                          newPosition.y - spread, 
-                          raycastHitF, 
-                          this);                 
+        
+        if (raycastHitE.collision) {          
+          this.visualizeRaycast(this.center.x + facingOffset, 
+                                this.center.y, 
+                                // newPosition.x - reach, 
+                                // newPosition.y - spread,
+                                raycastHitE.position.x, 
+                                raycastHitE.position.y,                                 
+                                raycastHitE.position, 
+                                this);
+          damagedEntities.push(raycastHitE.entity);
+        }
+        
+        const raycastHitF = this.dynamicRaycast(this.center.x + facingOffset, 
+                                                this.center.y, 
+                                                newPosition.x - reach, 
+                                                newPosition.y + spread);
+        
+        if (raycastHitF.collision) {          
+          this.visualizeRaycast(this.center.x + facingOffset, 
+                                this.center.y, 
+                                // newPosition.x  - reach, 
+                                // newPosition.y + spread,
+                                raycastHitF.position.x, 
+                                raycastHitF.position.y,                                 
+                                raycastHitF.position, 
+                                this);
+        damagedEntities.push(raycastHitF.entity);                        
+        }
         break;
+      
       case 'DOWN':
         newPosition.y += range;
+        
         const raycastHitG = this.dynamicRaycast(this.center.x, 
-                                                this.center.y, 
+                                                this.center.y + facingOffset, 
                                                 newPosition.x, 
                                                 newPosition.y);
-        visualizeRaycast( this.center.x, 
-                          this.center.y, 
-                          newPosition.x,
-                          newPosition.y - this.radius, 
-                          raycastHitG, 
-                          this);
-
-        const raycastHitH = this.dynamicRaycast(this.center.x, 
-                                                this.center.y, 
-                                                newPosition.x + spread, 
-                                                newPosition.y - reach);
-        visualizeRaycast( this.center.x, 
-                          this.center.y, 
-                          newPosition.x + spread, 
-                          newPosition.y - reach, 
-                          raycastHitH, 
-                          this);
         
-        const raycastHitI = this.dynamicRaycast(this.center.x, 
-                                                this.center.y, 
+        if (raycastHitG.collision) {          
+          this.visualizeRaycast(this.center.x, 
+                                this.center.y + facingOffset, 
+                                // newPosition.x,
+                                // newPosition.y, 
+                                raycastHitG.position.x, 
+                                raycastHitG.position.y,                                 
+                                raycastHitG.position, 
+                                this);
+          damagedEntities.push(raycastHitG.entity);
+        }
+        
+        const raycastHitH = this.dynamicRaycast(this.center.x, 
+                                                this.center.y + facingOffset, 
                                                 newPosition.x - spread, 
                                                 newPosition.y - reach);
-        visualizeRaycast( this.center.x, 
-                          this.center.y, 
-                          newPosition.x - spread, 
-                          newPosition.y - reach, 
-                          raycastHitI, 
-                          this);          
+        
+        if (raycastHitH.collision) {          
+          this.visualizeRaycast(this.center.x, 
+                                this.center.y + facingOffset, 
+                                // newPosition.x - spread, 
+                                // newPosition.y - reach,
+                                raycastHitH.position.x, 
+                                raycastHitH.position.y,                                 
+                                raycastHitH.position, 
+                                this);
+          damagedEntities.push(raycastHitH.entity);
+        }
+        
+        const raycastHitI = this.dynamicRaycast(this.center.x, 
+                                                this.center.y + facingOffset, 
+                                                newPosition.x + spread, 
+                                                newPosition.y - reach);
+        
+        if (raycastHitI.collision) {          
+          this.visualizeRaycast(this.center.x, 
+                                this.center.y + facingOffset, 
+                                // newPosition.x + spread, 
+                                // newPosition.y - reach,
+                                raycastHitI.position.x, 
+                                raycastHitI.position.y,                                 
+                                raycastHitI.position, 
+                                this); 
+          damagedEntities.push(raycastHitI.entity);
+        }          
         break;
+      
       case 'LEFT':
         newPosition.x -= range;
-        const raycastHitJ = this.dynamicRaycast(this.center.x, 
+        
+        const raycastHitJ = this.dynamicRaycast(this.center.x - facingOffset, 
                                                 this.center.y, 
                                                 newPosition.x, 
                                                 newPosition.y);
-        visualizeRaycast( this.center.x, 
-                          this.center.y, 
-                          newPosition.x + this.radius, 
-                          newPosition.y, 
-                          raycastHitJ, 
-                          this);
-
-        const raycastHitK = this.dynamicRaycast(this.center.x, 
-                                                this.center.y, 
-                                                newPosition.x + reach, 
-                                                newPosition.y + spread);
-        visualizeRaycast( this.center.x, 
-                          this.center.y, 
-                          newPosition.x + reach, 
-                          newPosition.y + spread, 
-                          raycastHitK, 
-                          this);
         
-        const raycastHitL = this.dynamicRaycast(this.center.x, 
+        if (raycastHitJ.collision) {          
+          this.visualizeRaycast(this.center.x - facingOffset, 
+                                this.center.y, 
+                                // newPosition.x, 
+                                // newPosition.y, 
+                                raycastHitJ.position.x, 
+                                raycastHitJ.position.y,                                 
+                                raycastHitJ.position, 
+                                this);
+          damagedEntities.push(raycastHitJ.entity);
+        }
+        
+        const raycastHitK = this.dynamicRaycast(this.center.x - facingOffset, 
                                                 this.center.y, 
                                                 newPosition.x + reach, 
                                                 newPosition.y - spread);
-        visualizeRaycast( this.center.x, 
-                          this.center.y, 
-                          newPosition.x + reach, 
-                          newPosition.y - spread, 
-                          raycastHitL, 
-                          this);                         
+        
+        if (raycastHitK.collision) {          
+          this.visualizeRaycast(this.center.x - facingOffset, 
+                                this.center.y, 
+                                // newPosition.x + reach, 
+                                // newPosition.y - spread,
+                                raycastHitK.position.x, 
+                                raycastHitK.position.y,                                 
+                                raycastHitK.position, 
+                                this);
+          damagedEntities.push(raycastHitK.entity);
+        }
+        
+        const raycastHitL = this.dynamicRaycast(this.center.x - facingOffset, 
+                                                this.center.y, 
+                                                newPosition.x + reach, 
+                                                newPosition.y + spread);
+        
+        if (raycastHitL.collision) {          
+          this.visualizeRaycast(this.center.x - facingOffset, 
+                                this.center.y, 
+                                // newPosition.x + reach, 
+                                // newPosition.y + spread,
+                                raycastHitL.position.x, 
+                                raycastHitL.position.y,                                 
+                                raycastHitL.position, 
+                                this);
+          damagedEntities.push(raycastHitL.entity);
+        }          
         break;
-    }
-  
+    }   
     
+    for (let i = damagedEntities.length -1; i >= 0; i--) {
+      const target = damagedEntities[i];
+      
+      target.onEnergyShield();
+      target.subtractHealth(1);              
+      
+      this.debugLog(target.entityId, target.currentHealth)
+
+    }
     
     if (direction === 'RIGHT' || direction === 'UP') {
-      this.equipmentSpriteBelow.addChild(this.attackWith); 
+      this.equipmentSpriteBelow.addChild(this.attackWeapon); 
     } else {
-       this.equipmentSpriteAbove.addChild(this.attackWith);      
+       this.equipmentSpriteAbove.addChild(this.attackWeapon);      
     }
   } 
   
@@ -323,7 +418,7 @@ export class Player extends Entity {
     if (this.facingDirection === DOWN) {this.body.animations.play( 'attackDown' )}    
     
     if (this.attackTime <= 0) {
-      this.attackWith.destroy();
+      this.attackWeapon.destroy();
     } 
   }      
   

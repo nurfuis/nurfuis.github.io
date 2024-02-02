@@ -24,7 +24,8 @@ export class WoodenKettle extends GameObject {
     this.hasCollision = true;
     this.width = gridSize * 3;
     this.height = gridSize * 2;
-    
+    this.center = new Vector2(this.position.x + this.width / 2, this.position.y + this.height / 2);     
+   
     this.overlayObject = null;
     this.hasOverlay = true;
     this.overlayPlane = overlay;
