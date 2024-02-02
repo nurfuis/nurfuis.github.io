@@ -396,7 +396,7 @@ export class Player extends Entity {
       const target = damagedEntities[i];
       
       target.onEnergyShield();
-      target.subtractHealth(1);              
+      target.subtractHealth(15);              
       
       this.debugLog(target.entityId, target.currentHealth)
 
