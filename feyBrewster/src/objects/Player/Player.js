@@ -440,6 +440,11 @@ export class Player extends Entity {
       if (this.facingDirection === RIGHT) {this.body.animations.play("standRight")}
       if (this.facingDirection === UP) {this.body.animations.play("standUp")}
       if (this.facingDirection === DOWN) {this.body.animations.play("standDown")}
+      
+      const nearbyEntities = this.findEntitiesWithinRadius(this, this.sensingRadius);
+      
+      this.pursueNearestEntity(nearbyEntities);        
+      
       return;
     }
     
@@ -496,9 +501,7 @@ export class Player extends Entity {
       this.workOnItemPickUp(delta);
       return;
     }
-    const nearbyEntities = this.findEntitiesWithinRadius(this, this.sensingRadius);
-    this.debugLog(nearbyEntities)
-    this.pursueNearestEntity(nearbyEntities);    
+  
     
     const distance = this.moveTowards(this, this.destinationPosition, this.speed);    
            
