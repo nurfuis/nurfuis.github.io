@@ -12,7 +12,6 @@ import { isSpaceFree } from "./helpers/grid.js";
 
 const rays = [];
 
-
 export class Entity extends GameObject {
   constructor() {
     super({
@@ -52,13 +51,16 @@ export class Entity extends GameObject {
     
   }
   _validateVector2(position) {
-    if (!position || !position.x || !position.y || isNaN(position.x) || isNaN(position.y)) {
+    if (!position || !position.x || !position.y ||
+        isNaN(position.x) || isNaN(position.y)
+      ) {
       console.warn("Invalid position value. Setting position to origin.");
       return this.originPosition; // Set default safe position
     } else {
       return new Vector2(position.x, position.y);
     }
   }  
+  
   get entityId () {
     return this._entityId;
   }
@@ -168,7 +170,10 @@ export class Entity extends GameObject {
     
     this.destinationPosition = { x: x, y: y };   
    
-    this.debugLog(this.entityId + " has joined at " + this.position.x + "," + this.position.y + "," + this.currentWorld); 
+    this.debugLog(this.entityId + " has joined at "
+        + this.position.x + "," + this.position.y + "," 
+        + this.currentWorld
+      ); 
   }  
  
   setProperties() {
@@ -270,7 +275,8 @@ export class Entity extends GameObject {
   respawn(delay) {
     setTimeout(() => {
       this.position = { x: this.originPosition.x, y: this.originPosition.y };
-      this.destinationPosition =  { x: this.originPosition.x, y: this.originPosition.y };
+      this.destinationPosition = { x: this.originPosition.x,
+                                   y: this.originPosition.y };
       
       this.revive();
       this.spawn();
@@ -318,17 +324,32 @@ export class Entity extends GameObject {
       y: Math.floor(this.position.y + repulsionForce.y / this.mass)
     };
     
-    const raycastHit = this.raycast(this.position.x, this.position.y, newPosition.x, newPosition.y);
-    this.visualizeRaycast(this.center.x, this.center.y, newPosition.x + gridSize / 2, newPosition.y + gridSize / 2, raycastHit, this);
+    const raycastHit = this.raycast(
+                          this.position.x,
+                          this.position.y, 
+                          newPosition.x, 
+                          newPosition.y
+                        );
+    this.visualizeRaycast(
+                          this.center.x, 
+                          this.center.y, 
+                          newPosition.x + gridSize / 2, 
+                          newPosition.y + gridSize / 2, 
+                          raycastHit, this);
 
     if (raycastHit) {
-      this.position = {x: Math.floor(raycastHit.x), y: Math.floor(raycastHit.y) }
+      this.position = { x: Math.floor(raycastHit.x), 
+                        y: Math.floor(raycastHit.y) }
       
-      this.setDestinationPosition(Math.floor(raycastHit.x), Math.floor(raycastHit.y), this.currentWorld);   
+      this.destinationPosition = { x: Math.floor(raycastHit.x),
+                                   y: Math.floor(raycastHit.y) };   
       this.updateHitboxCenter();
     }
     
-    if (!raycastHit && isSpaceFree(newPosition.x, newPosition.y, this).collisionDetected === false) {
+    if (!raycastHit && 
+      isSpaceFree(newPosition.x, 
+                  newPosition.y, 
+                  this).collisionDetected === false) {
       this.position = { x: newPosition.x, y: newPosition.y };
       this.destinationPosition = { x: newPosition.x, y: newPosition.y };
       this.updateHitboxCenter();
@@ -406,10 +427,18 @@ export class Entity extends GameObject {
   }  
   
   pursueNearestEntity(nearbyEntities) {
-    const filteredNearbyEntities = nearbyEntities.filter(entity => entity !== this);
-    const closestEntity = filteredNearbyEntities.reduce((closest, entity) => {
+    const filteredNearbyEntities = nearbyEntities.filter(
+        entity => entity !== this);
+    
+    const closestEntity = filteredNearbyEntities.reduce((
+                            closest, entity) => {
+      
       const distanceToEntity = this.distanceTo(entity);
-      if (distanceToEntity <= this.sensingRadius && (closest === undefined || distanceToEntity < this.distanceTo(closest))) {
+     
+     if (distanceToEntity <= this.sensingRadius &&
+          (closest === undefined ||
+           distanceToEntity < this.distanceTo(closest))
+        ) {
         return entity;
       } else {
         return closest;
@@ -418,9 +447,12 @@ export class Entity extends GameObject {
 
     if (closestEntity) {
       this.debugLog(closestEntity)
-      const angleToEntity = Math.atan2(closestEntity.center.y - this.center.y, closestEntity.center.x - this.center.x);
-      const pursuitMagnitude = 1; // Adjust for desired pursuit speed
-
+      const angleToEntity = Math.atan2(
+        closestEntity.center.y - this.center.y,
+        closestEntity.center.x - this.center.x);
+      
+      const pursuitMagnitude = 10;
+      
       const pursuitForce = {
         x: Math.cos(angleToEntity) * pursuitMagnitude,
         y: Math.sin(angleToEntity) * pursuitMagnitude,
@@ -430,13 +462,18 @@ export class Entity extends GameObject {
         x: Math.floor(this.position.x + pursuitForce.x),
         y: Math.floor(this.position.y + pursuitForce.y),
       };
-
-      if (isSpaceFree(newPosition.x, newPosition.y, this).collisionDetected === false) {
-        this.destinationPosition.x = newPosition.x;
-        this.destinationPosition.y = newPosition.y;
+      //  TODO if distance is less than attack range do an attack
+      
+      if (isSpaceFree(
+          newPosition.x,
+          newPosition.y,
+          this).collisionDetected === false
+        ) {
+        this.destinationPosition = { x: newPosition.x,
+                                     y: newPosition.y };
       }
-    }
-  }    
+    }    
+  }
   avoid(nearbyEntities, nearbyPlayer) {
     const distanceToPlayer = this.distanceTo(nearbyPlayer);
     const targetArcDistance = (Math.random() * 3 + 1) * nearbyPlayer.radius * 2;
@@ -444,14 +481,11 @@ export class Entity extends GameObject {
     const numNearby = nearbyEntities.length;
     const angleOffset = (Math.PI * 2) / numNearby * nearbyEntities.indexOf(this);
     
-    const angleToPlayer = Math.atan2(nearbyPlayer.center.y - this.center.y, nearbyPlayer.center.x - this.center.x);
-
-    const randomOffset = Math.random() * Math.PI / 4;;
-    // let targetAngle = angleToPlayer + angleOffset + randomOffset;
+    const angleToPlayer = Math.atan2(nearbyPlayer.center.y - this.center.y,
+      nearbyPlayer.center.x - this.center.x);
     
     let targetAngle = angleToPlayer + angleOffset;
-    
-    
+
     const magnitude = 0.1;
     
     const attractionForce = {
@@ -472,8 +506,13 @@ export class Entity extends GameObject {
     };
     
     if (this.debug2) {
-      const raycastHitA = this.raycast(this.center.x, this.center.y, newPosition.x, newPosition.y);
-      this.visualizeRaycast( this.center.x, 
+      const raycastHitA = this.raycast(
+                                       this.center.x,
+                                       this.center.y, 
+                                       newPosition.x, 
+                                       newPosition.y);
+      this.visualizeRaycast( 
+                        this.center.x, 
                         this.center.y, 
                         newPosition.x, 
                         newPosition.y, 
@@ -481,9 +520,13 @@ export class Entity extends GameObject {
                         this);
     }                
                       
-    if (isSpaceFree(newPosition.x, newPosition.y, this).collisionDetected === false) {
-      this.destinationPosition.x = newPosition.x;
-      this.destinationPosition.y = newPosition.y;    
+    if (isSpaceFree(
+                    newPosition.x,
+                    newPosition.y, 
+                    this).collisionDetected === false
+                  ) {
+      this.destinationPosition = { x:  newPosition.x, 
+                                   y: newPosition.y};
     }
   }
   
@@ -494,7 +537,10 @@ export class Entity extends GameObject {
       x: 0,
       y: 0,
     };
-    const numAvoiding = nearbyEntities.filter(entity => entity.inAvoidState).length;
+    
+    const numAvoiding = nearbyEntities.filter(
+      entity => entity.inAvoidState).length;
+    
     for (const entity of nearbyEntities) {
       if (entity.inAvoidState) {
         averagePosition.x += entity.position.x;
@@ -530,9 +576,13 @@ export class Entity extends GameObject {
       y: Math.floor(this.position.y + attractionForce.y)
     };
     
-    if (isSpaceFree(newPosition.x, newPosition.y, this).collisionDetected === false) {
-      this.destinationPosition.x = newPosition.x;
-      this.destinationPosition.y = newPosition.y;    
+    if (isSpaceFree(
+                  newPosition.x,
+                  newPosition.y, 
+                  this).collisionDetected === false
+                ) {
+      this.destinationPosition = { x: newPosition.x,
+                                   y: newPosition.y };    
     } 
   }  
   
@@ -600,8 +650,20 @@ export class Entity extends GameObject {
     const forceCap = this.mass;
     
     return {
-      x: Math.max(Math.min(collisionVectorNormalized.x * linearForce * logarithmicForce * forceCurve * relativeSpeed, forceCap), -forceCap).toFixed(2),
-      y: Math.max(Math.min(collisionVectorNormalized.y * linearForce * logarithmicForce * forceCurve * relativeSpeed, forceCap), -forceCap).toFixed(2)
+      x: Math.max(
+         Math.min(
+         collisionVectorNormalized.x 
+         * linearForce 
+         * relativeSpeed,
+         forceCap),
+         -forceCap).toFixed(2),
+      y: Math.max(
+         Math.min(
+         collisionVectorNormalized.y 
+         * linearForce 
+         * relativeSpeed,
+         forceCap),
+         -forceCap).toFixed(2)
     }       
   }
        
@@ -655,7 +717,14 @@ export class Entity extends GameObject {
     }
   }  
   
-  circleIntersection(rayStartX, rayStartY, rayDX, rayDY, circleCenterX, circleCenterY, circleRadius) {
+  circleIntersection(rayStartX,
+                     rayStartY,
+                     rayDX,
+                     rayDY,
+                     circleCenterX,
+                     circleCenterY,
+                     circleRadius
+                   ) {
     const a = rayDY;
     const b = -rayDX;
     const c = -a * rayStartX - b * rayStartY;
@@ -667,14 +736,22 @@ export class Entity extends GameObject {
     if (distanceFromCenter > this.radius * 4) {
       return null;
     }
-    const discriminant = (a * circleCenterX + b * circleCenterY + c) ** 2 - (a ** 2 + b ** 2) * (circleRadius ** 2 - distanceFromCenter ** 2);
+    const discriminant = (a * circleCenterX + 
+                          b * circleCenterY + c) ** 2 
+                          - (a ** 2 + b ** 2) 
+                          * (circleRadius ** 2 
+                          - distanceFromCenter ** 2);
 
     if (discriminant < 0) {
       return null;
     }
 
-    const t1 = (-a * circleCenterX - b * circleCenterY - c + Math.sqrt(discriminant)) / (a ** 2 + b ** 2);
-    const t2 = (-a * circleCenterX - b * circleCenterY - c - Math.sqrt(discriminant)) / (a ** 2 + b ** 2);
+    const t1 = (-a * circleCenterX 
+                - b * circleCenterY - c 
+                + Math.sqrt(discriminant)) / (a ** 2 + b ** 2);
+    const t2 = (-a * circleCenterX 
+               - b * circleCenterY - c 
+               - Math.sqrt(discriminant)) / (a ** 2 + b ** 2);
     
     let t = null;
     if (t1 >= 0 && t1 <= 1) {
@@ -707,9 +784,31 @@ export class Entity extends GameObject {
       const entityX2 = entity.maxX();
       const entityY2 = entity.maxY();
       
-      const intersection = this.lineSegmentIntersection(startX, startY, dX, dY, entityX1, entityY1, entityX2, entityY2);
+      const intersection = this.lineSegmentIntersection(
+                                startX, 
+                                startY, 
+                                dX, 
+                                dY,   
+                                entityX1, 
+                                entityY1, 
+                                entityX2, 
+                                entityY2
+                              );
       
-      if (this.entityId != entity.entityId && intersection && (!closestHit || this.distanceSquared(startX, startY, intersection.x, intersection.y) < this.distanceSquared(startX, startY, closestHit.x, closestHit.y))) {
+      if (this.entityId != entity.entityId && 
+          intersection && 
+          (!closestHit || 
+            this.distanceSquared(
+              startX, 
+              startY, 
+              intersection.x, 
+              intersection.y) < this.distanceSquared(
+                                      startX, 
+                                      startY, 
+                                      closestHit.x, 
+                                      closestHit.y))
+                                    ) {
+        
         closestHit = intersection;
       }
     }
@@ -717,7 +816,9 @@ export class Entity extends GameObject {
   }
    
   dynamicRaycastCircle(startX, startY, endX, endY) {
-    let closestHit = {collision: false, position: null, entity: null};
+    let closestHit = {collision: false, 
+                      position: null, 
+                      entity: null};
 
     const dX = endX - startX;
     const dY = endY - startY;
@@ -762,12 +863,20 @@ export class Entity extends GameObject {
       if (
         intersection &&
         (!closestHit.collision ||
-          this.distanceSquared(startX, startY, intersection.x, intersection.y) <
-            this.distanceSquared(startX, startY, closestHit.x, closestHit.y))
-      ) {
-       
-        closestHit = {collision: true, position: intersection, entity: entity};
+          this.distanceSquared(
+              startX, 
+              startY, 
+              intersection.x, 
+              intersection.y) < this.distanceSquared(
+                                      startX, 
+                                      startY, 
+                                      closestHit.x, 
+                                      closestHit.y))
+                                    ) {        
         
+        closestHit = { collision: true, 
+                       position: intersection,
+                       entity: entity };        
       }
     }
 
@@ -788,9 +897,28 @@ export class Entity extends GameObject {
       const obstacleX2 = obstacle.maxX();
       const obstacleY2 = obstacle.maxY();
       
-      const intersection = this.lineSegmentIntersection(startX, startY, dX, dY, obstacleX1, obstacleY1, obstacleX2, obstacleY2);
+      const intersection = this.lineSegmentIntersection(
+          startX, 
+          startY, 
+          dX, 
+          dY, 
+          obstacleX1, 
+          obstacleY1, 
+          obstacleX2, 
+          obstacleY2);
 
-      if (intersection && (!targetHit || this.distanceSquared(startX, startY, intersection.x, intersection.y) < this.distanceSquared(startX, startY, targetHit.x, targetHit.y))) {
+      if (intersection && 
+        (!targetHit || 
+          this.distanceSquared(
+            startX,
+            startY,
+            intersection.x, 
+            intersection.y) < this.distanceSquared(
+                                    startX, 
+                                    startY, 
+                                    targetHit.x, 
+                                    targetHit.y))
+                                  ) {
         targetHit = obstacle;
       }
     }
@@ -811,9 +939,27 @@ export class Entity extends GameObject {
       const obstacleX2 = obstacle.maxX();
       const obstacleY2 = obstacle.maxY();
       
-      const intersection = this.lineSegmentIntersection(startX, startY, dX, dY, obstacleX1, obstacleY1, obstacleX2, obstacleY2);
+      const intersection = this.lineSegmentIntersection(
+          startX, 
+          startY, 
+          dX, 
+          dY, 
+          obstacleX1, 
+          obstacleY1, 
+          obstacleX2, 
+          obstacleY2);
 
-      if (intersection && (!closestHit || this.distanceSquared(startX, startY, intersection.x, intersection.y) < this.distanceSquared(startX, startY, closestHit.x, closestHit.y))) {
+      if (intersection && 
+        (!closestHit || this.distanceSquared(
+          startX, 
+          startY, 
+          intersection.x, 
+          intersection.y) < this.distanceSquared(
+                                  startX, 
+                                  startY, 
+                                  closestHit.x, 
+                                  closestHit.y))
+                                ) {
         closestHit = intersection;
       }
     }
@@ -866,19 +1012,21 @@ export class Entity extends GameObject {
   
   displayName(ctx) {
     if (this.name) {
-      ctx.font = "12px handjet";
+      ctx.font = "18px handjet";
       ctx.fillText(`${this.name}`, this.position.x, this.position.y - 12);
     }
   }       
+  
   displayEntityId(ctx) {
     if (this.debug) {
       ctx.fillStyle = "white";
       
-      ctx.font = "12px handjet";
-      ctx.fillText(`${this.entityId}`, this.position.x, this.position.y + this.height + 12);      
-      
+      ctx.font = "18px handjet";
+      ctx.fillText(`${this.type}`,
+          this.position.x,
+          this.position.y + this.height + 12
+        );            
     }
-
   }
  
   drawImage(ctx) {
@@ -910,6 +1058,4 @@ export class Entity extends GameObject {
     this.center.x = Math.floor(this.position.x + this.width / 2);
     this.center.y = Math.floor(this.position.y + this.height / 2);
   }
-  
-   
 }
