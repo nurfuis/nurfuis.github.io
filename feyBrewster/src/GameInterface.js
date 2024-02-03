@@ -14,7 +14,10 @@ export class GameInterface {
     
     events.on("TEXT_OUTPUT", this, (details) => {
       this.handleOutput(details);
-    }); 
+    });
+    events.on("F2", this, () => {
+      this.toggleDebugDisplay2()        
+    });     
     events.on("F3", this, () => {     
       this.toggleDebugDisplay();
     });    
@@ -29,6 +32,10 @@ export class GameInterface {
   toggleTextInput() {
     this.textInput.style.display = this.textInput.style.display === "none" ? "" : "none";
   };
+  toggleDebugDisplay2(){
+    events.emit("TOGGLE_DEBUG_2")     
+  };  
+  
   toggleDebugDisplay(){
     this.debugDisplay = !this.debugDisplay; 
     events.emit("TOGGLE_DEBUG")     

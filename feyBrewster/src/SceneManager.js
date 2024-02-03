@@ -55,6 +55,7 @@ export class SceneManager {
     
     this.overlay = new Overlay({ position: new Vector2(0, 0) });
     this.mainScene.addChild(this.overlay);    
+    this.entities.overlay = this.overlay;
     
     this.collision = new Collision({ position: new Vector2(0, 0) });
     this.mainScene.addChild(this.collision);   
@@ -99,7 +100,8 @@ export class SceneManager {
     events.on("SPAWN_ZONE_READY", this, (position) => {
       for (let i = 0; i < this.playerList.length; i++) {
         const player = this.playerList[i];
-        player.joinWorld(position.x, position.y, position.world, this.foreground);
+        this.foreground.addChild(player);
+        player.joinWorld(position.x, position.y, position.world);
         player.spawn();
       }
       console.log('mainScene',this.mainScene);

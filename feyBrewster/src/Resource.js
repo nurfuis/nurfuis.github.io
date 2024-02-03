@@ -21,7 +21,8 @@ class Resources {
       woodenKettleTileset: "./public/sprites/woodenkettleTileset.png",
       woodenMashTunTileset: "./public/sprites/woodenmashtunTileset.png",
       broom: "./public/sprites/broom-sheet.png",
-      
+      twoTop: "./public/sprites/bartableTileset.png",
+      barstool: "./public/sprites/barstoolTileset.png",
     };
 
     this.images = {};
@@ -32,16 +33,16 @@ class Resources {
       this.images[key] = {
         image: img,
         isLoaded: false,
+        width: null,
+        height: null
       };
       img.onload = () => {
         this.images[key].isLoaded = true;
         this.images[key].width = img.width;
         this.images[key].height = img.height;
         
-        // Check if all images are loaded, and if so, emit the event
         if (Object.values(this.images).every((image) => image.isLoaded)) {
-          // Assuming you have an events object or function for emitting events:
-          events.emit("RESOURCES_LOADED"); // Replace with your actual event mechanism
+          events.emit("RESOURCES_LOADED"); 
         }        
       };
       

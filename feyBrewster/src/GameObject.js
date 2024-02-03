@@ -7,7 +7,6 @@ export class GameObject {
     this.children = [];
     this.parent = null;
     this.hasReadyBeenCalled = false;
-    this.invisible = false;
     this.debug = false;
     
   }
@@ -17,6 +16,7 @@ export class GameObject {
     }
   }  
   stepEntry(delta, root) {
+    if (this.inactive) {return}
     this.children.forEach((child) => child.stepEntry(delta, root));
   
     if (!this.hasReadyBeenCalled) {
@@ -36,9 +36,8 @@ export class GameObject {
     // ...
   }  
 
-  draw(ctx, x, y) {
-    if (this.invisible) {return};
-    
+  draw(ctx, x, y) {  
+    if (this.invisible) {return}
     const drawPosX = x + this.position.x;
     const drawPosY = y + this.position.y;
     

@@ -1,0 +1,43 @@
+import {GameObject} from "../../../GameObject.js";
+import {Vector2} from "../../../Vector2.js";
+import {Sprite} from "../../../Sprite.js";
+import {resources} from "../../../Resource.js";
+import {DOWN, LEFT, RIGHT, UP} from "../../../Input.js";
+import {Animations} from "../../../Animations.js";
+import {FrameIndexPattern} from "../../../FrameIndexPattern.js";
+import {gridSize} from  "../../../helpers/grid.js";
+import {isSpaceFree} from "../../../helpers/grid.js";
+
+import {
+  SWING_LEFT,
+  SWING_UP,
+  SWING_RIGHT,
+  SWING_DOWN,
+  
+} from "./attackAnimations.js";
+export class Broom extends GameObject {
+  constructor(x, y, world) {
+    super({});
+    this.x = x;
+    this.y = y;
+    this.world = world;
+    this.direction = DOWN;
+    
+    this.itemId = 'broom';
+    
+    const sprite = new Sprite({
+      frameSize: new Vector2(96, 96),
+      hFrames: 4,
+      vFrames: 1,      
+      resource: resources.images.broom,
+      position: new Vector2(-40, -32),
+      animations: new Animations({    
+        swingDown: new FrameIndexPattern(SWING_DOWN),       
+        swingLeft: new FrameIndexPattern(SWING_LEFT),
+        swingUp: new FrameIndexPattern(SWING_UP),       
+        swingRight: new FrameIndexPattern(SWING_RIGHT),         
+      }), 
+    })
+    this.addChild(sprite);           
+  }
+}

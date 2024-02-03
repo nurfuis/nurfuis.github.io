@@ -18,11 +18,17 @@ import {
 } from "./slimeAnimations.js";
 
 export class Slime extends Entity {
-  constructor() {
+  constructor(chunkId, objectData) {
     super({
     });    
-    this.type = 'entity';
+    this.chunkId = chunkId;    
+    this.objectData = objectData;    
+
+    this.isAlive = false;   
     this.respawnDelay = 10000;
+    
+    this.type = 'entity';
+   
     this.hasCollision = true;
     this.width = 32;
     this.height = 32;    
@@ -64,11 +70,9 @@ export class Slime extends Entity {
     this.addChild(this.body);
     
   }
-  setProperties(objectData) {
-    this.name = objectData.name;
-    
-    for (let i = 0; i < objectData.properties.length; i++) {
-      const property = objectData.properties[i];
+  setProperties() {
+    for (let i = 0; i < this.objectData.properties.length; i++) {
+      const property = this.objectData.properties[i];
       switch(property.name){
         case "mass":
           this.mass = property.value;
@@ -114,13 +118,13 @@ export class Slime extends Entity {
   workOnEnergyShield(delta) {
     this.shieldTime -= delta;
     this.body.animations.play("shield");
+    
     if (this.shieldTime <= 0) {
       this.shieldImage.destroy();
       this.body.animations.play('idle');
 
     }
   }     
-  
   workOnAvoid(delta) {
     this.avoidTime -= delta;
     this.body.frame = 2;
@@ -129,7 +133,6 @@ export class Slime extends Entity {
       this.body.animations.play('idle');
     }
   }    
-  
   tryMove(delta) { 
     const sequence = [
       { direction: LEFT, steps: 2 },  
@@ -183,6 +186,8 @@ export class Slime extends Entity {
   }   
     
   step(delta, root) {
+    if (!this.isAlive) { return; }
+
     if (this.shieldTime > 0) {
       this.workOnEnergyShield(delta);
       return;
@@ -222,11 +227,7 @@ export class Slime extends Entity {
     const hasArrived = distance < 1;    
     
     const collisionTest = this.runDynamicCollisionCheck();
-    if (collisionTest) {
-      this.subtractHealth(33)
-
-      
-    }    
+        
     
     if (hasArrived && !this.inAvoidState) {
       this.tryMove(delta);
@@ -234,7 +235,9 @@ export class Slime extends Entity {
   }
   
   ready() { 
-   
+    if (this.objectData.properties) {
+      this.setProperties();      
+    }    
   }    
 
 }

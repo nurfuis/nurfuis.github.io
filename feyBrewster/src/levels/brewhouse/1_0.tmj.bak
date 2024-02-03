@@ -315,7 +315,7 @@
  "tilesets":[
         {
          "firstgid":1,
-         "source":"feyBrewsterTileSet.tsx"
+         "source":"FeyBrewsterTileSet.tsx"
         }, 
         {
          "firstgid":257,

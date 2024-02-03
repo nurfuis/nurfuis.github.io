@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.10.2" name="FeyBrewsterTileSet" tilewidth="32" tileheight="32" tilecount="256" columns="16">
- <image source="../../../public/sprites/FeyBrewsterTileSet.png" width="512" height="512"/>
+<tileset version="1.10" tiledversion="1.10.2" name="feyBrewsterTileSet" tilewidth="32" tileheight="32" tilecount="256" columns="16">
+ <image source="feyBrewsterTileSet.png" width="512" height="512"/>
 </tileset>

@@ -1,4 +1,5 @@
 import { Entity } from "../../../Entity.js";
+
 import { resources } from "../../../Resource.js";
 import { GameObject } from "../../../GameObject.js";
 import { Vector2 } from "../../../Vector2.js";
@@ -6,34 +7,53 @@ import { Sprite } from "../../../Sprite.js";
 import { gridSize } from "../../../helpers/grid.js";
 import { Animations } from "../../../Animations.js";
 import { FrameIndexPattern } from "../../../FrameIndexPattern.js";
-import {
-  WOODEN_KETTLE_EMPTY,  
-  WOODEN_KETTLE_BOILING,
-} from "./woodenAnimations.js";
+
 import { generateUniqueId } from "../../../helpers/nextId.js";
 import { events } from "../../../Events.js";
 import { obstacles } from "../../../helpers/grid.js";
 
-export class WoodenKettle extends Entity {
+export class WoodenFermenter extends Entity {
   constructor(x, y, world, chunkId, overlay, objectData) {
-    super({});      
-    this.type = 'brewing equipment';
+    super({
+      position: new Vector2(x, y),
+    });      
+    this.currentWorld = world;
 
-    this.hasObstacle = true;
-    this.width = gridSize * 3;
+    this.entityId = null;   
+    this.hasCollision = true;
+    this.width = gridSize * 2;
     this.height = gridSize * 2;
+    this.center = new Vector2(this.position.x + this.width / 2, this.position.y + this.height / 2);
    
+    this.overlayObject = null;
     this.hasOverlay = true;
-    this.overlaySpriteFrame = 0;   
-    this.baseSpriteFrame = 4;     
-        
+    this.overlayPlane = overlay;
+    this.overlaySpriteFrame = 0;
+    
+    this.body = null;
+    this.baseSpriteFrame = 2;     
+    
+    this.facingDirection = objectData.properties[0].value;
+    this.type = 'brewing equipment';
   } 
-  addSkin() {
+  ready() {
+    
+    this.entityId = `woodenFermenter-${generateUniqueId()}`;
+    
+    if (this.hasCollision) {
+      obstacles.push(this);        
+    }
+    
+    if (this.facingDirection === 'UP') {
+      this.overlaySpriteFrame = 1;
+      this.baseSpriteFrame = 3;
+    }    
+    
     this.body = new Sprite({
       position: new Vector2(0, -32), // offset x, y    
-      resource: resources.images.woodenKettleTileset,
-      frameSize: new Vector2(96, 96),
-      hFrames: 4,
+      resource: resources.images.woodenFermentationVesselTileset,
+      frameSize: new Vector2(64, 96),
+      hFrames: 2,
       vFrames: 2,
       spacing: 0,
       frame: this.baseSpriteFrame,
@@ -45,24 +65,16 @@ export class WoodenKettle extends Entity {
       this.overlayObject.position = this.position.duplicate();
       this.overlayObject.addChild(new Sprite({
         position: new Vector2(0, -32), // offset x, y    
-        resource: resources.images.woodenKettleTileset,
-        frameSize: new Vector2(96, 96),
-        hFrames: 4,
+        resource: resources.images.woodenFermentationVesselTileset,
+        frameSize: new Vector2(64, 96),
+        hFrames: 2,
         vFrames: 2,
         spacing: 0,
         frame: this.overlaySpriteFrame,
-        animations: new Animations({
-          kettleBoil: new FrameIndexPattern(WOODEN_KETTLE_BOILING),
-          kettleEmpty: new FrameIndexPattern(WOODEN_KETTLE_EMPTY),
-        })          
       }))
       this.overlayPlane.addChild(this.overlayObject)
-    }     
-    
-  }
-  
-  ready() {
-    // ...
+    } 
+
   }
  
   step(delta, root) { 
@@ -78,5 +90,17 @@ export class WoodenKettle extends Entity {
       }
     }
     this.destroy();
-  } 
+  }
+  minX() {
+    return this.position.x;
+  }
+  minY () {
+    return this.position.y;
+  }
+  maxX() {
+    return this.position.x + this.width;
+  }
+  maxY() {
+    return this.position.y + this.height;
+  }  
 }

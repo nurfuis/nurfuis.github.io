@@ -3,7 +3,7 @@
  <editorsettings>
   <export target="0_0.tmj" format="json"/>
  </editorsettings>
- <tileset firstgid="1" source="feyBrewsterTileSet.tsx"/>
+ <tileset firstgid="1" source="FeyBrewsterTileSet.tsx"/>
  <layer id="1" name="terrain" width="16" height="16">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

@@ -34,10 +34,10 @@ export class Player extends Entity {
     super({
       position: new Vector2(0, 0)
     });
-    this.type = 'player';    
+    this.isAlive = false;   
     
     this.respawnDelay = 10000;
-
+    this.type = 'player';
     
     this.hasCollision = true;
     this.width = 32;
@@ -54,7 +54,7 @@ export class Player extends Entity {
     
     this.attackPower = 10;    
 
-    this.awarenessField = 12;
+    this.awarenessField = 5;
     this.sensingRadius = this.awarenessField * gridSize;
 
     this.mainhand = Broom;
@@ -114,8 +114,6 @@ export class Player extends Entity {
       this.onPickUpItem(data);
     })
   }
-  
-  
   
   doClickBehavior() {
     if (this.facingDirection === LEFT) {this.doSweepAttack(LEFT)}
@@ -496,10 +494,7 @@ export class Player extends Entity {
       this.workOnItemPickUp(delta);
       return;
     }
-    const nearbyEntities = this.findEntitiesWithinRadius(this, this.sensingRadius);
-    this.debugLog(nearbyEntities)
-    this.pursueNearestEntity(nearbyEntities);    
-    
+
     const distance = this.moveTowards(this, this.destinationPosition, this.speed);    
            
     const collidees = this.returnOverlappingEntities();

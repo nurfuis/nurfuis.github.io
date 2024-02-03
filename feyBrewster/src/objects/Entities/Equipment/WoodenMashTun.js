@@ -1,3 +1,5 @@
+import { Entity } from "../../../Entity.js";
+
 import { resources } from "../../../Resource.js";
 import { GameObject } from "../../../GameObject.js";
 import { Vector2 } from "../../../Vector2.js";
@@ -13,37 +15,21 @@ import { generateUniqueId } from "../../../helpers/nextId.js";
 import { events } from "../../../Events.js";
 import { obstacles } from "../../../helpers/grid.js";
 
-export class WoodenMashTun extends GameObject {
-  constructor(x, y, world, chunkId, overlay, objectData) {
-    super({
-      position: new Vector2(x, y),
-    });      
-    this.currentWorld = world;
+export class WoodenMashTun extends Entity {
+  constructor() {
+    super({});      
+    this.type = 'brewing equipment';
 
-    this.entityId = null;   
-    this.hasCollision = true;
+    this.hasObstacle = true;
     this.width = gridSize * 3;
     this.height = gridSize * 2;
-    this.center = new Vector2(this.position.x + this.width / 2, this.position.y + this.height / 2);     
    
-    this.overlayObject = null;
     this.hasOverlay = true;
-    this.overlayPlane = overlay;
-    this.overlaySpriteFrame = 0;
-    
-    this.body = null;
+    this.overlaySpriteFrame = 0;   
     this.baseSpriteFrame = 4;     
         
-    this.type = 'brewing equipment';
-  } 
-  ready() {
-    
-    this.entityId = `woodenMashTun-${generateUniqueId()}`;
-    
-    if (this.hasCollision) {
-      obstacles.push(this);        
-    } 
-    
+  }
+  addSkin() {
     this.body = new Sprite({
       position: new Vector2(0, -32), // offset x, y    
       resource: resources.images.woodenMashTunTileset,
@@ -72,8 +58,12 @@ export class WoodenMashTun extends GameObject {
         })         
       }))
       this.overlayPlane.addChild(this.overlayObject)
-    } 
-
+    }     
+    
+  }
+  
+  ready() {
+    // ...
   }
  
   step(delta, root) { 
@@ -90,16 +80,5 @@ export class WoodenMashTun extends GameObject {
     }
     this.destroy();
   }
-  minX() {
-    return this.position.x;
-  }
-  minY () {
-    return this.position.y;
-  }
-  maxX() {
-    return this.position.x + this.width;
-  }
-  maxY() {
-    return this.position.y + this.height;
-  }  
+ 
 }
