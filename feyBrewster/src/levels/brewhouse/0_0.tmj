@@ -209,7 +209,7 @@
                  "type":"Barstool",
                  "visible":true,
                  "width":32,
-                 "x":352,
+                 "x":352.33,
                  "y":352
                 }, 
                 {
@@ -281,7 +281,7 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":448,
+                 "x":160,
                  "y":288
                 }],
          "opacity":1,
