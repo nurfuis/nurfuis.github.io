@@ -306,17 +306,19 @@ export class Cell extends GameObject {
         this.neighborIds = this.getMooreNeighborIds();
     }
     
-  }  
+  } 
+  ready() {
+    this.lastUpdateTime = this.interval;
+    this.setCellFrame();
+  } 
+  
   setCellFrame(){
     const cellBody = frameLookupTable[this.cellType];
     const frameId = this.state > 8 ? 8 : this.state;
     const cellFrame = cellBody[frameId];
     this.body.frame = cellFrame;    
-  }  
-  ready() {
-    this.lastUpdateTime = this.interval;
-    this.setCellFrame();
-  }
+  } 
+ 
   cellRestore(delta) {
     if (this.resourceRespawnTimer > 0) {
       this.resourceRespawnTimer -= delta;
@@ -325,13 +327,15 @@ export class Cell extends GameObject {
       this.state = 1;
       this.setCellFrame();
     } 
-  }  
+  } 
+  
   mutation() {
       if (this.canMutate && Math.random() < this.growth / growthDenominator) {
           this.cellType = (this.cellType + 1) % 12; // Wrap around from 11 to 0
           this.setCellFrame();
       }
   } 
+  
   repopulate() {
     this.generations++;
     
@@ -340,12 +344,14 @@ export class Cell extends GameObject {
       this.setCellFrame();   
       this.mutation();   
     }        
-  }  
+  } 
+  
   depleteCell() {
     this.state = 0; 
     this.setCellFrame();
     this.resourceRespawnTimer = this.respawnDelay;
-  }    
+  }
+  
   createDeadSpot() {
     const cellsArray = this.parent.cellsSnapshot;   
     for (const neighborId of this.neighborIds) {
@@ -356,81 +362,80 @@ export class Cell extends GameObject {
       }
     }
   }
-  ageCorrelatedDrift() {
+  driftWest() {
     const cellReference = this.parent.children[neighborId];
-    
-    if (neighborCell.state === 1 && this.state === 2 && i === 0 && Math.random() < .5) {
-      
-      cellReference.state = this.state;
-      cellReference.setCellFrame();
-      
-      this.state = 1;
-      this.setCellFrame();         
-    }
-    
-    if (neighborCell.state === 1 && this.state === 3 && i === 0 && Math.random() < .4) {
+     if (this.state >= 3 && neighbor === 0) {
       
       cellReference.state = this.state;
       cellReference.setCellFrame();
       
       this.state = 1;
       this.setCellFrame();
-    }
-    
-    if (neighborCell.state === 1 && this.state === 4 && i === 0 && Math.random() < .3) {
-      
-      cellReference.state = this.state;
-      cellReference.setCellFrame();
-      
-      this.state = 1;
-      this.setCellFrame();
-    }
-    
-    if (neighborCell.state === 1 && this.state === 5 && i === 1 && Math.random() < .3) {
-      cellReference.state = this.state;
-      cellReference.setCellFrame();
-      
-      this.state = 1;
-      this.setCellFrame();
-    }
-    
-    if (neighborCell.state === 1 && this.state === 6 && i === 1 && Math.random() < .4) {
-      cellReference.state = this.state;
-      cellReference.setCellFrame();
-      
-      this.state = 1;
-      this.setCellFrame();
-    }
-    
-    if (neighborCell.state === 1 && this.state === 7 && i === 1 && Math.random() < .5) {
-      cellReference.state = this.state;
-      cellReference.setCellFrame();
-      
-      this.state = 1;
-      this.setCellFrame();
-    }        
-    
-    if (neighborCell.cellId === 666) {
-      cellReference.createDeadSpot();     
-      
     }  
-    // if (this.state >= 3 && neighbor === 0) {
+    
+  // ageCorrelatedDrift() {  
+    // if (neighborCell.state === 1 && this.state === 2 && i === 0 && Math.random() < .5) {
+      
+      // cellReference.state = this.state;
+      // cellReference.setCellFrame();
+      
+      // this.state = 1;
+      // this.setCellFrame();         
+    // }
+    
+    // if (neighborCell.state === 1 && this.state === 3 && i === 0 && Math.random() < .4) {
       
       // cellReference.state = this.state;
       // cellReference.setCellFrame();
       
       // this.state = 1;
       // this.setCellFrame();
-    // }      
-    if (neighborCell.state === 1 && this.state >= 4 && i === 2) {
+    // }
+    
+    // if (neighborCell.state === 1 && this.state === 4 && i === 0 && Math.random() < .3) {
       
-      cellReference.state = this.state;
-      cellReference.setCellFrame();
+      // cellReference.state = this.state;
+      // cellReference.setCellFrame();
       
-      this.state = 1;
-      this.setCellFrame();
-    }    
-  };
+      // this.state = 1;
+      // this.setCellFrame();
+    // }
+    
+    // if (neighborCell.state === 1 && this.state === 5 && i === 1 && Math.random() < .3) {
+      // cellReference.state = this.state;
+      // cellReference.setCellFrame();
+      
+      // this.state = 1;
+      // this.setCellFrame();
+    // }
+    
+    // if (neighborCell.state === 1 && this.state === 6 && i === 1 && Math.random() < .4) {
+      // cellReference.state = this.state;
+      // cellReference.setCellFrame();
+      
+      // this.state = 1;
+      // this.setCellFrame();
+    // }
+    
+    // if (neighborCell.state === 1 && this.state === 7 && i === 1 && Math.random() < .5) {
+      // cellReference.state = this.state;
+      // cellReference.setCellFrame();
+      
+      // this.state = 1;
+      // this.setCellFrame();
+    // }        
+    
+     
+    // if (neighborCell.state === 1 && this.state >= 4 && i === 2) {
+      
+      // cellReference.state = this.state;
+      // cellReference.setCellFrame();
+      
+      // this.state = 1;
+      // this.setCellFrame();
+    // }    
+  // };
+  
   applyRules() {
     this.lastUpdateTime = this.interval;
     
@@ -456,6 +461,7 @@ export class Cell extends GameObject {
         
         if (neighborId > cellsArray.length * 2) {
           neighborId = neighborId - cellsArray.length * 2;
+        
         } else {
           neighborId = neighborId - cellsArray.length;
         }
@@ -465,9 +471,7 @@ export class Cell extends GameObject {
         const neighborCell = cellsArray[neighborId];      
           
         const cellReference = this.parent.children[neighborId];       
-      
-    
-      
+            
         if (neighborCell.state > 1 && neighborCell.cellType === this.cellType) {
           numberOfAliveNeighbors++;
         }           
@@ -490,13 +494,15 @@ export class Cell extends GameObject {
         this.repopulate();
       }
     }
-  }  
+  }
+  
   workOnRules(delta) {
     this.lastUpdateTime -= delta;
     if (this.lastUpdateTime <= 0) {
       this.applyRules();          
     }
   }
+  
   step(delta, root) {
     
     if (this.state === 0) {
@@ -506,12 +512,13 @@ export class Cell extends GameObject {
     if (
       this.state === 1 && this.generations < this.capacity ||
       this.state === 1 && this.capacity === -1
-      ) {
+     ) {
       this.repopulate();
     }
     
     if (this.lastUpdateTime > 0) {
       this.workOnRules(delta);
+      this.driftWest()      
     }
   }   
 }
