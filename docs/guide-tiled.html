@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="shortcut icon" type="image/png" href="favicon.png"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Handjet">    
+    <link rel="stylesheet" href="./style.css" /> 
+    
+	<title>Using Tiled - Fey Brewster</title>
+  </head>
+  <body>
+  <div id="main">
+    <h1>Making a map with tiled.</h1>
+    
+      <p>Hello. Today we are making a map for use with the Fey Brewster javascript game engine. Let's dive right in.</p>
+    
+    <h2>Download the project files</h2>
+    
+      <p>Start by visiting this <a href="https://github.com/nurfuis/nurfuis.github.io/blob/main/feyBrewster/feyBrewster.zip">Github Link</a> to get the latest version of the project files. Extract the folder to your working directory. Then, open the Tiled application.</p>
+    
+    
+    <h2>Open the project file</h2>      
+      <img src="./images/screenshot1.png" />
+
+      <p>Begin by selecting the Open File or Project button. Use the pop-up window to navigate to the feyBrewster directory and locate the file feyBrewster.tiled-project.</p>
+      
+      <img src="./images/screenshot2.png" />
+
+      <p>If you don't see anything you may need to go to the View dropdown menu, select Views and Toolbars and ensure that the projects box is checked.</p>
+      
+      <img src="./images/screenshot3.png" />      
+
+      <p>The levels are located and stored in the src folder. To start a new level select the New Map button. Set the map size to 16 by 16 and the tile size to 32 by 32 pixels.</p>
+      
+      <img src="./images/screenshot4.png" />      
+      
+      <img src="./images/screenshot5.png" />      
+      
+      
+      <p>Save the file. In the save window navigate to the levels folder and create a new directory, name it after the region you are creating. Enter that directory and save the first chunk. I label the chunks with their position such as 0_0, 1_0, 2_0, etc. but any name will work.</p>
+      
+      <img src="./images/screenshot6.png" />      
+    
+    
+    <h2>Make the Chunk layers</h2>
+      The game engine has been hard coded to use 7 seperate Tiled layers to make up a chunk. The chunk must have all 7 layers in the correct order to properly render. There is a default chunk in the levels folder that can be copied to avoid setting up the chunk each time. More layers can be added without too much trouble but we should decide on that before going too far into making maps.
+      <img src="./images/screenshot7.png" />      
+      
+      <ol>
+        <li>Terrain - Tiles Layer (this layer is the base map).</li>
+        <li>Scenery - Tiles Layer (a layer for ground clutter, buildings and such).</li>
+        <li>Entities - Object Layer (equipment, creatures, things that the player will interact with).</li>
+        <li>Foreground - Object Layer (the player is added to this layer with the use of spawnLocation, doors, stairs, etc).</li>
+        <li>Overlay - Tiles Layer (trees, building that the player can walk behind, anything displayed over the char and is part of the map).</li>
+        <li>Collision - Tiles Layer (this layer is for drawing the walls of the map that contain the player in the world. I use a red tile to fill in all of the barriers on this layer. A special collider tile is added to the map for the tiles on this layer and the display of them can be toggled on or off).</li>
+        <li>Scripts - Object Layer (I haven't implimentd this feature yet but this layer will be for adding things like zones, spawners, or events that need to be triggered by the map).</li>
+      </ol>
+    
+    <h2>Tilesets</h2>
+      <p>The Fey Brewster engine maps currently have support for one tileset. It can be any size, though something to consider is that if the tileset image width is resized after making a map it will alter the indexing for the frames. The map will need to be re-created. Extending the height will work as long as the existing tiles positions are not altered. The spritesheet is divided into a grid and each tile is numbered starting from one and increasing as you go left to right and top down.</p>
+      
+      <p>We are using tiles 32px square. A typical tileset is 16 tiles wide and 16 tiles high. The resulting file is 512px square and contains 256 tiles referenced by the code using this array which corresponds to the tiles location on the image. As you can see, extending the image down would not alter the mapping of existing frames in the tileset.</p>
+      [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,<br />       
+      17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,<br />
+      33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,<br />
+      49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,<br />
+      65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,<br />
+      81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,<br />
+      97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,<br />
+      113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,<br />
+      129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,<br />
+      145,146, 147,148,149,150,151,152,153,154,155,156,157,158,159,160,<br />
+      161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,<br />
+      177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,<br />
+      193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,<br />
+      209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,<br />
+      225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,<br />
+      241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256]<br />
+      
+    <h3>Organizing Sprites</h3>
+      <p>When making game sprites include the terrain and scenery onto one spritesheet. Creatures and equipment and objects that can be interacted with will use individual spritesheets.</p>
+      
+      <p>Here is the inside of the WoodFermenter.js script.  It has a custom size and a unique image file. Other custom properties and behaviors can be set to the wood fermenter during development.</p>
+      <img src="./images/screenshot20.png" /> 
+      <img src="./images/screenshot22.png" /> 
+      
+      <p>The wood fermenter will be added to the map on the entities layer.</p>
+      
+      
+    
+    <h3>Add a new tileset...</h3>
+      <img src="./images/screenshot8.png" /> 
+      
+      <p>In the pop-up window navigate to project folder public/sprites and find a tilesheet to use. If you don't want to use one that already exists then this is the folder to add your own spritesheet to. Image files must be registered manually to the Resource.js file to be used in the game. </p>
+      <img src="./images/screenshot9.png" />       
+      <p>The tileset name should be camelCase and match the corresponding registry in the Resource.js file. The filenames are typically hyphenated and the in game registry is in camelCase. Save the tileset .tsx file in the same directory as the map you are making.</p>
+      <img src="./images/screenshot10.png" /> 
+      <img src="./images/screenshot12.png" /> 
+
+      <p>I opened the Resource.js file and edited it in notepad++ to include the snow.png file that I added to the public/sprites directory. The Resource.js file will be uploaded to the server along with the new map directory and the sprite image.<p>
+      <img src="./images/screenshot11.png" /> 
+      
+    <h2>Terrain Layer</h2>
+      <p>The base layer consisting of the ground, floor, substrate...surface...background...</p>
+      <img src="./images/screenshot13.png" />
+
+    <h2>Scenery</h2>
+      <p>The trees and stuff that goes over the base layer but beneath or blocked off to the player and entities.
+      <img src="./images/screenshot14.png" />
+      
+    <h2>Entities</h2>
+      <p>Adding the wood fermenter to the entities layer is as easy as pie. Make a new rectangle object and name it for the entity you want to place.</p>
+      <img src="./images/screenshot21.png" />
+      <img src="./images/screenshot23.png" />
+      
+      
+    <h2>Foreground</h2>
+      <p>I add a rectangle object and name it spawnLocation. I add a custom property named spawnLocation with the value tutorialMap (which must match the name of the directory). I will also update the main.js to load the new map because there is no other way at the moment to load worlds.</p>
+      <img src="./images/screenshot17.png" />      
+    <h2>Overlay</h2>
+      <p>This layer is drawn after the player and appears above it on the screen. Used for signs, trees and buildings the player is able to walk behind.
+      <img src="./images/screenshot15.png" />
+      
+    <h2>Collision</h2>
+      <p>Right now any tile you draw on here will be read as a barrier block. I like to use a red block with transparency set but I didn't feel like editing this tileset so I am using a snow tile to mark out the wall tiles. It won't be visible on the game screen.</p>
+      <img src="./images/screenshot16.png" />     
+
+    <h2>Scripts</h2>
+      <p>We will be able to call scripts and create zones on this layer.</p>
+      
+    <h2>Save the file</h2>
+      <p>Save the file. Then export as json map files.</p>
+    
+    <h2>Make a world file</h2>
+      <p>Just one chunk is not enough. We must add more chunks. To do so we need to make a world file (named world.world). On the menu go to World and select New World. Then select the world tool (N).</p>
+      <img src="./images/screenshot18.png" />
+      <p>Add the chunk to the world (Shift+A)</p>
+      <img src="./images/screenshot19.png" />
+      <h3>Save the world</h3>
+        <p>On the menu go to World and Save World then save the world.</p>
+        
+    <h2>Upload files to server</h2>
+      <p>From here you can continue making new maps for each chunk and adding them to the world. When the world is ready the updates are made to the server with the new directory, the spritesheet, the Resource.js asset loader, and the main.js.
+      
+  </div>  
+
+  </body>
+</html>

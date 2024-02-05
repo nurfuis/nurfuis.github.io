@@ -1,0 +1,10 @@
+html, body {
+	  font-family: arial;  
+}
+#main {
+    margin: auto;
+    max-width: 900px;
+li {
+  line-height: 1.5;
+  
+}
