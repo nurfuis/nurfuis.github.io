@@ -238,7 +238,7 @@ body {
   padding: 0.25rem;
 }
 html {
-  background-image: url("./public/images/pottery.png");
+  background-image: url("./public/images/pottery.webp");
 }
 .merriweather-light {
   font-family: "Merriweather", serif;
