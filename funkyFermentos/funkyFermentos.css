@@ -65,11 +65,10 @@
 
 .tile {
   border: 1px solid slategray;
-  padding: 1rem;
+  width: 128px;
+  height: 128px;
   margin: 1rem;
   cursor: pointer;
-  min-width: 96px;
-  min-height: 96px;
 }
 
 .main__gallery-header {
