@@ -8,7 +8,29 @@
 .main__watermark img {
   width: 64px;
 }
-
+.main-icon {
+  grid-area: main-icon;
+  text-align: center;
+}
+.main-icon img {
+  width: 32px;
+}
+.main__footer {
+  grid-area: main-footer;
+  text-align: center;
+}
+.main__footer img {
+  margin: 1rem;
+  width: 64px;
+}
+.main__breakup {
+  grid-area: main-breakup;
+  text-align: center;
+}
+.main__breakup img {
+  margin: 1rem;
+  width: 64px;
+}
 .main__call-to-action-button {
   width: 60%;
   background-color: #66a103;
@@ -115,7 +137,7 @@
   border-bottom: 1px dashed #f57f1f;
 }
 .main__ingredients-header {
-  user-select: none;
+  width: 100%;
 }
 .main__ingredients-wrapper {
   grid-area: main-ingredients-wrapper;
@@ -142,6 +164,9 @@
   background-color: rgb(250, 235, 215, 0.3);
   border-bottom: 1px dashed #f57f1f;
   margin-bottom: 2rem;
+}
+.main__logos-header {
+  padding-left: 1rem;
 }
 .main__sub-header {
   text-decoration: none;
@@ -178,11 +203,13 @@
   border-radius: 10px;
   display: grid;
   grid-template-areas:
+    "main-icon"
     "main-header-wrapper"
     "main-image"
     "main-call-to-action"
     "main-ingredients-wrapper"
     "main-logos-wrapper"
+    "main-breakup"
     "main-hook-wrapper"
     "main-logo"
     "main-call-to-action-two"
@@ -191,7 +218,8 @@
     "main-call-to-action-three"
     "main-gallery-header"
     "main-gallery"
-    "main-call-to-action-four";
+    "main-call-to-action-four"
+    "main-footer";
   grid-template-columns: 100% auto;
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
   background-image: linear-gradient(
@@ -207,7 +235,7 @@ body {
     rgb(215, 204, 200, 0.9)
   );
   margin: 0;
-  padding: 0.1;
+  padding: 0.25rem;
 }
 html {
   background-image: url("./public/images/pottery.png");
@@ -260,107 +288,107 @@ html {
   font-style: italic;
 }
 .background1 {
-  background-image: url("./public/images/gallery/1.jpg");
+  background-image: url("./public/images/gallery/small/1.webp");
   background-position: center;
   background-size: cover;
 }
 .background2 {
-  background-image: url("./public/images/gallery/2.jpg");
+  background-image: url("./public/images/gallery/small/2.webp");
   background-position: center;
   background-size: cover;
 }
 .background3 {
-  background-image: url("./public/images/gallery/3.jpg");
+  background-image: url("./public/images/gallery/small/3.webp");
   background-position: center;
   background-size: cover;
 }
 .background4 {
-  background-image: url("./public/images/gallery/4.jpg");
+  background-image: url("./public/images/gallery/small/4.webp");
   background-position: center;
   background-size: cover;
 }
 .background5 {
-  background-image: url("./public/images/gallery/5.jpg");
+  background-image: url("./public/images/gallery/small/5.webp");
   background-position: center;
   background-size: cover;
 }
 .background6 {
-  background-image: url("./public/images/gallery/6.jpg");
+  background-image: url("./public/images/gallery/small/6.webp");
   background-position: center;
   background-size: cover;
 }
 .background7 {
-  background-image: url("./public/images/gallery/7.jpg");
+  background-image: url("./public/images/gallery/small/7.webp");
   background-position: center;
   background-size: cover;
 }
 .background8 {
-  background-image: url("./public/images/gallery/8.jpg");
+  background-image: url("./public/images/gallery/small/8.webp");
   background-position: center;
   background-size: cover;
 }
 .background9 {
-  background-image: url("./public/images/gallery/9.jpg");
+  background-image: url("./public/images/gallery/small/9.webp");
   background-position: center;
   background-size: cover;
 }
 .background10 {
-  background-image: url("./public/images/gallery/10.jpg");
+  background-image: url("./public/images/gallery/small/10.webp");
   background-position: center;
   background-size: cover;
 }
 .background11 {
-  background-image: url("./public/images/gallery/11.jpg");
+  background-image: url("./public/images/gallery/small/11.webp");
   background-position: center;
   background-size: cover;
 }
 .background12 {
-  background-image: url("./public/images/gallery/12.jpg");
+  background-image: url("./public/images/gallery/small/12.webp");
   background-position: center;
   background-size: cover;
 }
 .background13 {
-  background-image: url("./public/images/gallery/13.jpg");
+  background-image: url("./public/images/gallery/small/13.webp");
   background-position: center;
   background-size: cover;
 }
 .background14 {
-  background-image: url("./public/images/gallery/14.jpg");
+  background-image: url("./public/images/gallery/small/14.webp");
   background-position: center;
   background-size: cover;
 }
 .background15 {
-  background-image: url("./public/images/gallery/15.webp");
+  background-image: url("./public/images/gallery/small/15.webp");
   background-position: center;
   background-size: cover;
 }
 .background16 {
-  background-image: url("./public/images/gallery/16.webp");
+  background-image: url("./public/images/gallery/small/16.webp");
   background-position: center;
   background-size: cover;
 }
 .background17 {
-  background-image: url("./public/images/gallery/17.webp");
+  background-image: url("./public/images/gallery/small/17.webp");
   background-position: center;
   background-size: cover;
 }
 .background18 {
-  background-image: url("./public/images/gallery/18.webp");
+  background-image: url("./public/images/gallery/small/18.webp");
   background-position: center;
   background-size: cover;
 }
 .background19 {
-  background-image: url("./public/images/gallery/19.webp");
+  background-image: url("./public/images/gallery/small/19.webp");
   background-position: center;
   background-size: cover;
 }
 .background20 {
-  background-image: url("./public/images/gallery/20.webp");
+  background-image: url("./public/images/gallery/small/20.webp");
   background-position: center;
   background-size: cover;
 }
 .background21 {
-  background-image: url("./public/images/gallery/21.webp");
+  background-image: url("./public/images/gallery/small/21.webp");
   background-position: center;
   background-size: cover;
 }
