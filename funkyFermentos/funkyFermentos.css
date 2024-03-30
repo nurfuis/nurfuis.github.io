@@ -1,0 +1,366 @@
+@import url("https://fonts.googleapis.com/css2?family=Kode+Mono:wght@400..700&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap");
+
+.main__watermark {
+  grid-area: main-watermark;
+  text-align: center;
+  margin: 2rem;
+}
+.main__watermark img {
+  width: 64px;
+}
+
+.main__call-to-action-button {
+  width: 60%;
+  background-color: #66a103;
+  color: white;
+  font-size: larger;
+  text-shadow: 0px 1px 1px rgba(2, 2, 2, 0.3);
+  padding: 1rem;
+  margin: 2rem 1rem 4rem 1rem;
+}
+
+.main__call-to-action-button:hover {
+  background-color: rgb(102, 161, 3, 0.7);
+  border-color: #66a103;
+}
+.main__call-to-action-four {
+  grid-area: main-call-to-action-four;
+  text-align: center;
+}
+.main__call-to-action-three {
+  grid-area: main-call-to-action-three;
+  text-align: center;
+}
+.main__call-to-action-two {
+  grid-area: main-call-to-action-two;
+  text-align: center;
+}
+
+.main__call-to-action {
+  grid-area: main-call-to-action;
+  text-align: center;
+}
+
+.tile {
+  border: 1px solid slategray;
+  padding: 1rem;
+  margin: 1rem;
+  cursor: pointer;
+  min-width: 96px;
+  min-height: 96px;
+}
+
+.main__gallery-header {
+  grid-area: main-gallery-header;
+}
+.main__gallery-wrapper {
+  grid-area: main-gallery;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.right {
+  text-align: right;
+  border-radius: 15px 0 0 0;
+}
+.left {
+  border-radius: 0 15px 0 0;
+}
+.main__testimonials-content-wrapper {
+  padding: 1rem;
+  background-color: rgb(250, 235, 215, 0.3);
+  border-bottom: 1px dashed #f57f1f;
+  margin-left: 2rem;
+  margin-right: 4rem;
+  margin-bottom: 2rem;
+}
+.main__testimonials-wrapper {
+  grid-area: main-testimonials-wrapper;
+}
+
+.main__logos-details-header {
+  padding: 0 1rem 0 1rem;
+  text-transform: capitalize;
+}
+
+.main__logos-details-wrapper {
+  grid-area: main-logos-wrapper;
+}
+
+.main__hook-content {
+  text-indent: 1rem;
+  line-height: 1.8;
+}
+
+.main__hook-quote {
+  font-size: large;
+  font-weight: bold;
+  padding: 1rem;
+  border-radius: 15px;
+  background-color: rgb(240, 255, 255, 0.3);
+  display: block;
+}
+
+.main__hook-wrapper {
+  grid-area: main-hook-wrapper;
+  margin: 2rem;
+  padding: 1rem;
+  border: 1px dashed #f04c22;
+  background-color: rgb(250, 235, 215, 0.3);
+}
+.main__ingredients-content {
+  font-size: large;
+  padding: 1rem;
+  background-color: rgb(250, 235, 215, 0.3);
+  border-bottom: 1px dashed #f57f1f;
+}
+.main__ingredients-header {
+  user-select: none;
+}
+.main__ingredients-wrapper {
+  grid-area: main-ingredients-wrapper;
+  padding-left: 1rem;
+  margin-bottom: 2rem;
+}
+
+.main__pathos-detail {
+  padding: 0.5rem;
+  border: 1px solid #f04c22;
+  border-radius: 5px;
+  padding: 0.3rem;
+  margin: 0.3rem;
+  display: inline-block;
+}
+
+.main__pathos-details-wrapper {
+  width: 100%;
+}
+.main__logos-details-wrapper p {
+  margin: 0 2rem 0 2rem;
+  padding: 1rem;
+  border-radius: 15px;
+  background-color: rgb(250, 235, 215, 0.3);
+  border-bottom: 1px dashed #f57f1f;
+  margin-bottom: 2rem;
+}
+.main__sub-header {
+  text-decoration: none;
+}
+
+.main__header {
+  text-decoration: underline;
+}
+.main_header-wrapper {
+  grid-area: main-header-wrapper;
+}
+.main__image {
+  grid-area: main-image;
+}
+.main__image img {
+  max-width: 90%;
+  margin: 0.5rem 0 0 0.5rem;
+}
+.main__logo {
+  grid-area: main-logo;
+  text-align: center;
+  margin: 2rem;
+}
+.main__logo img {
+  width: 64px;
+}
+.main__wrapper {
+  max-width: 360px;
+  min-width: 240px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 1rem;
+  border: 1px solid slategrey;
+  border-radius: 10px;
+  display: grid;
+  grid-template-areas:
+    "main-header-wrapper"
+    "main-image"
+    "main-call-to-action"
+    "main-ingredients-wrapper"
+    "main-logos-wrapper"
+    "main-hook-wrapper"
+    "main-logo"
+    "main-call-to-action-two"
+    "main-testimonials-wrapper"
+    "main-watermark"
+    "main-call-to-action-three"
+    "main-gallery-header"
+    "main-gallery"
+    "main-call-to-action-four";
+  grid-template-columns: 100% auto;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+  background-image: linear-gradient(
+    rgb(255, 240, 232, 1),
+    rgb(215, 204, 200, 1)
+  );
+}
+
+body {
+  font-family: Open Sans;
+  background-image: linear-gradient(
+    rgb(255, 240, 232, 0.9),
+    rgb(215, 204, 200, 0.9)
+  );
+  margin: 0;
+  padding: 0;
+}
+html {
+  background-image: url("./public/images/pottery.png");
+}
+.merriweather-light {
+  font-family: "Merriweather", serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.merriweather-regular {
+  font-family: "Merriweather", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.merriweather-bold {
+  font-family: "Merriweather", serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.merriweather-black {
+  font-family: "Merriweather", serif;
+  font-weight: 900;
+  font-style: normal;
+}
+
+.merriweather-light-italic {
+  font-family: "Merriweather", serif;
+  font-weight: 300;
+  font-style: italic;
+}
+
+.merriweather-regular-italic {
+  font-family: "Merriweather", serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.merriweather-bold-italic {
+  font-family: "Merriweather", serif;
+  font-weight: 700;
+  font-style: italic;
+}
+
+.merriweather-black-italic {
+  font-family: "Merriweather", serif;
+  font-weight: 900;
+  font-style: italic;
+}
+.background1 {
+  background-image: url("./public/images/gallery/1.jpg");
+  background-position: center;
+  background-size: cover;
+}
+.background2 {
+  background-image: url("./public/images/gallery/2.jpg");
+  background-position: center;
+  background-size: cover;
+}
+.background3 {
+  background-image: url("./public/images/gallery/3.jpg");
+  background-position: center;
+  background-size: cover;
+}
+.background4 {
+  background-image: url("./public/images/gallery/4.jpg");
+  background-position: center;
+  background-size: cover;
+}
+.background5 {
+  background-image: url("./public/images/gallery/5.jpg");
+  background-position: center;
+  background-size: cover;
+}
+.background6 {
+  background-image: url("./public/images/gallery/6.jpg");
+  background-position: center;
+  background-size: cover;
+}
+.background7 {
+  background-image: url("./public/images/gallery/7.jpg");
+  background-position: center;
+  background-size: cover;
+}
+.background8 {
+  background-image: url("./public/images/gallery/8.jpg");
+  background-position: center;
+  background-size: cover;
+}
+.background9 {
+  background-image: url("./public/images/gallery/9.jpg");
+  background-position: center;
+  background-size: cover;
+}
+.background10 {
+  background-image: url("./public/images/gallery/10.jpg");
+  background-position: center;
+  background-size: cover;
+}
+.background11 {
+  background-image: url("./public/images/gallery/11.jpg");
+  background-position: center;
+  background-size: cover;
+}
+.background12 {
+  background-image: url("./public/images/gallery/12.jpg");
+  background-position: center;
+  background-size: cover;
+}
+.background13 {
+  background-image: url("./public/images/gallery/13.jpg");
+  background-position: center;
+  background-size: cover;
+}
+.background14 {
+  background-image: url("./public/images/gallery/14.jpg");
+  background-position: center;
+  background-size: cover;
+}
+.background15 {
+  background-image: url("./public/images/gallery/15.webp");
+  background-position: center;
+  background-size: cover;
+}
+.background16 {
+  background-image: url("./public/images/gallery/16.webp");
+  background-position: center;
+  background-size: cover;
+}
+.background17 {
+  background-image: url("./public/images/gallery/17.webp");
+  background-position: center;
+  background-size: cover;
+}
+.background18 {
+  background-image: url("./public/images/gallery/18.webp");
+  background-position: center;
+  background-size: cover;
+}
+.background19 {
+  background-image: url("./public/images/gallery/19.webp");
+  background-position: center;
+  background-size: cover;
+}
+.background20 {
+  background-image: url("./public/images/gallery/20.webp");
+  background-position: center;
+  background-size: cover;
+}
+.background21 {
+  background-image: url("./public/images/gallery/21.webp");
+  background-position: center;
+  background-size: cover;
+}
