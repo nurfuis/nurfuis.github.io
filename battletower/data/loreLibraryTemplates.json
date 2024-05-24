@@ -1,0 +1,91 @@
+{
+  "Character": {
+    "name": {
+      "label": "name",
+      "type": "text",
+      "prompt": "Choose a name for the character."
+    },
+    "description": {
+      "label": "description",
+      "type": "textarea",
+      "prompt": "Provide a description for the character."
+    },
+    "attackPower": {
+      "label": "attackPower",
+      "type": "text",
+      "prompt": "Enter an integer for the attack power."
+    },
+    "defenseRating": {
+      "label": "defenseRating",
+      "type": "text",
+      "prompt": "Enter an integer for the defense rating."
+    },
+    "magicPower": {
+      "label": "magicPower",
+      "type": "text",
+      "prompt": "Enter an integer for the magic power."
+    },
+    "resistanceRating": {
+      "label": "resistanceRating",
+      "type": "text",
+      "prompt": "Enter an integer for the resistance rating."
+    },
+    "ability1": {
+      "label": "ability1",
+      "type": "text",
+      "prompt": "Name a battle ability for this move slot. Prioritize a direct attack."
+    },
+    "ability2": {
+      "label": "ability2",
+      "type": "text",
+      "prompt": "Name a battle ability for this move slot. Prioritize a strategic attack."
+    },
+    "ability3": {
+      "label": "ability3",
+      "type": "text",
+      "prompt": "Name a battle ability for this move slot. Prioritize a delayed effect or battlefield effect."
+    },
+    "ability4": {
+      "label": "ability4",
+      "type": "text",
+      "prompt": "Name a battle ability for this move slot. Prioritize a speed or targeted attack."
+    },
+    "block": {
+      "label": "block",
+      "type": "text",
+      "prompt": "Name a block type ability for this move slot."
+    },
+    "heal": {
+      "label": "heal",
+      "type": "text",
+      "prompt": "Name a heal type ability for this move slot."
+    },
+    "inventory": {
+      "label": "inventory",
+      "type": "text",
+      "prompt": "Name one to three special items this character can use during combat. Items may be consumable, one time use, or special equipment. "
+    },
+    "school": {
+      "label": "school",
+      "type": "select",
+      "options": ["wood", "fire", "earth", "water", "metal"],
+      "prompt": "Choose which force this character is most proficient with: 'wood', 'fire', 'earth', 'water', 'metal'."
+    },
+    "maxHealth": {
+      "label": "maxHealth",
+      "type": "text",
+      "prompt": "Enter an integer for the maximum health of this character."
+    },
+    "maxEnergy": {
+      "label": "maxEnergy",
+      "type": "text",
+      "prompt": "Enter an integer for the maximum energy of this character."
+    },
+    "nature": {
+      "label": "nature",
+      "type": "select",
+      "options": ["determined", "burly", "curious", "focused"],
+      "prompt": "Choose a nature for the character. Determined boosts attack. Burly raises defense. Curious enhances magic. Focused fortifies resistance. "
+    }
+  }
+}
