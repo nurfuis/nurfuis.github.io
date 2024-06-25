@@ -17,6 +17,9 @@
       crossorigin=""
     ></script>
     <style>
+      body {
+        margin: 0px;
+      }
       #map {
         height: 600px;
         width: 900px;
@@ -30,11 +33,18 @@
 
   <script>
     var map = L.map("map").setView([36.1604, -121.6926], 11);
+    // Get the window width and height
+    var width = window.innerWidth || document.documentElement.clientWidth;
+    var height = window.innerHeight || document.documentElement.clientHeight;
+
+    // Set the map container size
+    document.getElementById("map").style.width = width + "px";
+    document.getElementById("map").style.height = height + "px";
 
     L.tileLayer("https://tile.opentopomap.org/{z}/{x}/{y}.png", {
       maxZoom: 99,
       attribution:
-        '&copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)'
+        '&copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
     }).addTo(map);
   </script>
 </html>
