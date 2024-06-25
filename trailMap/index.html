@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Trail Map</title>
     <link
       rel="stylesheet"
@@ -17,15 +18,23 @@
     ></script>
     <style>
       #map {
-        height: 180px;
-        width: 300px;
+        height: 600px;
+        width: 900px;
       }
     </style>
   </head>
+
   <body>
     <div id="map"></div>
   </body>
+
   <script>
-    var map = L.map("map").setView([51.505, -0.09], 13);
+    var map = L.map("map").setView([36.1604, -121.6926], 11);
+
+    L.tileLayer("https://tile.opentopomap.org/{z}/{x}/{y}.png", {
+      maxZoom: 99,
+      attribution:
+        '&copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)'
+    }).addTo(map);
   </script>
 </html>
