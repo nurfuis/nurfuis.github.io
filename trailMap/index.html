@@ -10,6 +10,11 @@
       body {
         margin: 0px;
       }
+      .topo-map__link--image {
+        border-radius: 5px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      }
+
       .main-details__wrapper {
         margin: 2em;
       }
@@ -51,6 +56,7 @@
   <body>
     <div class="main-details__wrapper">
       <h1>Trail Conditions</h1>
+
       <div class="search">
         <input
           type="text"
@@ -61,6 +67,7 @@
         <button onclick="filterTrails()">Search</button>
         <button class="reset" onclick="resetSearch()">Reset</button>
       </div>
+
       <div class="dropdown">
         <select id="trailDropDown" onchange="filterTrails()">
           <option value="">Select a Trail</option>
@@ -69,14 +76,19 @@
           <option value="jackass-ridge">Jackass Ridge Trail</option>
         </select>
       </div>
+
       <h2>Big Sur Wilderness Topo Map</h2>
+
       <div class="map__wrapper">
         <a href="topo-map.html">
-          <img src="assets/images/map-static-300x200.png"
+          <img
+            class="topo-map__link--image"
+            src="assets/images/map-static-300x200.png"
         /></a>
       </div>
+
+      <div id="trailInfo"></div>
     </div>
-    <div id="trailInfo"></div>
   </body>
   <script>
     function resetSearch() {
@@ -101,7 +113,6 @@
         document.getElementById("trailInfo").innerHTML = `Trail info for: ${
           selectedTrail || userInput
         }`;
-
       }
     }
   </script>
