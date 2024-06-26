@@ -96,14 +96,15 @@
       </div>
       <div class="main__header-wrapper">
         <h1>Trail Conditions</h1>
+        <h2>Big Sur Wilderness</h2>
         <p>
-          Search or select a trail to examine. Click <a href="#">here</a> to see
-          a list of Big Sur wilderness trails.
+          Explore the area with the topo map. Search or select a trail to
+          examine. Click <a href="#">here</a> to view a list of trails.
         </p>
       </div>
 
       <div class="map__wrapper">
-        <h2>Big Sur Wilderness Topo Map</h2>
+        <h3>Topographic Map</h3>
         <div class="map__image-wrapper">
           <img
             class="topo-map__link--image"
@@ -120,6 +121,7 @@
           id="searchInput"
           onfocus="resetDropdown()"
         />
+
         <button onclick="filterTrails()">Search</button>
         <button class="reset" onclick="resetSearch()">Reset</button>
       </div>
@@ -235,7 +237,7 @@
       // Use JavaScript to smoothly scroll to the trail information section
       // document.getElementById("searchInput").blur();
       trailInfoWrapper.focus();
-      trailInfoWrapper.scrollIntoView({ block: "start" });
+      trailInfoWrapper.scrollIntoView({ behavior: "smooth" });
     }
   </script>
 </html>
