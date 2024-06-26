@@ -8,20 +8,44 @@
 
     <style>
       body {
-        margin: 0px;
+        margin: 0.25em;
       }
+
+      .trail-information__wrapper {
+        grid-area: trail-info-wrapper;
+      }
+
       .topo-map__link--image {
         border-radius: 5px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
       }
-
-      .main-details__wrapper {
-        margin: .25em;
+      .map__wrapper a {
+        display: block;
+      }
+      .map__image-wrapper {
+        text-align: center;
+      }
+      .map__wrapper {
+        grid-area: map-wrapper;
+      }
+      .main__header {
+        grid-area: main-header;
+      }
+      .main__wrapper {
+        margin: 0 auto 0 auto;
+        max-width: 360px;
+        display: grid;
+        grid-template-areas:
+          "main-header"
+          "search"
+          "dropdown"
+          "map-wrapper"
+          "trail-info-wrapper";
       }
       .search {
-        max-width: 400px;
         display: flex;
         align-items: center;
+        grid-area: search;
       }
       .search input[type="text"] {
         flex: 1;
@@ -44,6 +68,7 @@
       }
       .dropdown {
         margin-top: 1em;
+        grid-area: dropdown;
       }
       .dropdown select {
         padding: 10px;
@@ -54,8 +79,8 @@
   </head>
 
   <body>
-    <div class="main-details__wrapper">
-      <h1>Trail Conditions</h1>
+    <div class="main__wrapper">
+      <h1 class="main__header">Trail Conditions</h1>
 
       <div class="search">
         <input
@@ -77,20 +102,27 @@
         </select>
       </div>
 
-      <h2>Big Sur Wilderness Topo Map</h2>
-
       <div class="map__wrapper">
-        <a href="topo-map.html">
+        <h2>Big Sur Wilderness Topo Map</h2>
+        <div class="map__image-wrapper">
           <img
             class="topo-map__link--image"
             src="assets/images/map-static-300x200.png"
-        /></a>
+            onclick="openTopoMap()"
+          />
+        </div>
       </div>
 
-      <div id="trailInfo"></div>
+      <div class="trail-information__wrapper">
+        <h2>Latest Information</h2>
+        <div id="trailInfo"></div>
+      </div>
     </div>
   </body>
   <script>
+    function openTopoMap() {
+      window.location.href = "topo-map.html";
+    }
     function resetSearch() {
       document.getElementById("searchInput").value = "";
       resetDropdown();
