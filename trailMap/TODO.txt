@@ -1,7 +1,1 @@
-Setup project 1 hour
-Select Map API 1 hour
-Tested Leaflet 2 hour
 
-Researched design standards 1 hour
-Create link for map app page 1 hour
-Add search and dropdown elements 1 hour
