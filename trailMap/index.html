@@ -45,15 +45,16 @@
         grid-template-areas:
           "nav-wrapper"
           "main-header"
+          "map-wrapper"
           "search"
           "dropdown"
-          "map-wrapper"
           "trail-info-wrapper";
       }
       .search {
         display: flex;
         align-items: center;
         grid-area: search;
+        margin-top: 2em;
       }
       .search input[type="text"] {
         flex: 1;
@@ -100,6 +101,18 @@
           a list of Big Sur wilderness trails.
         </p>
       </div>
+
+      <div class="map__wrapper">
+        <h2>Big Sur Wilderness Topo Map</h2>
+        <div class="map__image-wrapper">
+          <img
+            class="topo-map__link--image"
+            src="assets/images/map-static-300x200.png"
+            onclick="openTopoMap()"
+          />
+        </div>
+      </div>
+
       <div class="search">
         <input
           type="text"
@@ -120,17 +133,6 @@
           <option value="skyline-to-the-sea">Skyline to the Sea Trail</option>
           <option value="jackass-ridge">Jackass Ridge Trail</option>
         </select>
-      </div>
-
-      <div class="map__wrapper">
-        <h2>Big Sur Wilderness Topo Map</h2>
-        <div class="map__image-wrapper">
-          <img
-            class="topo-map__link--image"
-            src="assets/images/map-static-300x200.png"
-            onclick="openTopoMap()"
-          />
-        </div>
       </div>
 
       <div class="trail-information__wrapper">
