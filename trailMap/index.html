@@ -10,7 +10,14 @@
       body {
         margin: 0.25em;
       }
-
+      .nav__wrapper {
+        grid-area: nav-wrapper;
+      }
+      .trail-information__wrapper p {
+        text-indent: 2cap;
+        border-bottom: 1px dashed cadetblue;
+        padding-bottom: 0.25em;
+      }
       .trail-information__wrapper {
         grid-area: trail-info-wrapper;
       }
@@ -28,7 +35,7 @@
       .map__wrapper {
         grid-area: map-wrapper;
       }
-      .main__header {
+      .main__header-wrapper {
         grid-area: main-header;
       }
       .main__wrapper {
@@ -36,6 +43,7 @@
         max-width: 360px;
         display: grid;
         grid-template-areas:
+          "nav-wrapper"
           "main-header"
           "search"
           "dropdown"
@@ -80,8 +88,17 @@
 
   <body>
     <div class="main__wrapper">
-      <h1 class="main__header">Trail Conditions</h1>
-
+      <div class="nav-wrapper">
+        <a href="#">TRAILS</a> | <a href="#">CAMPS</a> | <a href="#">ABOUT</a> |
+        <a href="#">GIVE</a>
+      </div>
+      <div class="main__header-wrapper">
+        <h1>Trail Conditions</h1>
+        <p>
+          Search for or select a trail to examine. Click <a href="#">here</a> to
+          see a list of Big Sur wilderness trails.
+        </p>
+      </div>
       <div class="search">
         <input
           type="text"
@@ -96,6 +113,8 @@
       <div class="dropdown">
         <select id="trailDropDown" onchange="filterTrails()">
           <option value="">Select a Trail</option>
+          <option value="all-big-sur">All Big Sur wilderness trails</option>
+
           <option value="pine-ridge">Pine Ridge Trail</option>
           <option value="skyline-to-the-sea">Skyline to the Sea Trail</option>
           <option value="jackass-ridge">Jackass Ridge Trail</option>
@@ -114,8 +133,42 @@
       </div>
 
       <div class="trail-information__wrapper">
-        <h2>Latest Information</h2>
-        <div id="trailInfo"></div>
+        <h2 id="trailInfo">Latest Information</h2>
+        <div>
+          <h4>Name:</h4>
+          <p>Name of the trail</p>
+          <h4>Status:</h4>
+          <p>The trail condition</p>
+          <h4>Length:</h4>
+          <p>How long is it?</p>
+          <h4>Elevation change:</h4>
+          <p>How harddd is it?</p>
+          <h4>Description:</h4>
+          <p>
+            Are there any bears? Will I see big trees? Does it end at the beach?
+            Are there any stores nearby?
+          </p>
+          <h4>Water:</h4>
+          <p>Is water available on the route or nearby?</p>
+          <h4>Accessible by:</h4>
+          <p>
+            How can you get here? By truck, car, bus, hitch, is it interior and
+            accessed by another trail?
+          </p>
+          <h4>GPX Track:</h4>
+          <p>A link to the downloadable gps track.</p>
+          <h4>Reports:</h4>
+          <p>
+            A list with a few of the freshest reports at the top and a link to
+            the history with past reports.
+          </p>
+          <ol>
+            <li>Newest</li>
+            <li>Newer</li>
+            <li>New</li>
+            <li>See older reports</li>
+          </ol>
+        </div>
       </div>
     </div>
   </body>
@@ -135,17 +188,21 @@
       const userInput = document.getElementById("searchInput").value;
       const trailDropDown = document.getElementById("trailDropDown");
       const selectedTrail = trailDropDown.value;
+      const trailInfoWrapper = document.getElementById("trailInfo");
 
       // Clear trail info section each time the function is called
-      document.getElementById("trailInfo").innerHTML = "";
+      trailInfoWrapper.innerHTML = "";
 
       // Add logic to filter trails based on user input or dropdown selection
       if (userInput || selectedTrail) {
         // Logic to display trail info based on user input or selectedTrail
-        document.getElementById("trailInfo").innerHTML = `Trail info for: ${
+        trailInfoWrapper.innerHTML = `Trail info for: ${
           selectedTrail || userInput
         }`;
       }
+
+      // Use JavaScript to smoothly scroll to the trail information section
+      trailInfoWrapper.scrollIntoView({ behavior: "smooth" });
     }
   </script>
 </html>
