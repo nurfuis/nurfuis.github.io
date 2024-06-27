@@ -241,11 +241,16 @@
         trailInfoWrapper.innerHTML = `Trail info for: ${
           selectedTrail || userInput
         }`;
+      } else {
+        const infoBlock = document.querySelectorAll(
+          ".trail-information__wrapper"
+        );
+        infoBlock[0].style.display = "none";
       }
 
       // Use JavaScript to smoothly scroll to the trail information section
       // document.getElementById("searchInput").blur();
-      trailInfoWrapper.focus();
+      // trailInfoWrapper.focus();
       trailInfoWrapper.scrollIntoView({ behavior: "smooth" });
     }
   </script>
