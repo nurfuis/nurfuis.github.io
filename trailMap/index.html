@@ -35,6 +35,7 @@
       }
       .map__wrapper {
         grid-area: map-wrapper;
+        display: block;
       }
       .main__header-wrapper {
         grid-area: main-header;
@@ -56,6 +57,7 @@
         align-items: center;
         grid-area: search;
         margin-top: 2em;
+        display: none;
       }
       .search input[type="text"] {
         flex: 1;
@@ -99,7 +101,7 @@
         <h1>Trail Conditions</h1>
         <h2>Big Sur Wilderness</h2>
         <p>
-          Explore with the topo map. Search or select a trail for details. Click
+          Select a trail for details. Click
           <a href="#">here</a> to view a list of trails.
         </p>
       </div>
@@ -121,6 +123,7 @@
           placeholder="Search for Trails"
           id="searchInput"
           onfocus="resetDropdown()"
+          onblur="filterTrails()"
         />
 
         <button onclick="filterTrails()">Search</button>
@@ -130,8 +133,6 @@
       <div class="dropdown">
         <select id="trailDropDown" onchange="filterTrails()">
           <option value="">Select a Trail</option>
-          <option value="all-big-sur">All Big Sur wilderness trails</option>
-
           <option value="pine-ridge">Pine Ridge Trail</option>
           <option value="skyline-to-the-sea">Skyline to the Sea Trail</option>
           <option value="jackass-ridge">Jackass Ridge Trail</option>
@@ -216,6 +217,8 @@
         ".trail-information__wrapper"
       );
       infoBlock[0].style.display = "none";
+      // document.querySelectorAll(".map__wrapper")[0].style.display = "block";
+
       resetDropdown();
     }
     function resetDropdown() {
@@ -235,6 +238,7 @@
         ".trail-information__wrapper"
       );
       infoBlock[0].style.display = "block";
+
       // Add logic to filter trails based on user input or dropdown selection
       if (userInput || selectedTrail) {
         // Logic to display trail info based on user input or selectedTrail
@@ -251,7 +255,8 @@
       // Use JavaScript to smoothly scroll to the trail information section
       // document.getElementById("searchInput").blur();
       // trailInfoWrapper.focus();
-      trailInfoWrapper.scrollIntoView({ behavior: "smooth" });
+      trailDropDown.scrollIntoView({ behavior: "smooth" });
+      // document.querySelectorAll(".map__wrapper")[0].style.display = "none";
     }
   </script>
 </html>
