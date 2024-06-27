@@ -8,7 +8,7 @@
 
     <style>
       body {
-        margin: 0.25em;
+        margin: 0.25em 0.25em 4em 0.25em;
       }
       .nav__wrapper {
         grid-area: nav-wrapper;
@@ -20,6 +20,7 @@
       }
       .trail-information__wrapper {
         grid-area: trail-info-wrapper;
+        display: none;
       }
 
       .topo-map__link--image {
@@ -98,8 +99,8 @@
         <h1>Trail Conditions</h1>
         <h2>Big Sur Wilderness</h2>
         <p>
-          Explore the area with the topo map. Search or select a trail to
-          examine. Click <a href="#">here</a> to view a list of trails.
+          Explore with the topo map. Search or select a trail for details. Click
+          <a href="#">here</a> to view a list of trails.
         </p>
       </div>
 
@@ -211,6 +212,10 @@
     }
     function resetSearch() {
       document.getElementById("searchInput").value = "";
+      const infoBlock = document.querySelectorAll(
+        ".trail-information__wrapper"
+      );
+      infoBlock[0].style.display = "none";
       resetDropdown();
     }
     function resetDropdown() {
@@ -226,6 +231,10 @@
       // Clear trail info section each time the function is called
       trailInfoWrapper.innerHTML = "";
 
+      const infoBlock = document.querySelectorAll(
+        ".trail-information__wrapper"
+      );
+      infoBlock[0].style.display = "block";
       // Add logic to filter trails based on user input or dropdown selection
       if (userInput || selectedTrail) {
         // Logic to display trail info based on user input or selectedTrail
