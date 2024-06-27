@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Big Sur Wilderness Trail Conditions</title>
+    <title>Keep Sur Wild</title>
 
     <style>
       body {
@@ -13,16 +13,6 @@
       .nav__wrapper {
         grid-area: nav-wrapper;
       }
-      .trail-information__wrapper p {
-        text-indent: 2cap;
-        border-bottom: 1px dashed cadetblue;
-        padding-bottom: 0.25em;
-      }
-      .trail-information__wrapper {
-        grid-area: trail-info-wrapper;
-        display: none;
-      }
-
       .topo-map__link--image {
         border-radius: 5px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
@@ -47,46 +37,7 @@
         grid-template-areas:
           "nav-wrapper"
           "main-header"
-          "map-wrapper"
-          "search"
-          "dropdown"
-          "trail-info-wrapper";
-      }
-      .search {
-        display: flex;
-        align-items: center;
-        grid-area: search;
-        margin-top: 2em;
-        display: none;
-      }
-      .search input[type="text"] {
-        flex: 1;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-      }
-      .search button {
-        padding: 10px;
-        margin-left: 5px;
-        background-color: #4caf50;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-      }
-      .search button.reset {
-        background-color: #ccc;
-        color: rgb(0, 0, 0);
-        margin-left: 5px;
-      }
-      .dropdown {
-        margin-top: 1em;
-        grid-area: dropdown;
-      }
-      .dropdown select {
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
+          "map-wrapper";
       }
     </style>
   </head>
@@ -94,20 +45,25 @@
   <body>
     <div class="main__wrapper">
       <div class="nav-wrapper">
-        <a href="#">TRAILS</a> | <a href="#">CAMPS</a> | <a href="#">ABOUT</a> |
+        <a href="trail-conditions.html">TRAILS</a> | <a href="#">CAMPS</a> |
+        <a href="topo-map.html">MAP</a> | <a href="#">ABOUT</a> |
         <a href="#">GIVE</a>
       </div>
       <div class="main__header-wrapper">
-        <h1>Trail Conditions</h1>
-        <h2>Big Sur Wilderness</h2>
+        <h1>Preserve access to Big Sur Wilderness Areas</h1>
         <p>
-          Select a trail for details. Click
-          <a href="#">here</a> to view a list of trails.
+          Your trails are dissappearing unless something is done to prevent it.
+          Support trail work in the Big Sur wild to stop this treasure from
+          being lost.
         </p>
+        <h2>Trail Information</h2>
+        <p>Get up to date information about trail conditions.</p>
+        <h2>Camping Information</h2>
+        <p>Plan a backcountry camping trip.</p>
       </div>
 
       <div class="map__wrapper">
-        <h3>Topographic Map</h3>
+        <h2>Topographic Map</h2>
         <div class="map__image-wrapper">
           <img
             class="topo-map__link--image"
@@ -117,146 +73,12 @@
         </div>
       </div>
 
-      <div class="search">
-        <input
-          type="text"
-          placeholder="Search for Trails"
-          id="searchInput"
-          onfocus="resetDropdown()"
-          onblur="filterTrails()"
-        />
-
-        <button onclick="filterTrails()">Search</button>
-        <button class="reset" onclick="resetSearch()">Reset</button>
-      </div>
-
-      <div class="dropdown">
-        <select id="trailDropDown" onchange="filterTrails()">
-          <option value="">Select a Trail</option>
-          <option value="pine-ridge">Pine Ridge Trail</option>
-          <option value="skyline-to-the-sea">Skyline to the Sea Trail</option>
-          <option value="jackass-ridge">Jackass Ridge Trail</option>
-        </select>
-      </div>
-
-      <div class="trail-information__wrapper">
-        <h2 id="trailInfo">Latest Information</h2>
-        <div>
-          <!-- <h4>Aliases:</h4>
-          <p>Alternative known names of the trail</p> -->
-          <h4>Status:</h4>
-          <p>The trail condition</p>
-          <h4>Reports:</h4>
-          <p>
-            A list with a few of the freshest reports at the top and a link to
-            the history with past reports.
-          </p>
-          <ol>
-            <li>Newest</li>
-            <li>Newer</li>
-            <li>New</li>
-            <li>See older reports</li>
-          </ol>
-          <h4>Length:</h4>
-          <p>How long is it?</p>
-          <h4>Elevation change:</h4>
-          <p>How harddd is it?</p>
-          <h4>Description:</h4>
-          <p>
-            Are there any bears? Will I see big trees? Does it end at the beach?
-            Are there any stores nearby?
-          </p>
-
-          <h4>Difficulty rating:</h4>
-          <p>
-            Consider using a standardized hiking difficulty rating system (e.g.,
-            easy, moderate, challenging, expert) to give users a general idea of
-            the trail's demands.
-          </p>
-          <h4>Technical features:</h4>
-          <p>
-            If the trail has any technical features like rock scrambles, steep
-            sections, or water crossings, mention them here.
-          </p>
-          <h4>Water availability:</h4>
-          <p>Is water available on the route or nearby?</p>
-          <h4>Camping availability:</h4>
-          <p>What are the camping options along this trail?</p>
-          <h4>Accessible by:</h4>
-          <p>
-            How can you get here? By truck, car, bus, hitch, is it interior and
-            accessed by another trail?
-          </p>
-          <h4>Trailhead:</h4>
-          <ul>
-            <li>Coordinates: 32, -121</li>
-            <li>Parking: 4-5 Vehicles</li>
-            <li>Restrooms: None</li>
-            <li>Nearest amenities: Big Sur</li>
-          </ul>
-          <h4>Connections:</h4>
-          <ul>
-            <li>Connecting trail</li>
-            <li>Connecting trail</li>
-          </ul>
-          <h4>GPX Track:</h4>
-          <p>A link to the downloadable gps track.</p>
-          <h4>Map:</h4>
-          <p>Show on map.</p>
-        </div>
-      </div>
+      
     </div>
   </body>
   <script>
     function openTopoMap() {
       window.location.href = "topo-map.html";
-    }
-    function resetSearch() {
-      document.getElementById("searchInput").value = "";
-      const infoBlock = document.querySelectorAll(
-        ".trail-information__wrapper"
-      );
-      infoBlock[0].style.display = "none";
-      // document.querySelectorAll(".map__wrapper")[0].style.display = "block";
-
-      resetDropdown();
-    }
-    function resetDropdown() {
-      document.getElementById("trailDropDown").value = "";
-    }
-    // This is an example function to filter trails based on user input
-    function filterTrails() {
-      const userInput = document.getElementById("searchInput").value;
-      const trailDropDown = document.getElementById("trailDropDown");
-      const selectedTrail = trailDropDown.value;
-      const trailInfoWrapper = document.getElementById("trailInfo");
-
-      // Clear trail info section each time the function is called
-      trailInfoWrapper.innerHTML = "";
-
-      const infoBlock = document.querySelectorAll(
-        ".trail-information__wrapper"
-      );
-      infoBlock[0].style.display = "block";
-
-      // Add logic to filter trails based on user input or dropdown selection
-      if (userInput || selectedTrail) {
-        // Logic to display trail info based on user input or selectedTrail
-        trailInfoWrapper.innerHTML = `Trail info for: ${
-          selectedTrail || userInput
-        }`;
-      } else {
-        const infoBlock = document.querySelectorAll(
-          ".trail-information__wrapper"
-        );
-        infoBlock[0].style.display = "none";
-      }
-
-      // Use JavaScript to smoothly scroll to the trail information section
-      // document.getElementById("searchInput").blur();
-      // trailInfoWrapper.focus();
-      trailDropDown.scrollIntoView({ behavior: "smooth" });
-      // document.querySelectorAll(".map__wrapper")[0].style.display = "none";
     }
   </script>
 </html>
