@@ -1,0 +1,45 @@
+body {
+  margin: 0.25em 0.25em 4em 0.25em;
+}
+
+.alert {
+  color: red;
+  display: block;
+  margin: 2em auto 2em auto;
+}
+
+.nav__wrapper {
+  grid-area: nav-wrapper;
+}
+
+.topo-map__link--image {
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.map__wrapper a {
+  display: block;
+}
+
+.map-image__wrapper {
+  text-align: center;
+}
+
+.map__wrapper {
+  grid-area: map-wrapper;
+  display: block;
+}
+
+.welcome-header__wrapper {
+  grid-area: welcome-header;
+}
+
+.main__wrapper {
+  margin: 0 auto 0 auto;
+  max-width: 360px;
+  display: grid;
+  grid-template-areas:
+    "nav-wrapper"
+    "welcome-header"
+    "map-wrapper";
+}
