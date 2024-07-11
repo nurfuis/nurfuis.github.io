@@ -49,7 +49,7 @@
         background-color: #4caf50;
         transition: background-color 0.5s ease-in-out;
       }
-      #copy-button:active {
+      button:active {
         background-color: #ddd;
         transform: scale(0.85);
         transition: transform 0.1s ease-in-out,
@@ -183,6 +183,7 @@
               name="start-char"
               min="0"
               value="0"
+              type="number"
               required
             />
             <br />
@@ -194,6 +195,7 @@
               value="1"
               min="1"
               max="999"
+              type="number"
               required
             />
             <br />
@@ -205,6 +207,7 @@
               value="10"
               min="10"
               max="256"
+              type="number"
               required
             /><br />
             <button type="reset">Clear Form</button>
@@ -230,23 +233,41 @@
       const stringLength = document.getElementById("input-3");
 
       function updateValues() {
-        const stringLengthValue = parseInt(stringLength.value);
-        const startCharValue = parseInt(startChar.value);
-        const intervalValue = parseInt(interval.value);
+        if (!!data) {
+          const stringLengthValue = parseInt(stringLength.value);
+          const startCharValue = parseInt(startChar.value);
+          const intervalValue = parseInt(interval.value);
 
-        const dataLength = data.length;
+          const dataLength = data.length;
 
-        const availableChars = dataLength - startCharValue;
-        const maxIntervalValue = Math.floor(availableChars / stringLengthValue);
+          const availableChars = dataLength - startCharValue;
+          const maxIntervalValue = Math.floor(
+            availableChars / stringLengthValue
+          );
+          const maxStartCharValue =
+            dataLength - intervalValue * stringLengthValue;
 
-        // Set the maximum allowed value for the interval input
-        interval.setAttribute("max", maxIntervalValue);
-        if (intervalValue > maxIntervalValue) {
-          interval.value = maxIntervalValue;
+          startChar.setAttribute("max", maxStartCharValue);
+          interval.setAttribute("max", maxIntervalValue);
+
+          if (startCharValue > dataLength - intervalValue * stringLengthValue) {
+            startCharValue = Math.max(
+              0,
+              dataLength - intervalValue * stringLengthValue
+            );
+          }
+
+          if (intervalValue > maxIntervalValue) {
+            interval.value = maxIntervalValue;
+          }
+
+          if (stringLengthValue > 255) {
+            stringLength.value = 256;
+          }
+
+          console.log("Available Chars:", availableChars);
+          console.log("Max Interval Value:", maxIntervalValue);
         }
-
-        console.log("Available Chars:", availableChars);
-        console.log("Max Interval Value:", maxIntervalValue);
       }
 
       startChar.addEventListener("change", updateValues);
@@ -270,6 +291,7 @@
         if (!!data) {
           const formattedString = formatBase64String(data);
           base64Data.value = formattedString;
+          updateValues();
           // base64Data.scrollIntoView({ behavior: "smooth" });
         } else {
           const inputForm = document.getElementById("input-form");
@@ -291,6 +313,7 @@
       });
       imageInput.addEventListener("change", function (event) {
         generatePassword(event);
+        updateValues();
       });
 
       function generatePassword(event) {
