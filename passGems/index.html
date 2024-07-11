@@ -38,6 +38,17 @@
       img {
         margin: 2em;
       }
+      #copy-button:active {
+        background-color: #ddd; /* Slightly darken on click */
+        transform: scale(0.95); /* Shrink slightly on click */
+        transition: transform 0.1s ease-in-out,
+          background-color 0.1s ease-in-out; /* Add transition effect */
+      }
+
+      #copy-button.copied {
+        background-color: #4caf50; /* Green background on successful copy */
+        transition: background-color 0.5s ease-in-out; /* Add transition effect */
+      }
       #base64-data {
         font-size: 1.2rem;
         color: #ffff00;
@@ -127,7 +138,26 @@
         </form>
       </div>
 
-      <div class="output"><p id="base64-data"></p></div>
+      <div class="output">
+        <p id="base64-data"></p>
+        <button id="copy-button">Copy</button>
+      </div>
+
+      <script>
+        const copyButton = document.getElementById("copy-button");
+        const textToCopy = document.getElementById("base64-data");
+
+        copyButton.addEventListener("click", () => {
+          navigator.clipboard
+            .writeText(textToCopy.textContent)
+            .then(() => {
+              console.log("Text copied to clipboard!");
+            })
+            .catch((err) => {
+              console.error("Failed to copy text: ", err);
+            });
+        });
+      </script>
     </div>
 
     <script>
