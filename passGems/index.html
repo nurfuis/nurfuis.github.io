@@ -240,14 +240,17 @@
 
           const dataLength = data.length;
 
-          const availableChars = dataLength - startCharValue;
+          const availableChars = Math.max(0, dataLength - startCharValue);
 
-          const maxIntervalValue = Math.floor(
-            availableChars / stringLengthValue
+          const maxStartCharValue = Math.max(
+            0,
+            availableChars - intervalValue * stringLengthValue
           );
 
-          const maxStartCharValue =
-            dataLength - intervalValue * stringLengthValue;
+          const maxIntervalValue = Math.max(
+            1,
+            Math.floor(availableChars / stringLengthValue)
+          );
 
           startChar.setAttribute("max", maxStartCharValue);
 
@@ -255,10 +258,14 @@
 
           if (startCharValue > maxStartCharValue) {
             startCharValue.value = maxStartCharValue;
+          } else if (startCharValue < 0) {
+            startChar.value = 0;
           }
 
           if (intervalValue > maxIntervalValue) {
             interval.value = maxIntervalValue;
+          } else if (intervalValue < 1) {
+            interval.value = 1;
           }
 
           if (stringLengthValue > 255) {
