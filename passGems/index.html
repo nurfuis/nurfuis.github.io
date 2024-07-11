@@ -58,6 +58,7 @@
         font-size: 1.2rem;
         color: #ffff00;
         margin-bottom: 1rem;
+        overflow: scroll;
       }
 
       #selected-image {
@@ -180,8 +181,11 @@
       const clearPasswordButton = document.getElementById("clear-password");
       const copyButton = document.getElementById("copy-button");
       const textToCopy = document.getElementById("base64-data");
+      let data;
 
       copyButton.addEventListener("click", () => {
+        event.preventDefault();
+
         navigator.clipboard
           .writeText(textToCopy.textContent)
           .then(() => {
@@ -191,7 +195,6 @@
             console.error("Failed to copy text: ", err);
           });
       });
-      let data;
 
       regenButton.addEventListener("click", function (savedEvent) {
         event.preventDefault();
