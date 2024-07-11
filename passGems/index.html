@@ -225,6 +225,34 @@
       const textToCopy = document.getElementById("base64-data");
       let data;
 
+      const startChar = document.getElementById("input-1");
+      const interval = document.getElementById("input-2");
+      const stringLength = document.getElementById("input-3");
+
+      function updateValues() {
+        const stringLengthValue = parseInt(stringLength.value);
+        const startCharValue = parseInt(startChar.value);
+        const intervalValue = parseInt(interval.value);
+
+        const dataLength = data.length;
+
+        const availableChars = dataLength - startCharValue;
+        const maxIntervalValue = Math.floor(availableChars / stringLengthValue);
+
+        // Set the maximum allowed value for the interval input
+        interval.setAttribute("max", maxIntervalValue);
+        if (intervalValue > maxIntervalValue) {
+          interval.value = maxIntervalValue;
+        }
+
+        console.log("Available Chars:", availableChars);
+        console.log("Max Interval Value:", maxIntervalValue);
+      }
+
+      startChar.addEventListener("change", updateValues);
+      interval.addEventListener("change", updateValues);
+      stringLength.addEventListener("change", updateValues);
+
       copyButton.addEventListener("click", () => {
         event.preventDefault();
 
