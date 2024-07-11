@@ -42,7 +42,7 @@
         box-sizing: border-box;
       }
       img {
-        margin: 2em auto 2em auto;
+        margin: 0.25em auto 1em auto;
       }
 
       #copy-button.copied {
@@ -56,14 +56,22 @@
           background-color 0.1s ease-in-out;
       }
       #base64-data {
-        font-size: 1.2rem;
-        color: #ffff00;
         margin-bottom: 1rem;
-        overflow: hidden;
       }
 
       #selected-image {
         max-width: 128px;
+      }
+      .password {
+        font-size: 1.2rem;
+        color: #ffff00;
+        margin-bottom: 1rem;
+      }
+      .password-output {
+        text-align: center;
+        border: 1px dashed #ffff00; /* Thick yellow solid border */
+        padding: 1em;
+        margin: 2em;
       }
       .output-wrapper {
         text-align: center;
@@ -129,7 +137,10 @@
         <h1>PassGems</h1>
         <h2>Exctract Passwords From Images</h2>
       </div>
-
+      <div class="password-output">
+        <p class="password">Passw0rd!</p>
+        <input id="base64-data" type="password" />
+      </div>
       <div class="contents-wrapper">
         <div class="image-wrapper">
           <img
@@ -139,7 +150,6 @@
           />
         </div>
         <div class="output-wrapper">
-          <p id="base64-data">Passw0rd!</p>
           <form>
             <button id="copy-button">Copy</button>
 
@@ -151,8 +161,9 @@
       </div>
 
       <div class="contents-wrapper">
-        <h3>Select Image</h3>
         <div class="submission-wrapper">
+          <h3>Select Image</h3>
+
           <p>Load an image to retrieve a password.</p>
           <div class="input-form">
             <form id="input-form">
@@ -216,7 +227,7 @@
         event.preventDefault();
 
         navigator.clipboard
-          .writeText(textToCopy.textContent)
+          .writeText(textToCopy.value)
           .then(() => {
             console.log("Text copied to clipboard!");
           })
@@ -224,16 +235,27 @@
             console.error("Failed to copy text: ", err);
           });
       });
-
-      regenButton.addEventListener("click", function (savedEvent) {
+      regenButton.addEventListener("click", function (event) {
         event.preventDefault();
-        const formattedString = formatBase64String(data);
-        base64Data.textContent = formattedString;
+        if (!!data) {
+          const formattedString = formatBase64String(data);
+          base64Data.value = formattedString;
+          base64Data.scrollIntoView({ behavior: "smooth" });
+        } else {
+          const inputForm = document.getElementById("input-form");
+          if (inputForm) {
+            inputForm.scrollIntoView({ behavior: "smooth" });
+          } else {
+            console.warn(
+              "Warning: Could not find input form element with ID 'input-form'"
+            );
+          }
+        }
       });
-      clearPasswordButton.addEventListener("click", function (savedEvent) {
-        base64Data.textContent = "Passw0rd!";
+      clearPasswordButton.addEventListener("click", function (event) {
+        base64Data.value = "";
       });
-      clearImageButton.addEventListener("click", function (savedEvent) {
+      clearImageButton.addEventListener("click", function (event) {
         selectedImage.src = "assets/images/icon.png";
         data = null;
       });
@@ -249,7 +271,8 @@
           selectedImage.style.display = "block";
           data = base64String;
           const formattedString = formatBase64String(base64String);
-          base64Data.textContent = formattedString;
+          base64Data.value = formattedString;
+          base64Data.scrollIntoView({ behavior: "smooth" });
         };
 
         reader.readAsDataURL(event.target.files[0]);
@@ -259,9 +282,9 @@
         if (startChar < strLength) {
           return startChar;
         } else {
-          const quotient = Math.floor(startChar / 10);
-          const remainder = startChar % 10;
-          return remainder % numSpecialChars; // Ensure index stays within specialChars length
+          const quotient = Math.floor(startChar / strLength);
+          const remainder = startChar % strLength;
+          return remainder % numSpecialChars;
         }
       }
       function formatBase64String(base64String) {
@@ -288,7 +311,8 @@
 
         for (let i = startChar; i < filteredString.length; i += interval) {
           if (!addedSpecialChar) {
-            const c = startChar + parseInt(b[0] + interval * stringLength);
+            const c =
+              startChar + parseInt(b[0] + interval * stringLength + startChar);
             const specialCharIndex = getSpecialCharIndex(
               c,
               specialChars.length,
