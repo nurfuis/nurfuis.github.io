@@ -241,20 +241,20 @@
           const dataLength = data.length;
 
           const availableChars = dataLength - startCharValue;
+
           const maxIntervalValue = Math.floor(
             availableChars / stringLengthValue
           );
+
           const maxStartCharValue =
             dataLength - intervalValue * stringLengthValue;
 
           startChar.setAttribute("max", maxStartCharValue);
+
           interval.setAttribute("max", maxIntervalValue);
 
-          if (startCharValue > dataLength - intervalValue * stringLengthValue) {
-            startCharValue = Math.max(
-              0,
-              dataLength - intervalValue * stringLengthValue
-            );
+          if (startCharValue > maxStartCharValue) {
+            startCharValue.value = maxStartCharValue;
           }
 
           if (intervalValue > maxIntervalValue) {
