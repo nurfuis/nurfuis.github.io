@@ -8,20 +8,20 @@
       body {
         font-family: monospace;
         margin: 2rem;
-        background-color: #212529; /* Dark gray background */
-        color: #ffff00; /* Yellow text */
+        background-color: #212529;
+        color: #ffff00;
       }
 
       h1 {
         text-align: center;
-        color: #ffff00; /* Yellow text */
+        color: #ffff00;
         margin-bottom: 1rem;
       }
 
       label {
         display: block;
         margin-bottom: 0.5rem;
-        color: #ffff00; /* Yellow text */
+        color: #ffff00;
         font-weight: bold;
       }
 
@@ -29,68 +29,80 @@
       input[type="file"],
       button {
         padding: 0.5rem 1rem;
-        border: 1px solid #ffff00; /* Yellow border */
+        border: 1px solid #ffff00;
         border-radius: 3px;
         margin-bottom: 1rem;
-        background-color: #373a3c; /* Even darker gray background */
-        color: #ffff00; /* Yellow text */
+        background-color: #373a3c;
+        color: #ffff00;
+      }
+      input,
+      button {
+        width: 80%;
+        box-sizing: border-box;
       }
       img {
         margin: 2em;
       }
-      #copy-button:active {
-        background-color: #ddd; /* Slightly darken on click */
-        transform: scale(0.95); /* Shrink slightly on click */
-        transition: transform 0.1s ease-in-out,
-          background-color 0.1s ease-in-out; /* Add transition effect */
-      }
 
       #copy-button.copied {
-        background-color: #4caf50; /* Green background on successful copy */
-        transition: background-color 0.5s ease-in-out; /* Add transition effect */
+        background-color: #4caf50;
+        transition: background-color 0.5s ease-in-out;
+      }
+      #copy-button:active {
+        background-color: #ddd;
+        transform: scale(0.85);
+        transition: transform 0.1s ease-in-out,
+          background-color 0.1s ease-in-out;
       }
       #base64-data {
         font-size: 1.2rem;
         color: #ffff00;
         margin-bottom: 1rem;
       }
-      .output {
-        grid-area: "data";
+
+      #selected-image {
+        max-width: 128px;
       }
-      .contents-wrapper {
-        grid-area: "mid";
-      }
-      .header-wrapper {
+      .output-wrapper {
+        text-align: center;
         width: 100%;
-        grid-area: "top";
       }
-      .passform {
-        width: 50%;
-        grid-area: "form";
+
+      .submission-wrapper {
+        text-align: center;
+        width: 100%;
       }
       .image-wrapper {
         width: 50%;
-        grid-area: "image";
       }
-      .submit {
-        grid-area: "generate";
+      .passform-wrapper {
+        width: 50%;
       }
-      .container {
+      .contents-wrapper {
+        width: 100%;
+        display: flex;
+        margin-bottom: 3em;
+      }
+      .header-wrapper {
+        width: 100%;
+      }
+      .main-wrapper {
         border: 2px solid #ffff00; /* Thick yellow solid border */
         padding: 2rem;
-        margin: 1rem auto; /* Center the container */
-        width: 80%;
-        max-width: 600px;
+        margin: 1rem auto; /* Center the main-wrapper */
+        width: 60%;
+        max-width: 480px;
         background-color: #2d333b; /* Darker gray background */
         border-radius: 5px; /* Rounded corners */
       }
     </style>
   </head>
   <body>
-    <div class="container">
+    <div class="main-wrapper">
       <div class="header-wrapper">
         <h1>PassGems</h1>
       </div>
+
       <div class="contents-wrapper">
         <div class="image-wrapper">
           <img
@@ -100,64 +112,62 @@
           />
         </div>
 
-        <div class="passform">
+        <div class="passform-wrapper">
           <form id="password-form">
-            <label for="input-1">1:</label>
+            <label for="input-1">1: Starting Char</label>
             <input
               type="number"
               id="input-1"
               name="start-char"
               min="0"
+              value="0"
               required
             />
             <br />
-            <label for="input-2">2:</label>
+            <label for="input-2">2: Interval</label>
             <input
               type="number"
               id="input-2"
               name="interval"
+              value="1"
               min="1"
               required
             />
             <br />
-            <label for="input-3">3:</label>
+            <label for="input-3">3: Length</label>
             <input
               type="number"
               id="input-3"
               name="string-length"
+              value="10"
               min="10"
               required
-            />
+            /><br />
+            <button type="reset">Clear Form</button>
           </form>
         </div>
       </div>
-      <div class="submit">
-        <form id="input-form">
-          <input type="file" id="image-input" accept="image/*" /><br /><br />
-          <button id="regen-button">Regen from Loaded Image</button>
+
+      <div class="submission-wrapper">
+        <p>Load an image to generate a password.</p>
+        <div class="input-form">
+          <form id="input-form">
+            <input type="file" id="image-input" accept="image/*" />
+            <button type="reset" id="clear-image">Clear Image</button>
+            <button id="regen-button">Regen</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="output-wrapper">
+        <p id="base64-data">Password</p>
+        <form>
+          <button type="reset" id="clear-password">Clear Password</button>
+          <button id="copy-button">Copy</button>
         </form>
       </div>
 
-      <div class="output">
-        <p id="base64-data"></p>
-        <button id="copy-button">Copy</button>
-      </div>
-
-      <script>
-        const copyButton = document.getElementById("copy-button");
-        const textToCopy = document.getElementById("base64-data");
-
-        copyButton.addEventListener("click", () => {
-          navigator.clipboard
-            .writeText(textToCopy.textContent)
-            .then(() => {
-              console.log("Text copied to clipboard!");
-            })
-            .catch((err) => {
-              console.error("Failed to copy text: ", err);
-            });
-        });
-      </script>
+      <script></script>
     </div>
 
     <script>
@@ -166,43 +176,61 @@
       const selectedImage = document.getElementById("selected-image");
       const passwordForm = document.getElementById("password-form");
       const regenButton = document.getElementById("regen-button");
+      const clearImageButton = document.getElementById("clear-image");
+      const clearPasswordButton = document.getElementById("clear-password");
+      const copyButton = document.getElementById("copy-button");
+      const textToCopy = document.getElementById("base64-data");
 
-      let savedResult;
+      copyButton.addEventListener("click", () => {
+        navigator.clipboard
+          .writeText(textToCopy.textContent)
+          .then(() => {
+            console.log("Text copied to clipboard!");
+          })
+          .catch((err) => {
+            console.error("Failed to copy text: ", err);
+          });
+      });
+      let data;
 
       regenButton.addEventListener("click", function (savedEvent) {
         event.preventDefault();
-        const formattedString = formatBase64String(savedResult);
+        const formattedString = formatBase64String(data);
         base64Data.textContent = formattedString;
       });
-
+      clearPasswordButton.addEventListener("click", function (savedEvent) {
+        base64Data.textContent = "Password";
+      });
+      clearImageButton.addEventListener("click", function (savedEvent) {
+        selectedImage.src = "assets/images/icon.png";
+        data = null;
+      });
       imageInput.addEventListener("change", function (event) {
         generatePassword(event);
       });
 
-      function getSpecialCharIndex(startChar, numSpecialChars) {
-        if (startChar < 10) {
-          return startChar; // Use startChar directly if less than 10
-        } else if (startChar < 20) {
-          return startChar % 10; // Use the second digit for special char position
-        } else {
-          // Handle larger startChars (divide by 10 with remainder for special char)
-          const quotient = Math.floor(startChar / 10);
-          const remainder = startChar % 10;
-          return remainder % numSpecialChars; // Ensure index stays within specialChars length
-        }
-      }
       function generatePassword(event) {
         const reader = new FileReader();
         reader.onload = function (event) {
           const base64String = event.target.result;
           selectedImage.src = base64String;
           selectedImage.style.display = "block";
-          savedResult = base64String;
+          data = base64String;
           const formattedString = formatBase64String(base64String);
           base64Data.textContent = formattedString;
         };
 
         reader.readAsDataURL(event.target.files[0]);
+      }
+
+      function getSpecialCharIndex(startChar, numSpecialChars, strLength) {
+        if (startChar < strLength) {
+          return startChar;
+        } else {
+          const quotient = Math.floor(startChar / 10);
+          const remainder = startChar % 10;
+          return remainder % numSpecialChars; // Ensure index stays within specialChars length
+        }
       }
       function formatBase64String(base64String) {
         const formattedString = base64String.split(",")[1];
@@ -216,29 +244,36 @@
         const interval = parseInt(document.getElementById("input-2").value);
         const stringLength = parseInt(document.getElementById("input-3").value);
 
-        const specialChars = "&)$(*#!@%^"; // Define the allowed special characters
+        const specialChars = `!"#$%&'()*+,-./:;<=>?@[\]^_{|}~`; // Define the allowed special characters
 
         let addedSpecialChar = false;
         let extractedChars = "";
+
+        const a = base64String.length.toString();
+        const b = a.split("");
 
         let index = 0;
 
         for (let i = startChar; i < filteredString.length; i += interval) {
           if (!addedSpecialChar) {
+            const c = startChar + parseInt(b[0] + interval * stringLength);
             const specialCharIndex = getSpecialCharIndex(
-              startChar,
-              specialChars.length
+              c,
+              specialChars.length,
+              stringLength
             );
 
             if (specialCharIndex == index) {
-              extractedChars += specialChars[specialCharIndex];
+              extractedChars += specialChars[specialCharIndex]; // use a modulo and a consistently callculable metric to offset which char is taken from the array by manipulating data variable
               addedSpecialChar = true;
               index++;
             }
           }
+
           if (extractedChars.length === stringLength) {
             break;
           }
+
           extractedChars += filteredString[i];
 
           index++;
