@@ -12,7 +12,8 @@
         color: #ffff00;
       }
 
-      h1 {
+      h1,
+      h2 {
         text-align: center;
         color: #ffff00;
         margin-bottom: 1rem;
@@ -41,7 +42,7 @@
         box-sizing: border-box;
       }
       img {
-        margin: 2em;
+        margin: 2em auto 2em auto;
       }
 
       #copy-button.copied {
@@ -79,6 +80,7 @@
       .passform-wrapper {
         width: 50%;
       }
+
       .contents-wrapper {
         width: 100%;
         display: flex;
@@ -96,12 +98,36 @@
         background-color: #2d333b; /* Darker gray background */
         border-radius: 5px; /* Rounded corners */
       }
+      @media screen and (max-width: 480px) {
+        .passform-wrapper {
+          width: 100%;
+        }
+        .image-wrapper {
+          width: 100%;
+        }
+        .main-wrapper {
+          border: 2px solid #ffff00; /* Thick yellow solid border */
+          padding: 0;
+          margin: 0; /* Center the main-wrapper */
+          width: 100%;
+          max-width: 480px;
+          background-color: #2d333b; /* Darker gray background */
+          text-align: center;
+        }
+        body {
+          margin: 0.25rem;
+        }
+        .contents-wrapper {
+          flex-direction: column; /* Change to column layout on narrow screens */
+        }
+      }
     </style>
   </head>
   <body>
     <div class="main-wrapper">
       <div class="header-wrapper">
         <h1>PassGems</h1>
+        <h2>Exctract Passwords From Images</h2>
       </div>
 
       <div class="contents-wrapper">
@@ -112,8 +138,32 @@
             src="./assets/images/icon.png"
           />
         </div>
+        <div class="output-wrapper">
+          <p id="base64-data">Passw0rd!</p>
+          <form>
+            <button id="copy-button">Copy</button>
 
+            <button id="regen-button">Regen</button>
+
+            <button type="reset" id="clear-password">Clear Password</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="contents-wrapper">
+        <h3>Select Image</h3>
+        <div class="submission-wrapper">
+          <p>Load an image to retrieve a password.</p>
+          <div class="input-form">
+            <form id="input-form">
+              <input type="file" id="image-input" accept="image/*" />
+              <button type="reset" id="clear-image">Clear Image</button>
+            </form>
+          </div>
+        </div>
         <div class="passform-wrapper">
+          <h3>Adjust Parameters</h3>
+          <p>Remember your values to re-create the password later.</p>
           <form id="password-form">
             <label for="input-1">1: Starting Char</label>
             <input
@@ -148,27 +198,6 @@
           </form>
         </div>
       </div>
-
-      <div class="submission-wrapper">
-        <p>Load an image to generate a password.</p>
-        <div class="input-form">
-          <form id="input-form">
-            <input type="file" id="image-input" accept="image/*" />
-            <button type="reset" id="clear-image">Clear Image</button>
-            <button id="regen-button">Regen</button>
-          </form>
-        </div>
-      </div>
-
-      <div class="output-wrapper">
-        <p id="base64-data">Passw0rd!</p>
-        <form>
-          <button type="reset" id="clear-password">Clear Password</button>
-          <button id="copy-button">Copy</button>
-        </form>
-      </div>
-
-      <script></script>
     </div>
 
     <script>
@@ -247,7 +276,7 @@
         const interval = parseInt(document.getElementById("input-2").value);
         const stringLength = parseInt(document.getElementById("input-3").value);
 
-        const specialChars = `!"#$%&'()*+,-./:;<=>?@[\]^_{|}~`; // Define the allowed special characters
+        const specialChars = `!@#$%^&*()_+-=[]{}|;:'<>,.?/`;
 
         let addedSpecialChar = false;
         let extractedChars = "";
