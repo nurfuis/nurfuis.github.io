@@ -44,11 +44,6 @@
       img {
         margin: 0.25em auto 1em auto;
       }
-
-      #copy-button.copied {
-        background-color: #4caf50;
-        transition: background-color 0.5s ease-in-out;
-      }
       button:active {
         background-color: #ddd;
         transform: scale(0.85);
@@ -439,6 +434,7 @@
           }
         }
       });
+      
       function regen() {
         if (!!data) {
           const formattedString = formatBase64String(data);
