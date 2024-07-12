@@ -283,6 +283,7 @@
             if (startCharValue > overshoot) {
               startChar.value = startCharValue - overshoot;
               startCharValue = startCharValue - overshoot;
+              regen();
             } else {
               const remainderOvershoot = overshoot - startCharValue;
               startChar.value = 0;
@@ -300,10 +301,11 @@
               if (intervalValue > quotient) {
                 interval.value = intervalValue - quotient;
                 intervalValue = intervalValue - quotient;
+                regen();
               } else {
                 // the password string is too long. set interval to 0 and shorten the stringlength
-                interval.value = 0;
-                intervalValue = 0;
+                interval.value = 1;
+                intervalValue = 1;
                 const remainingRemainder =
                   quotient * stringLengthValue -
                   intervalValue * stringLengthValue;
@@ -312,6 +314,7 @@
             }
           } else {
             console.log("The key fits within the image.");
+            regen();
           }
         }
       }
@@ -343,12 +346,11 @@
           }
         }
       });
-      regenButton.addEventListener("click", function (event) {
-        event.preventDefault();
+      function regen() {
         if (!!data) {
           const formattedString = formatBase64String(data);
           base64Data.value = formattedString;
-          updateValues();
+
           // base64Data.scrollIntoView({ behavior: "smooth" });
         } else {
           const inputForm = document.getElementById("input-form");
@@ -360,6 +362,10 @@
             );
           }
         }
+      }
+      regenButton.addEventListener("click", function (event) {
+        event.preventDefault();
+        regen();
       });
       clearPasswordButton.addEventListener("click", function (event) {
         base64Data.value = "";
@@ -368,6 +374,7 @@
         selectedImage.src = "assets/images/icon.png";
         data = null;
       });
+
       imageInput.addEventListener("change", function (event) {
         generatePassword(event);
       });
@@ -378,10 +385,11 @@
           const base64String = event.target.result;
           selectedImage.src = base64String;
           selectedImage.style.display = "block";
+
           data = base64String;
+
           const formattedString = formatBase64String(base64String);
           base64Data.value = formattedString;
-          updateValues();
 
           base64Data.scrollIntoView({ behavior: "smooth" });
         };
@@ -398,6 +406,7 @@
           return remainder % numSpecialChars;
         }
       }
+
       function formatBase64String(base64String) {
         const formattedString = base64String.split(",")[1];
         const passwordRegex = /[a-zA-Z0-9!@#$%^&*()]/;
@@ -431,7 +440,7 @@
             );
 
             if (specialCharIndex == index) {
-              extractedChars += specialChars[specialCharIndex]; // use a modulo and a consistently callculable metric to offset which char is taken from the array by manipulating data variable
+              extractedChars += specialChars[specialCharIndex];
               addedSpecialChar = true;
               index++;
             }
