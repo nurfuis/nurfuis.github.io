@@ -227,14 +227,23 @@
           image.
         </p>
         <p>
+          SecureImagePass employs a basic implementation of stenography.
+          Stenography is the practice of hiding information within another
+          medium. In this instance, the image acts as the carrier, and the
+          password information is concealed within its data using configurable
+          parameters. This approach offers a potential alternative for password
+          storage, placing the burden of memorization on the image and chosen
+          parameters.
+        </p>
+        <p>
           SecureImagePass operates entirely client-side. No image data or
           user-defined parameters are transmitted over a network or stored by
           the application. The onus of safeguarding the image and parameters
           falls solely on the user.
         </p>
         <p>
-          This is a demonstration of a concept. The provided code is for
-          informational purposes only and may be subject to change or become
+          SecureImagePass is a demonstration of a concept. The provided code is
+          for informational purposes only and may be subject to change or become
           unavailable. Users are responsible for implementing and securing their
           own instance if desired.
         </p>
@@ -356,6 +365,7 @@
             .writeText(textToCopy.value)
             .then(() => {
               console.log("Text copied to clipboard!");
+              base64Data.value = "";
             })
             .catch((err) => {
               console.error("Failed to copy text: ", err);
