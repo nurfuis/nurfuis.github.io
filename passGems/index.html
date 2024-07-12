@@ -194,7 +194,6 @@
               name="interval"
               value="1"
               min="1"
-              max="999"
               type="number"
               required
             />
@@ -232,52 +231,120 @@
       const interval = document.getElementById("input-2");
       const stringLength = document.getElementById("input-3");
 
+      let maxStartCharValue;
+      let maxIntervalValue;
+      let maxStringLengthValue;
+
       function updateValues() {
         if (!!data) {
-          const stringLengthValue = parseInt(stringLength.value);
-          const startCharValue = parseInt(startChar.value);
-          const intervalValue = parseInt(interval.value);
+          console.log("...............");
 
-          const dataLength = data.length;
+          console.log("UPDATE PARAMETERS");
 
-          const availableChars = Math.max(0, dataLength - startCharValue);
+          // let stringLengthValue = parseInt(stringLength.value);
+          // if (stringLengthValue > 255) {
+          //   stringLength.value = 256;
+          //   stringLengthValue = 256;
+          // }
+          // console.log("String Length Value: ", stringLengthValue);
 
-          const maxStartCharValue = Math.max(
-            0,
-            availableChars - intervalValue * stringLengthValue
-          );
+          // let startCharValue = parseInt(startChar.value);
+          // if (startCharValue > dataLength) {
+          //   startChar.value = dataLength;
+          //   startCharValue = dataLength;
+          // } else if (startCharValue < 0) {
+          //   startChar.value = 0;
+          //   startCharValue = 0;
+          // }
+          // console.log("Start Char Value: ", startCharValue);
 
-          const maxIntervalValue = Math.max(
-            1,
-            Math.floor(availableChars / stringLengthValue)
-          );
+          // const availableChars = Math.max(0, dataLength - startCharValue);
+          // console.log("Available Chars: ", availableChars);
+          // const maxStartCharValue = Math.max(
+          //   0,
+          //   availableChars - intervalValue * stringLengthValue
+          // );
+          // console.log("Max start char", maxStartCharValue);
 
-          startChar.setAttribute("max", maxStartCharValue);
+          // let intervalValue = parseInt(interval.value);
+          // console.log("Interval Value: ", intervalValue);
+          // const maxIntervalValue = Math.max(
+          //   1,
+          //   Math.floor(availableChars / stringLengthValue)
+          // );
+          // console.log("Max Interval Value", maxIntervalValue);
+          // startChar.setAttribute("max", maxStartCharValue);
 
-          interval.setAttribute("max", maxIntervalValue);
+          // interval.setAttribute("max", maxIntervalValue);
 
-          if (startCharValue > maxStartCharValue) {
-            startCharValue.value = maxStartCharValue;
-          } else if (startCharValue < 0) {
-            startChar.value = 0;
-          }
-
-          if (intervalValue > maxIntervalValue) {
-            interval.value = maxIntervalValue;
-          } else if (intervalValue < 1) {
-            interval.value = 1;
-          }
-
-          if (stringLengthValue > 255) {
-            stringLength.value = 256;
-          }
-
-          console.log("Available Chars:", availableChars);
-          console.log("Max Interval Value:", maxIntervalValue);
+          // if (intervalValue > maxIntervalValue) {
+          //   interval.value = maxIntervalValue;
+          // } else if (intervalValue < 1) {
+          //   interval.value = 1;
+          // }
         }
       }
+      function onUpdateStartChar() {
+        if (!!data) {
+          const dataLength = data.length;
 
-      startChar.addEventListener("change", updateValues);
+          let startCharValue = parseInt(startChar.value);
+
+          if (startCharValue > dataLength) {
+            startChar.value = dataLength;
+            startCharValue = dataLength;
+          } else if (startCharValue < 0) {
+            startChar.value = 0;
+            startCharValue = 0;
+          }
+          console.log("Start Char Value: ", startCharValue);
+
+          const availableChars = Math.max(0, dataLength - startCharValue);
+          console.log("Available Chars: ", availableChars);
+
+          const intervalValue = parseInt(interval.value);
+          console.log("Interval Value: ", intervalValue);
+
+          let stringLengthValue = parseInt(stringLength.value);
+          if (stringLengthValue > 255) {
+            stringLength.value = 256;
+            stringLengthValue = 256;
+          } else if (stringLengthValue < 10) {
+            stringLength.value = 10;
+            stringLengthValue = 10;
+          }
+          console.log("String Length Value: ", stringLengthValue);
+
+          const maxStartCharValue =
+            availableChars - intervalValue * stringLengthValue;
+          console.log("Max start char", maxStartCharValue);
+
+          if (startCharValue > maxStartCharValue) {
+            startChar.value = maxStartCharValue;
+            startCharValue = maxStartCharValue;
+          } else if (startCharValue < 0) {
+            startChar.value = 0;
+            startCharValue = 0;
+
+            const maxIntervalValue = Math.max(
+              1,
+              Math.floor(availableChars / stringLengthValue)
+            );
+            console.log("Max Interval Value", maxIntervalValue);
+            if (intervalValue > maxIntervalValue) {
+              interval.value = maxIntervalValue;
+            } else if (intervalValue < 1) {
+              interval.value = 1;
+              console.log("The string is too long or the file is too small.");
+            }
+            console.log(
+              "The interval is too great for the designated string length and file size."
+            );
+          }
+        }
+      }
+      startChar.addEventListener("change", onUpdateStartChar);
+
       interval.addEventListener("change", updateValues);
       stringLength.addEventListener("change", updateValues);
 
@@ -320,7 +387,6 @@
       });
       imageInput.addEventListener("change", function (event) {
         generatePassword(event);
-        updateValues();
       });
 
       function generatePassword(event) {
@@ -332,6 +398,8 @@
           data = base64String;
           const formattedString = formatBase64String(base64String);
           base64Data.value = formattedString;
+          updateValues();
+
           base64Data.scrollIntoView({ behavior: "smooth" });
         };
 
@@ -397,6 +465,7 @@
             break;
           }
         }
+
         return extractedChars;
       }
     </script>
