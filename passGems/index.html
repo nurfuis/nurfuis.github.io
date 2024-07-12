@@ -434,7 +434,7 @@
           }
         }
       });
-      
+
       function regen() {
         if (!!data) {
           const formattedString = formatBase64String(data);
@@ -476,6 +476,7 @@
           selectedImage.style.display = "block";
 
           data = base64String;
+          updateValues();
 
           const formattedString = formatBase64String(base64String);
           base64Data.value = formattedString;
