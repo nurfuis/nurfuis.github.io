@@ -62,6 +62,9 @@
       #selected-image {
         max-width: 128px;
       }
+      .wall-of-text {
+        line-height: 1.5;
+      }
       .password {
         font-size: 1.2rem;
         color: #ffff00;
@@ -134,8 +137,8 @@
   <body>
     <div class="main-wrapper">
       <div class="header-wrapper">
-        <h1>PassGems</h1>
-        <h2>Exctract Passwords From Images</h2>
+        <h1>SecureImagePass</h1>
+        <h2>Turn Images into Secure Passwords</h2>
       </div>
       <div class="password-output">
         <p class="password">Passw0rd!</p>
@@ -212,6 +215,29 @@
             <button type="reset">Clear Form</button>
           </form>
         </div>
+      </div>
+      <div class="wall-of-text">
+        <p>
+          SecureImagePass facilitates the generation of user-defined passwords
+          based on image data and configurable parameters. Users upload an image
+          and define parameters (starting position, character step, length). The
+          application generates a password deterministically using these inputs.
+          The image and parameters serve as a key to recreate the password at
+          any time. Note: The application does not store the password within the
+          image.
+        </p>
+        <p>
+          SecureImagePass operates entirely client-side. No image data or
+          user-defined parameters are transmitted over a network or stored by
+          the application. The onus of safeguarding the image and parameters
+          falls solely on the user.
+        </p>
+        <p>
+          This is a demonstration of a concept. The provided code is for
+          informational purposes only and may be subject to change or become
+          unavailable. Users are responsible for implementing and securing their
+          own instance if desired.
+        </p>
       </div>
     </div>
 
