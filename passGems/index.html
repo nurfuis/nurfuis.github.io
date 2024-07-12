@@ -62,8 +62,24 @@
       #selected-image {
         max-width: 128px;
       }
+      .wall-of-text form {
+        text-align: center;
+        margin-top: 2em;
+      }
+      .wall-of-text div {
+        text-align: center;
+        padding: 1em;
+      }
+      .wall-of-text img {
+        width: 32px;
+        margin-left: auto;
+        margin-right: auto;
+        user-select: none;
+      }
       .wall-of-text {
         line-height: 1.5;
+        padding: 1em;
+        border-top: 1px dashed #ffff00; /* Thick yellow solid border */
       }
       .password {
         font-size: 1.2rem;
@@ -217,6 +233,7 @@
         </div>
       </div>
       <div class="wall-of-text">
+        <h2>Wall of Text</h2>
         <p>
           SecureImagePass facilitates the generation of user-defined passwords
           based on image data and configurable parameters. Users upload an image
@@ -226,6 +243,9 @@
           any time. Note: The application does not store the password within the
           image.
         </p>
+
+        <div><img src="./assets/images/icon.png" /></div>
+
         <p>
           SecureImagePass employs a basic implementation of stenography.
           Stenography is the practice of hiding information within another
@@ -235,18 +255,55 @@
           storage, placing the burden of memorization on the image and chosen
           parameters.
         </p>
+
+        <div><img src="./assets/images/icon.png" /></div>
+
         <p>
           SecureImagePass operates entirely client-side. No image data or
           user-defined parameters are transmitted over a network or stored by
           the application. The onus of safeguarding the image and parameters
           falls solely on the user.
         </p>
+
+        <div><img src="./assets/images/icon.png" /></div>
+
         <p>
           SecureImagePass is a demonstration of a concept. The provided code is
           for informational purposes only and may be subject to change or become
           unavailable. Users are responsible for implementing and securing their
           own instance if desired.
         </p>
+
+        <div><img src="./assets/images/icon.png" /></div>
+
+        <p>
+          SecureImagePass refers to these image-parameter combos as "passGems" -
+          a term reflecting the potential value they hold (assuming you don't
+          lose your image or forget the settings). Remember, great security
+          often hinges on memorable details. Use this approach with caution and
+          a healthy dose of skepticism.
+        </p>
+        <div><img src="./assets/images/icon.png" /></div>
+
+        <h3>TL;DR</h3>
+        SecureImagePass lets you create passwords based on an image and settings
+        you choose. It doesn't store the password in the image, but uses the
+        image and settings together like a key to recreate it whenever you need
+        it. This is all done on your device and nothing is sent over the
+        internet. It's a concept, not a finished product, so use it with caution
+        if you decide to build your own. Remember, even though you don't have to
+        memorize a complex password, you still need to remember the image and
+        settings to use it.
+        <form>
+          <button id="scrollToTopBtn">Back to Top</button>
+          <script>
+            const scrollToTopBtn = document.getElementById("scrollToTopBtn");
+
+            scrollToTopBtn.addEventListener("click", () => {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+          </script>
+        </form>
       </div>
     </div>
 
