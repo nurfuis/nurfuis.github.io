@@ -237,74 +237,17 @@
 
       function updateValues() {
         if (!!data) {
-          console.log("...............");
+          console.log("..................[>");
 
-          console.log("UPDATE PARAMETERS");
-
-          // let stringLengthValue = parseInt(stringLength.value);
-          // if (stringLengthValue > 255) {
-          //   stringLength.value = 256;
-          //   stringLengthValue = 256;
-          // }
-          // console.log("String Length Value: ", stringLengthValue);
-
-          // let startCharValue = parseInt(startChar.value);
-          // if (startCharValue > dataLength) {
-          //   startChar.value = dataLength;
-          //   startCharValue = dataLength;
-          // } else if (startCharValue < 0) {
-          //   startChar.value = 0;
-          //   startCharValue = 0;
-          // }
-          // console.log("Start Char Value: ", startCharValue);
-
-          // const availableChars = Math.max(0, dataLength - startCharValue);
-          // console.log("Available Chars: ", availableChars);
-          // const maxStartCharValue = Math.max(
-          //   0,
-          //   availableChars - intervalValue * stringLengthValue
-          // );
-          // console.log("Max start char", maxStartCharValue);
-
-          // let intervalValue = parseInt(interval.value);
-          // console.log("Interval Value: ", intervalValue);
-          // const maxIntervalValue = Math.max(
-          //   1,
-          //   Math.floor(availableChars / stringLengthValue)
-          // );
-          // console.log("Max Interval Value", maxIntervalValue);
-          // startChar.setAttribute("max", maxStartCharValue);
-
-          // interval.setAttribute("max", maxIntervalValue);
-
-          // if (intervalValue > maxIntervalValue) {
-          //   interval.value = maxIntervalValue;
-          // } else if (intervalValue < 1) {
-          //   interval.value = 1;
-          // }
-        }
-      }
-      function onUpdateStartChar() {
-        if (!!data) {
           const dataLength = data.length;
 
-          let startCharValue = parseInt(startChar.value);
+          // as it is, will it go through? and if not, start adjusting values.
+          // start with the starting char, move to the interval, last the password,
+          // and finally, the file must be too small.
 
-          if (startCharValue > dataLength) {
-            startChar.value = dataLength;
-            startCharValue = dataLength;
-          } else if (startCharValue < 0) {
-            startChar.value = 0;
-            startCharValue = 0;
-          }
-          console.log("Start Char Value: ", startCharValue);
+          // step 1
 
-          const availableChars = Math.max(0, dataLength - startCharValue);
-          console.log("Available Chars: ", availableChars);
-
-          const intervalValue = parseInt(interval.value);
-          console.log("Interval Value: ", intervalValue);
-
+          // validate the str len
           let stringLengthValue = parseInt(stringLength.value);
           if (stringLengthValue > 255) {
             stringLength.value = 256;
@@ -313,37 +256,79 @@
             stringLength.value = 10;
             stringLengthValue = 10;
           }
-          console.log("String Length Value: ", stringLengthValue);
+          // console.log("String Length Value: ", stringLengthValue);
 
-          const maxStartCharValue =
-            availableChars - intervalValue * stringLengthValue;
-          console.log("Max start char", maxStartCharValue);
+          // step 2
+          // get interval
+          const intervalValue = parseInt(interval.value);
+          // console.log("Interval Value: ", intervalValue);
 
-          if (startCharValue > maxStartCharValue) {
-            startChar.value = maxStartCharValue;
-            startCharValue = maxStartCharValue;
+          // step 3
+
+          // TODO regex only num
+          let startCharValue = parseInt(startChar.value);
+          // const maxStartValue = dataLength - intervalValue * stringLengthValue;
+
+          // validate the startChar input
+          if (startCharValue > dataLength) {
+            startChar.value = dataLength;
+            startCharValue = dataLength;
           } else if (startCharValue < 0) {
             startChar.value = 0;
             startCharValue = 0;
+          }
+          // console.log("Start Char Value: ", startCharValue);
 
-            const maxIntervalValue = Math.max(
-              1,
-              Math.floor(availableChars / stringLengthValue)
-            );
-            console.log("Max Interval Value", maxIntervalValue);
-            if (intervalValue > maxIntervalValue) {
-              interval.value = maxIntervalValue;
-            } else if (intervalValue < 1) {
-              interval.value = 1;
-              console.log("The string is too long or the file is too small.");
-            }
+          // check if the key is too big
+          // keyLengthReq
+          const keyLengthReq =
+            startCharValue + intervalValue * stringLengthValue;
+
+          // compare the result
+          if (keyLengthReq > dataLength) {
+            const overshoot = keyLengthReq - dataLength;
             console.log(
-              "The interval is too great for the designated string length and file size."
+              "The parameters are outside the bounds of the supplied image by ",
+              overshoot
             );
+
+            if (startCharValue > overshoot) {
+              startChar.value = startCharValue - overshoot;
+              startCharValue = startCharValue - overshoot;
+            } else {
+              const remainderOvershoot = overshoot - startCharValue;
+              startChar.value = 0;
+              startCharValue = 0;
+              console.log(
+                "The starting char is set to 0 and a remainder must come from the itnerval or the string length",
+                remainderOvershoot
+              );
+              // is the strLen * the interval less than the remainder
+              const quotient = Math.ceil(
+                remainderOvershoot / stringLengthValue
+              );
+              console.log("Number of intervals to remove", quotient);
+              // compare
+              if (intervalValue > quotient) {
+                interval.value = intervalValue - quotient;
+                intervalValue = intervalValue - quotient;
+              } else {
+                // the password string is too long. set interval to 0 and shorten the stringlength
+                interval.value = 0;
+                intervalValue = 0;
+                const remainingRemainder =
+                  quotient * stringLengthValue -
+                  intervalValue * stringLengthValue;
+                console.log("Use a larger image", remainingRemainder);
+              }
+            }
+          } else {
+            console.log("The key fits within the image.");
           }
         }
       }
-      startChar.addEventListener("change", onUpdateStartChar);
+
+      startChar.addEventListener("change", updateValues);
 
       interval.addEventListener("change", updateValues);
       stringLength.addEventListener("change", updateValues);
