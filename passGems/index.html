@@ -231,20 +231,11 @@
       const interval = document.getElementById("input-2");
       const stringLength = document.getElementById("input-3");
 
-      let maxStartCharValue;
-      let maxIntervalValue;
-      let maxStringLengthValue;
-
       function updateValues() {
         if (!!data) {
           console.log("..................[>");
 
           const dataLength = data.length;
-
-          // as it is, will it go through? and if not, start adjusting values.
-          // start with the starting char, move to the interval, last the password,
-          // and finally, the file must be too small.
-
           // step 1
 
           // validate the str len
@@ -264,10 +255,7 @@
           // console.log("Interval Value: ", intervalValue);
 
           // step 3
-
-          // TODO regex only num
           let startCharValue = parseInt(startChar.value);
-          // const maxStartValue = dataLength - intervalValue * stringLengthValue;
 
           // validate the startChar input
           if (startCharValue > dataLength) {
@@ -329,21 +317,31 @@
       }
 
       startChar.addEventListener("change", updateValues);
-
       interval.addEventListener("change", updateValues);
       stringLength.addEventListener("change", updateValues);
 
       copyButton.addEventListener("click", () => {
         event.preventDefault();
+        if (!!data) {
+          navigator.clipboard
+            .writeText(textToCopy.value)
+            .then(() => {
+              console.log("Text copied to clipboard!");
+            })
+            .catch((err) => {
+              console.error("Failed to copy text: ", err);
+            });
+        } else {
+          const inputForm = document.getElementById("input-form");
 
-        navigator.clipboard
-          .writeText(textToCopy.value)
-          .then(() => {
-            console.log("Text copied to clipboard!");
-          })
-          .catch((err) => {
-            console.error("Failed to copy text: ", err);
-          });
+          if (inputForm) {
+            inputForm.scrollIntoView({ behavior: "smooth" });
+          } else {
+            console.warn(
+              "Warning: Could not find input form element with ID 'input-form'"
+            );
+          }
+        }
       });
       regenButton.addEventListener("click", function (event) {
         event.preventDefault();
