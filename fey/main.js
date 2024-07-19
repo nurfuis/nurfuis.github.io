@@ -66,6 +66,7 @@ gameLoop.start();
 
 function createGameCanvasMain() {
   const gameCanvasMain = document.createElement("canvas");
+  gameCanvasMain.id = "gameCanvas";
   gameCanvasMain.style.zIndex = "1";
   gameCanvasMain.width = gameParams.width;
   gameCanvasMain.height = gameParams.height;
