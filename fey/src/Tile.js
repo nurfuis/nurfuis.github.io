@@ -18,9 +18,9 @@ export class Tile extends GameObject {
     this.position.x = coords.x;
     this.position.y = coords.y;
 
-    this.source = this.findMatchingTileset();
-
     this.showGrid = false;
+
+    this.source = this.findMatchingTileset();
 
     if (!!this.source) {
       const hFrames = this.source.image.width / this.width;
