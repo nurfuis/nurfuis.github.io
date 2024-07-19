@@ -3,12 +3,12 @@ const debug = false;
 function loadResources() {
   let images = {};
   let imageList = {
-    keg: "/assets/sprites/woodenKeg.png",
-    grainBag: "/assets/sprites/grainBag.png",
-    air: "/assets/sprites/air.png",
-    tileSet: "/assets/sprites/base.png",
-    player: "/assets/sprites/player.png",
-    shadow: "/assets/sprites/shadow.png",
+    keg: "../../assets/sprites/woodenKeg.png",
+    grainBag: "../../assets/sprites/grainBag.png",
+    air: "../../assets/sprites/air.png",
+    tileSet: "../../assets/sprites/base.png",
+    player: "../../assets/sprites/player.png",
+    shadow: "../../assets/sprites/shadow.png",
   };
 
   Object.keys(imageList).forEach((key) => {
