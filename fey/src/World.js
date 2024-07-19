@@ -37,7 +37,7 @@ export class World extends GameObject {
     // }
   }
 
-  async build(mapData) {
+  build(mapData) {
     for (const tileSet of mapData["tilesets"]) {
       const img = new Image();
       img.src = tileSet["image"];
@@ -62,9 +62,6 @@ export class World extends GameObject {
         this.tileHeight,
         this.tilesets
       );
-      setTimeout(() => {
-        console.log("Delayed for 1 second.");
-      }, "1000");
       this.addChild(newLayer);
     }
   }
