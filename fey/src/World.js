@@ -37,7 +37,7 @@ export class World extends GameObject {
     // }
   }
 
-  async build(mapData) {
+  build(mapData) {
     for (const tileSet of mapData["tilesets"]) {
       const img = new Image();
       img.src = tileSet["image"];
@@ -56,15 +56,13 @@ export class World extends GameObject {
     this.tileHeight = mapData["tileheight"];
 
     for (const layer of mapData["layers"]) {
-      const newLayerPromise = new Layer(
+      const newLayer = new Layer(
         layer,
         this.tileWidth,
         this.tileHeight,
         this.tilesets
       );
-      newLayerPromise.then(() => {
-        this.addChild(newLayerPromise);
-      });
+      this.addChild(newLayer);
     }
   }
 }
