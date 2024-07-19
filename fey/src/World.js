@@ -37,7 +37,7 @@ export class World extends GameObject {
     // }
   }
 
-  build(mapData) {
+  async build(mapData) {
     for (const tileSet of mapData["tilesets"]) {
       const img = new Image();
       img.src = tileSet["image"];
