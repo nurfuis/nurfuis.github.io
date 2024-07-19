@@ -22,19 +22,24 @@ const mapData = await loadMap();
 
 const main = new GameObject({ position: new Vector2(0, 0) });
 
-main.world = new World();
+const world = new World();
+main.world = world;
 main.world.build(mapData);
 main.addChild(main.world);
 
-main.camera = new Camera(main.world.tileWidth);
+const camera = new Camera(main.world.tileWidth);
+main.camera = camera;
 main.addChild(main.camera);
 
-main.automatedInput = new AutomatedInput();
-main.input = new Input(
+const automatedInput = new AutomatedInput();
+main.automatedInput = automatedInput;
+
+const input = new Input(
   main.world.tileWidth,
   main.world.tileHeight,
   main.camera
 );
+main.input = input;
 
 export const player = new Player();
 main.player = player;
