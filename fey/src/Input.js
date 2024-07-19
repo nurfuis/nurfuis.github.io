@@ -73,8 +73,6 @@ export class Input {
     const halfWidth = canvas.width / 2;
     const halfHeight = canvas.height / 2;
 
-    let heldDirections = []; // Array to store current directions
-
     canvas.addEventListener("touchstart", (event) => {
       const touch = event.touches[0]; // Get the first touch point
       const x = touch.clientX;
@@ -82,14 +80,14 @@ export class Input {
 
       // Check touch location and update heldDirections
       if (x < halfWidth) {
-        heldDirections.push("LEFT");
+        this.heldDirections.push("LEFT");
       } else if (x > halfWidth) {
-        heldDirections.push("RIGHT");
+        this.heldDirections.push("RIGHT");
       }
       if (y < halfHeight) {
-        heldDirections.push("UP");
+        this.heldDirections.push("UP");
       } else if (y > halfHeight) {
-        heldDirections.push("DOWN");
+        this.heldDirections.push("DOWN");
       }
     });
 
