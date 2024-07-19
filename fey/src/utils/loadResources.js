@@ -3,13 +3,13 @@ const debug = false;
 function loadResources() {
   let images = {};
   let imageList = {
-    energy: "/assets/sprites/energy.png",
-    keg: "/assets/sprites/woodenKeg.png",
-    grainBag: "/assets/sprites/grainBag.png",
-    air: "/assets/sprites/air.png",
-    tileSet: "/assets/sprites/base.png",
-    player: "/assets/sprites/player.png",
-    shadow: "/assets/sprites/shadow.png",
+    energy: "/fey/assets/sprites/energy.png",
+    keg: "/fey/assets/sprites/woodenKeg.png",
+    grainBag: "/fey/assets/sprites/grainBag.png",
+    air: "/fey/assets/sprites/air.png",
+    tileSet: "/fey/assets/sprites/base.png",
+    player: "/fey/assets/sprites/player.png",
+    shadow: "/fey/assets/sprites/shadow.png",
   };
 
   Object.keys(imageList).forEach((key) => {
