@@ -7,6 +7,8 @@ import { Sprite } from "./Sprite.js";
 import { Animations } from "./Animations.js";
 import { FrameIndexPattern } from "./FrameIndexPattern.js";
 import {
+  DANCE,
+  SPIN,
   PICK_UP_DOWN,
   STAND_DOWN,
   STAND_LEFT,
@@ -50,13 +52,14 @@ export class Player extends GameObject {
     this.facingDirection = DOWN;
 
     this.powerSupply = new Battery();
-    this.powerSupply.storedEnergy = this.powerSupply.storedCapacity;
+    this.powerSupply.storedEnergy = 4000;
+    this.powerSupply.storedCapacity = 4000;
 
     this.motor = new Motor();
     this.motor.KV = 10;
 
     this.transmission = new Transmission();
-    this.transmission.gear = 3;
+    this.transmission.gear = 2;
 
     this._maxSpeed = this.powerSupply.dischargeRate;
 
@@ -83,6 +86,8 @@ export class Player extends GameObject {
       scale: 1,
       position: new Vector2(-16, -52), // offset x, y
       animations: new Animations({
+        dance: new FrameIndexPattern(DANCE),
+        spin: new FrameIndexPattern(SPIN),
         standDown: new FrameIndexPattern(STAND_DOWN),
         standUp: new FrameIndexPattern(STAND_UP),
         standLeft: new FrameIndexPattern(STAND_LEFT),
@@ -108,7 +113,8 @@ export class Player extends GameObject {
       this.onPickUpItem(data);
     });
   }
-  get mass() {
+  get totalMass() {
+    // plus encumberance
     return this._mass + this?.inventory?.items?.length * this.scale ** 2;
   }
 
@@ -123,7 +129,8 @@ export class Player extends GameObject {
         (this.motor.KV *
           this.powerSupply.voltage *
           this.transmission.gearBox[this.transmission.gear].motor) /
-        (this.mass * this.transmission.gearBox[this.transmission.gear].drive);
+        (this.totalMass *
+          this.transmission.gearBox[this.transmission.gear].drive);
 
       switch (direction) {
         case "LEFT":
@@ -181,11 +188,11 @@ export class Player extends GameObject {
 
     const sag = this.powerSupply.dropoff[this.powerSupply.storedCharge];
 
-    const forceX = this._acceleration.x * this.mass * sag;
-    const forceY = this._acceleration.y * this.mass * sag;
+    const forceX = this._acceleration.x * this.totalMass * sag;
+    const forceY = this._acceleration.y * this.totalMass * sag;
 
-    const vX = forceX / this.mass;
-    const vY = forceY / this.mass;
+    const vX = forceX / this.totalMass;
+    const vY = forceY / this.totalMass;
 
     if (vX < 0 || vX > 0) {
       this._velocity.x = vX * 1 - this._gravity;
@@ -238,7 +245,7 @@ export class Player extends GameObject {
           break;
 
         case DOWN:
-          this.body.animations.play("standDown");
+          this.body.animations.play("dance");
           break;
 
         default:
@@ -295,13 +302,28 @@ export class Player extends GameObject {
       canPickUpItems: this.canPickUpItems,
     });
   }
+  recoverEnergy() {
+    this.body.animations.play("spin");
 
+    this.powerSupply.storedEnergy += 10;
+    if (this.powerSupply.storedEnergy > this.powerSupply.storedCapacity / 3) {
+      this.isDisabled = false;
+    }
+  }
   step(delta, root) {
     const layer = this.parent;
     const world = layer.parent;
 
     this.powerSupply.checkState();
     this.powerSupply.drawPower(this._acceleration);
+
+    if (this.powerSupply.storedCharge == "discharged") {
+      this.isDisabled = true;
+    }
+    if (this.isDisabled) {
+      this.recoverEnergy();
+      return;
+    }
 
     if (this.itemPickUpTime > 0) {
       this.workOnItemPickUp(delta);
@@ -320,6 +342,29 @@ export class Player extends GameObject {
 
     this.move(this.direction, world);
 
+    if (!this.direction) {
+      if (this.powerSupply.storedEnergy < this.powerSupply.storedCapacity) {
+        switch (this.powerSupply.storedCharge) {
+          case "absorb":
+            this.powerSupply.storedEnergy += 8;
+
+            break;
+          case "bulk":
+            this.powerSupply.storedEnergy += 12;
+
+            break;
+          case "low":
+            this.powerSupply.storedEnergy += 16;
+
+            break;
+          default:
+            this.powerSupply.storedEnergy += 4;
+
+            break;
+        }
+      }
+    }
+
     this.keyPress = input.heldKeys;
     if (this.gcd > 0) {
       this.gcd -= delta;
@@ -333,27 +378,61 @@ export class Player extends GameObject {
     this.tryEmitPosition();
   }
 
+  drawManaBar(ctx, posX, posY) {
+    const width = this.width; // Assuming 'this.width' represents the total width for the bar
+    const height = 4;
+    let fillColor = "blue";
+    const emptyColor = "gray";
+    const percentFull = Math.min(
+      this.powerSupply.storedEnergy / this.powerSupply.storedCapacity,
+      1
+    ); // Clamp percentage between 0 and 1
+    switch (this.powerSupply.storedCharge) {
+      case "discharged":
+        fillColor = "gray";
+        break;
+      case "critical":
+        fillColor = "red";
+        break;
+      case "low":
+        fillColor = "orange";
+        break;
+      case "bulk":
+        fillColor = "purple";
+        break;
+      case "absorb":
+        fillColor = "blue";
+        break;
+      case "float":
+        fillColor = "gold";
+        break;
+      default:
+        break;
+    }
+    // Draw the empty bar outline
+    ctx.beginPath();
+    ctx.rect(posX, posY, width, height);
+    ctx.strokeStyle = emptyColor;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.closePath();
+
+    // Draw the filled portion of the bar
+    ctx.beginPath();
+    ctx.rect(posX, posY, width * percentFull, height); // Fill based on percentage
+    ctx.fillStyle = fillColor;
+    ctx.fill();
+    ctx.closePath();
+  }
   drawImage(ctx) {
     const posX = this.position.x;
     const posY = this.position.y;
-
     // ctx.fillText(`Player: ${posX}, ${posY}  `, posX, posY + 16);
 
-    // ctx.beginPath();
-
-    // ctx.rect(posX, posY, this.width, this.height);
-
-    // if (this.showGrid) {
-    //   ctx.strokeStyle = "blue";
-    //   ctx.lineWidth = 1;
-
-    //   ctx.stroke();
-    // }
-    // ctx.closePath();
-
-    // ctx.lineWidth = 1;
+    this.drawManaBar(ctx, posX - 16, posY - 44);
   }
 }
+
 function getTile(position, world) {
   const background = world.children[0]; // layer id 0
   let currentChunk;

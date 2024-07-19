@@ -3,7 +3,7 @@ const debug = true;
 import { foreground_id, gameParams } from "./config/constants.js";
 
 import { loadMap } from "./src/utils/loadMap.js";
-
+import { resources } from "./src/utils/loadResources.js";
 import { Vector2 } from "./src/Vector2.js";
 import { GameObject } from "./src/GameObject.js";
 import { GameLoop } from "./src/GameLoop.js";
@@ -22,9 +22,11 @@ const mapData = await loadMap();
 
 const main = new GameObject({ position: new Vector2(0, 0) });
 
-main.world = new World();
-main.world.build(mapData);
-main.addChild(main.world);
+const world = new World();
+const worldReady = await world.build(mapData);
+
+main.world = world;
+main.addChild(world);
 
 main.camera = new Camera(main.world.tileWidth);
 main.addChild(main.camera);

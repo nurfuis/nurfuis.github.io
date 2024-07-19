@@ -42,7 +42,112 @@ export const WALK_DOWN = makeWalkingFrames(1);
 export const WALK_RIGHT = makeWalkingFrames(7);
 export const WALK_UP = makeWalkingFrames(4);
 export const WALK_LEFT = makeWalkingFrames(10);
-
+export const SPIN = {
+  duration: 500,
+  frames: [
+    {
+      time: 0,
+      frame: 1,
+    },
+    {
+      time: 100,
+      frame: 4,
+    },
+    {
+      time: 200,
+      frame: 7,
+    },
+    {
+      time: 300,
+      frame: 10,
+    },
+    {
+      time: 400,
+      frame: 12,
+    },
+  ],
+};
+export const DANCE = {
+  duration: 4200,
+  frames: [
+    {
+      time: 0,
+      frame: 1,
+    },
+    {
+      time: 200,
+      frame: 0,
+    },
+    {
+      time: 400,
+      frame: 1,
+    },
+    {
+      time: 700,
+      frame: 11,
+    },
+    {
+      time: 900,
+      frame: 9,
+    },
+    {
+      time: 1100,
+      frame: 10,
+    },
+    {
+      time: 1300,
+      frame: 1,
+    },
+    {
+      time: 1600,
+      frame: 2,
+    },
+    {
+      time: 1800,
+      frame: 1,
+    },
+    {
+      time: 2100,
+      frame: 6,
+    },
+    {
+      time: 2300,
+      frame: 8,
+    },
+    {
+      time: 2500,
+      frame: 7,
+    },
+    {
+      time: 2700,
+      frame: 12,
+    },
+    {
+      time: 3000,
+      frame: 13,
+    },
+    {
+      time: 3200,
+      frame: 14,
+    },
+    {
+      time: 3400,
+      frame: 13,
+    },
+    {
+      time: 3600,
+      frame: 14,
+    },
+    {
+      time: 3800,
+      frame: 13,
+    },
+    {
+      time: 4000,
+      frame: 14,
+    },
+  ],
+};
 export const PICK_UP_DOWN = {
   duration: 10,
   frames: [
