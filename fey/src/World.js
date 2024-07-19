@@ -62,7 +62,7 @@ export class World extends GameObject {
         this.tileHeight,
         this.tilesets
       );
-      newLayerPromise.then((newLayerPromise) => {
+      newLayerPromise.then(() => {
         this.addChild(newLayerPromise);
       });
     }
