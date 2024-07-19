@@ -24,6 +24,7 @@ const main = new GameObject({ position: new Vector2(0, 0) });
 
 main.world = new World();
 main.world.build(mapData);
+
 main.addChild(main.world);
 
 main.camera = new Camera(main.world.tileWidth);
@@ -35,7 +36,9 @@ main.input = new Input(
   main.world.tileHeight,
   main.camera
 );
-
+setTimeout(() => {
+  console.log("waiting");
+}, "5000");
 export const player = new Player();
 main.player = player;
 main.world.children[foreground_id].addChild(main.player);
