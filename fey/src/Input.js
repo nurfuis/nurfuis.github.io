@@ -67,7 +67,7 @@ export class Input {
 
     // debugger
     this.keyCode = undefined;
-    const canvas = document.getElementById("gameCanvas");
+    const canvas = window;
 
     // Define touch zones based on canvas dimensions (adjust as needed)
     const halfWidth = canvas.width / 2;
