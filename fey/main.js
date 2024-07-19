@@ -22,24 +22,19 @@ const mapData = await loadMap();
 
 const main = new GameObject({ position: new Vector2(0, 0) });
 
-const world = new World();
-main.world = world;
+main.world = new World();
 main.world.build(mapData);
 main.addChild(main.world);
 
-const camera = new Camera(main.world.tileWidth);
-main.camera = camera;
+main.camera = new Camera(main.world.tileWidth);
 main.addChild(main.camera);
 
-const automatedInput = new AutomatedInput();
-main.automatedInput = automatedInput;
-
-const input = new Input(
+main.automatedInput = new AutomatedInput();
+main.input = new Input(
   main.world.tileWidth,
   main.world.tileHeight,
   main.camera
 );
-main.input = input;
 
 export const player = new Player();
 main.player = player;
@@ -71,7 +66,6 @@ gameLoop.start();
 
 function createGameCanvasMain() {
   const gameCanvasMain = document.createElement("canvas");
-  gameCanvasMain.id = "gameCanvas";
   gameCanvasMain.style.zIndex = "1";
   gameCanvasMain.width = gameParams.width;
   gameCanvasMain.height = gameParams.height;
