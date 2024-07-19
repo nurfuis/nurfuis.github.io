@@ -38,31 +38,42 @@ export class World extends GameObject {
   }
 
   build(mapData) {
-    for (const tileSet of mapData["tilesets"]) {
+    const loadedTilesets = [];
+
+    function processTileSet(tileSet, callback) {
       const img = new Image();
+      img.onload = function () {
+        // Callback function after image loads
+        const a = {
+          image: img,
+          width: tileSet["imagewidth"],
+          height: tileSet["imageheight"],
+        };
+        loadedTilesets.push({ firstgid: tileSet["firstgid"], source: a });
+        callback(); // Call the callback function after processing
+      };
       img.src = tileSet["image"];
+    }
 
-      const a = { image: img, width: null, height: null, isLoaded: true };
-      a.width = tileSet["imagewidth"];
-      a.height = tileSet["imageheight"];
+    // Loop through tilesets with callbacks
+    mapData["tilesets"].forEach((tileSet) => {
+      processTileSet(tileSet, () => {
+        // All tilesets are loaded, proceed with further processing
+        if (loadedTilesets.length === mapData["tilesets"].length) {
+          this.tileWidth = mapData["tilewidth"];
+          this.tileHeight = mapData["tileheight"];
 
-      this.tilesets.push({
-        firstgid: tileSet["firstgid"],
-        source: a,
+          for (const layer of mapData["layers"]) {
+            const newLayer = new Layer(
+              layer,
+              this.tileWidth,
+              this.tileHeight,
+              loadedTilesets
+            );
+            this.addChild(newLayer);
+          }
+        }
       });
-    }
-
-    this.tileWidth = mapData["tilewidth"];
-    this.tileHeight = mapData["tileheight"];
-
-    for (const layer of mapData["layers"]) {
-      const newLayer = new Layer(
-        layer,
-        this.tileWidth,
-        this.tileHeight,
-        this.tilesets
-      );
-      this.addChild(newLayer);
-    }
+    });
   }
 }
