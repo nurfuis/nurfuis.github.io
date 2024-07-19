@@ -63,8 +63,9 @@ export class World extends GameObject {
         this.tilesets
       );
       setTimeout(() => {
-        this.addChild(newLayer);
+        console.log("Delayed for 1 second.");
       }, "1000");
+      this.addChild(newLayer);
     }
   }
 }
