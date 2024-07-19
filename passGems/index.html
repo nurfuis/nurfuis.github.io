@@ -312,12 +312,53 @@
       const clearPasswordButton = document.getElementById("clear-password");
       const copyButton = document.getElementById("copy-button");
       const textToCopy = document.getElementById("base64-data");
-      let data;
-
       const startChar = document.getElementById("input-1");
       const interval = document.getElementById("input-2");
       const stringLength = document.getElementById("input-3");
+      let data;
 
+      startChar.addEventListener("change", updateValues);
+      interval.addEventListener("change", updateValues);
+      stringLength.addEventListener("change", updateValues);      
+      copyButton.addEventListener("click", () => {
+        event.preventDefault();
+        if (!!data) {
+          navigator.clipboard
+            .writeText(textToCopy.value)
+            .then(() => {
+              console.log("Text copied to clipboard!");
+              base64Data.value = "";
+            })
+            .catch((err) => {
+              console.error("Failed to copy text: ", err);
+            });
+        } else {
+          const inputForm = document.getElementById("input-form");
+
+          if (inputForm) {
+            inputForm.scrollIntoView({ behavior: "smooth" });
+          } else {
+            console.warn(
+              "Warning: Could not find input form element with ID 'input-form'"
+            );
+          }
+        }
+      });      
+      regenButton.addEventListener("click", function (event) {
+        event.preventDefault();
+        regen();
+      });
+      clearPasswordButton.addEventListener("click", function (event) {
+        base64Data.value = "";
+      });
+      clearImageButton.addEventListener("click", function (event) {
+        selectedImage.src = "assets/images/icon.png";
+        data = null;
+      });
+      imageInput.addEventListener("change", function (event) {
+        generatePassword(event);
+      });
+           
       function updateValues() {
         if (!!data) {
           console.log("..................[>");
@@ -396,7 +437,7 @@
                 const remainingRemainder =
                   quotient * stringLengthValue -
                   intervalValue * stringLengthValue;
-                console.log("Use a larger image", remainingRemainder);
+                throw error("Use a larger image", remainingRemainder);
               }
             }
           } else {
@@ -405,42 +446,11 @@
           }
         }
       }
-
-      startChar.addEventListener("change", updateValues);
-      interval.addEventListener("change", updateValues);
-      stringLength.addEventListener("change", updateValues);
-
-      copyButton.addEventListener("click", () => {
-        event.preventDefault();
-        if (!!data) {
-          navigator.clipboard
-            .writeText(textToCopy.value)
-            .then(() => {
-              console.log("Text copied to clipboard!");
-              base64Data.value = "";
-            })
-            .catch((err) => {
-              console.error("Failed to copy text: ", err);
-            });
-        } else {
-          const inputForm = document.getElementById("input-form");
-
-          if (inputForm) {
-            inputForm.scrollIntoView({ behavior: "smooth" });
-          } else {
-            console.warn(
-              "Warning: Could not find input form element with ID 'input-form'"
-            );
-          }
-        }
-      });
-
       function regen() {
         if (!!data) {
           const formattedString = formatBase64String(data);
           base64Data.value = formattedString;
 
-          // base64Data.scrollIntoView({ behavior: "smooth" });
         } else {
           const inputForm = document.getElementById("input-form");
           if (inputForm) {
@@ -452,22 +462,6 @@
           }
         }
       }
-      regenButton.addEventListener("click", function (event) {
-        event.preventDefault();
-        regen();
-      });
-      clearPasswordButton.addEventListener("click", function (event) {
-        base64Data.value = "";
-      });
-      clearImageButton.addEventListener("click", function (event) {
-        selectedImage.src = "assets/images/icon.png";
-        data = null;
-      });
-
-      imageInput.addEventListener("change", function (event) {
-        generatePassword(event);
-      });
-
       function generatePassword(event) {
         const reader = new FileReader();
         reader.onload = function (event) {
@@ -486,7 +480,6 @@
 
         reader.readAsDataURL(event.target.files[0]);
       }
-
       function getSpecialCharIndex(startChar, numSpecialChars, strLength) {
         if (startChar < strLength) {
           return startChar;
@@ -496,7 +489,6 @@
           return remainder % numSpecialChars;
         }
       }
-
       function formatBase64String(base64String) {
         const formattedString = base64String.split(",")[1];
         const passwordRegex = /[a-zA-Z0-9!@#$%^&*()]/;
