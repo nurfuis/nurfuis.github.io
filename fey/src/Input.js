@@ -67,39 +67,7 @@ export class Input {
 
     // debugger
     this.keyCode = undefined;
-    const canvas = window;
 
-    // Define touch zones based on canvas dimensions (adjust as needed)
-    const halfWidth = canvas.width / 2;
-    const halfHeight = canvas.height / 2;
-
-    canvas.addEventListener("touchstart", (event) => {
-      const touch = event.touches[0]; // Get the first touch point
-      const x = touch.clientX;
-      const y = touch.clientY;
-
-      // Check touch location and update heldDirections
-      if (x < halfWidth) {
-        this.heldDirections.push("LEFT");
-      } else if (x > halfWidth) {
-        this.heldDirections.push("RIGHT");
-      }
-      if (y < halfHeight) {
-        this.heldDirections.push("UP");
-      } else if (y > halfHeight) {
-        this.heldDirections.push("DOWN");
-      }
-    });
-
-    canvas.addEventListener("touchend", (event) => {
-      // Remove direction from heldDirections based on ending touch
-      const touchedIndex = event.changedTouches.length - 1; // Get index of ending touch
-      const touch = event.changedTouches[touchedIndex];
-      const x = touch.clientX;
-      const y = touch.clientY;
-
-      // Logic similar to touchstart, but remove directions
-    });
     this.textInput.addEventListener("focus", () => {
       this.isTextFocused = true;
     });
