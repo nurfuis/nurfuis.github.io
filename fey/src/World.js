@@ -56,13 +56,15 @@ export class World extends GameObject {
     this.tileHeight = mapData["tileheight"];
 
     for (const layer of mapData["layers"]) {
-      const newLayer = new Layer(
+      const newLayerPromise = new Layer(
         layer,
         this.tileWidth,
         this.tileHeight,
         this.tilesets
       );
-      this.addChild(newLayer);
+      newLayerPromise.then((newLayer) => {
+        this.addChild(newLayer);
+      });
     }
   }
 }
