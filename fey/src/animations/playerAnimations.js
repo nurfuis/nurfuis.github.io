@@ -79,20 +79,24 @@ export const DANCE = {
       frame: 0,
     },
     {
-      time: 400,
+      time: 300,
       frame: 1,
     },
     {
-      time: 700,
+      time: 500,
       frame: 11,
     },
     {
-      time: 900,
+      time: 700,
       frame: 9,
     },
     {
-      time: 1100,
+      time: 900,
       frame: 10,
+    },
+    {
+      time: 1100,
+      frame: 2,
     },
     {
       time: 1300,
@@ -103,20 +107,24 @@ export const DANCE = {
       frame: 2,
     },
     {
-      time: 1800,
+      time: 1700,
       frame: 1,
     },
     {
-      time: 2100,
+      time: 1900,
       frame: 6,
     },
     {
-      time: 2300,
+      time: 2100,
       frame: 8,
     },
     {
-      time: 2500,
+      time: 2300,
       frame: 7,
+    },
+    {
+      time: 2500,
+      frame: 0,
     },
     {
       time: 2700,
