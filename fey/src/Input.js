@@ -70,26 +70,52 @@ export class Input {
     // debugger
     this.keyCode = undefined;
 
-    const canvas = document.getElementById("gameCanvas");
+    const centerX = this.windowWidth / 2;
+    const centerY = this.windowHeight / 2;
+
+    const upAngle = Math.PI * 1.5;
+    const rightAngle = 0;
+    const downAngle = Math.PI * 0.5;
+    const leftAngle = Math.PI;
 
     document.addEventListener("touchstart", (event) => {
       const touchX = event.touches[0].clientX;
       const touchY = event.touches[0].clientY;
 
-      if (touchY < this.windowHeight / 3) this.onArrowPressed(UP);
-      if (touchY > (this.windowHeight * 2) / 3) this.onArrowPressed(DOWN);
+      let angle = Math.atan2(touchY - centerY, touchX - centerX);
+
+      angle = normalizeAngle(angle);
+
+      const wedgeAngle = Math.PI / 4;
+      const tolerance = wedgeAngle / 3;
+
       if (
-        touchX < this.windowWidth / 2 &&
-        touchY > this.windowHeight / 3 &&
-        touchY < (this.windowHeight * 2) / 3
-      )
-        this.onArrowPressed(LEFT);
-      if (
-        touchX > this.windowWidth / 2 &&
-        touchY > this.windowHeight / 3 &&
-        touchY < (this.windowHeight * 2) / 3
-      )
+        angle > upAngle - wedgeAngle - tolerance &&
+        angle < upAngle + wedgeAngle + tolerance
+      ) {
+        this.onArrowPressed(UP);
+      } else if (
+        angle > rightAngle - wedgeAngle - tolerance &&
+        angle < rightAngle + wedgeAngle + tolerance
+      ) {
         this.onArrowPressed(RIGHT);
+      } else if (
+        angle > downAngle - wedgeAngle - tolerance &&
+        angle < downAngle + wedgeAngle + tolerance
+      ) {
+        this.onArrowPressed(DOWN);
+      } else if (
+        angle > leftAngle - wedgeAngle - tolerance &&
+        angle < leftAngle + wedgeAngle + tolerance
+      ) {
+        this.onArrowPressed(LEFT);
+      }
+
+      function normalizeAngle(angle) {
+        angle = angle + Math.PI * 2;
+        angle %= Math.PI * 2;
+        return angle;
+      }
     });
 
     document.addEventListener("touchend", (event) => {
