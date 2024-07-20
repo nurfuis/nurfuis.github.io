@@ -73,9 +73,9 @@ function createGameCanvasMain() {
 
   const windowWidth = window.innerWidth;
   const windowHeight = window.innerHeight;
-
   gameCanvasMain.width = windowWidth;
   gameCanvasMain.height = windowHeight;
+
   gameCanvasMain.style.backgroundColor = gameParams.backgroundColor;
 
   gameWrapper.appendChild(gameCanvasMain);

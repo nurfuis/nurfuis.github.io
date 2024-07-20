@@ -2,9 +2,8 @@ import { GameObject } from "./GameObject.js";
 import { events } from "./Events.js";
 import { Vector2 } from "./Vector2.js";
 
-import { gameParams } from "../config/constants.js";
-const displayWidth = gameParams.width;
-const displayHeight = gameParams.height;
+const displayWidth = window.innerWidth;
+const displayHeight = window.innerHeight;
 
 import {
   NORTH,
