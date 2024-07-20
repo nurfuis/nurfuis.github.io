@@ -122,6 +122,7 @@ export class Player extends GameObject {
     if (direction && direction != this._lastDirection) {
       this._velocity = new Vector2(0, 0);
       this._acceleration = new Vector2(0, 0);
+      this.facingDirection = direction;
       return;
     }
     if (direction) {
