@@ -68,7 +68,7 @@ export const SPIN = {
   ],
 };
 export const DANCE = {
-  duration: 4200,
+  duration: 8400,
   frames: [
     {
       time: 0,
@@ -120,31 +120,83 @@ export const DANCE = {
     },
     {
       time: 2700,
-      frame: 12,
+      frame: 1,
     },
     {
       time: 3000,
-      frame: 13,
+      frame: 12,
     },
     {
       time: 3200,
-      frame: 14,
+      frame: 13,
     },
     {
       time: 3400,
-      frame: 13,
+      frame: 14,
     },
     {
       time: 3600,
-      frame: 14,
-    },
-    {
-      time: 3800,
       frame: 13,
     },
     {
-      time: 4000,
+      time: 3800,
       frame: 14,
+    },
+    {
+      time: 4000,
+      frame: 13,
+    },
+    {
+      time: 4200,
+      frame: 14,
+    },
+    {
+      time: 4400,
+      frame: 1,
+    },
+    {
+      time: 4600,
+      frame: 7,
+    },
+    {
+      time: 5000,
+      frame: 10,
+    },
+    {
+      time: 5400,
+      frame: 4,
+    },
+    {
+      time: 5800,
+      frame: 11,
+    },
+    {
+      time: 6200,
+      frame: 6,
+    },
+    {
+      time: 6400,
+      frame: 9,
+    },
+    {
+      time: 6800,
+      frame: 8,
+    },
+    {
+      time: 7000,
+      frame: 12,
+    },
+    {
+      time: 7200,
+      frame: 13,
+    },
+    {
+      time: 7400,
+      frame: 14,
+    },
+    {
+      time: 7600,
+      frame: 1,
     },
   ],
 };
