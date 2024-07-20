@@ -2,8 +2,8 @@ const debug = true;
 
 import { foreground_id, gameParams } from "./config/constants.js";
 
-import { loadMap } from "./src/utils/loadMap.js";
 import { resources } from "./src/utils/loadResources.js";
+import { loadMap } from "./src/utils/loadMap.js";
 import { Vector2 } from "./src/Vector2.js";
 import { GameObject } from "./src/GameObject.js";
 import { GameLoop } from "./src/GameLoop.js";
@@ -17,6 +17,8 @@ import { Inventory } from "./src/Inventory.js";
 const gameWrapper = createGameWrapper();
 const gameCanvasMain = createGameCanvasMain();
 const gameCtx = gameCanvasMain.getContext("2d");
+
+
 
 const mapData = await loadMap();
 
@@ -68,6 +70,7 @@ gameLoop.start();
 
 function createGameCanvasMain() {
   const gameCanvasMain = document.createElement("canvas");
+  gameCanvasMain.id = "gameCanvas";
   gameCanvasMain.style.zIndex = "1";
   gameCanvasMain.width = gameParams.width;
   gameCanvasMain.height = gameParams.height;

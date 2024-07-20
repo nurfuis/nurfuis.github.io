@@ -46,6 +46,8 @@ export const NUMPAD0 = "NUMPAD0";
 
 export class Input {
   constructor(tileWidth, tileHeight, camera) {
+    this.windowWidth = window.innerWidth;
+    this.windowHeight = window.innerHeight;
     this.camera = camera;
     this.tileWidth = tileWidth;
     this.tileHeight = tileHeight;
@@ -67,6 +69,32 @@ export class Input {
 
     // debugger
     this.keyCode = undefined;
+
+    const canvas = document.getElementById("gameCanvas");
+
+    document.addEventListener("touchstart", (event) => {
+      const touchX = event.touches[0].clientX;
+      const touchY = event.touches[0].clientY;
+
+      if (touchY < this.windowHeight / 3) this.onArrowPressed(UP);
+      if (touchY > (this.windowHeight * 2) / 3) this.onArrowPressed(DOWN);
+      if (
+        touchX < this.windowWidth / 2 &&
+        touchY > this.windowHeight / 3 &&
+        touchY < (this.windowHeight * 2) / 3
+      )
+        this.onArrowPressed(LEFT);
+      if (
+        touchX > this.windowWidth / 2 &&
+        touchY > this.windowHeight / 3 &&
+        touchY < (this.windowHeight * 2) / 3
+      )
+        this.onArrowPressed(RIGHT);
+    });
+
+    document.addEventListener("touchend", (event) => {
+      this.heldDirections = [];
+    });
 
     this.textInput.addEventListener("focus", () => {
       this.isTextFocused = true;
