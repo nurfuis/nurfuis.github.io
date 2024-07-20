@@ -18,8 +18,6 @@ const gameWrapper = createGameWrapper();
 const gameCanvasMain = createGameCanvasMain();
 const gameCtx = gameCanvasMain.getContext("2d");
 
-
-
 const mapData = await loadMap();
 
 const main = new GameObject({ position: new Vector2(0, 0) });
@@ -72,8 +70,12 @@ function createGameCanvasMain() {
   const gameCanvasMain = document.createElement("canvas");
   gameCanvasMain.id = "gameCanvas";
   gameCanvasMain.style.zIndex = "1";
-  gameCanvasMain.width = gameParams.width;
-  gameCanvasMain.height = gameParams.height;
+
+  const windowWidth = window.innerWidth;
+  const windowHeight = window.innerHeight;
+
+  gameCanvasMain.width = windowWidth;
+  gameCanvasMain.height = windowHeight;
   gameCanvasMain.style.backgroundColor = gameParams.backgroundColor;
 
   gameWrapper.appendChild(gameCanvasMain);
