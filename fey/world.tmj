@@ -108,7 +108,52 @@
          "draworder":"topdown",
          "id":2,
          "name":"entities",
-         "objects":[],
+         "objects":[
+                {
+                 "gid":6,
+                 "height":32,
+                 "id":2,
+                 "name":"",
+                 "rotation":0,
+                 "type":"Tile",
+                 "visible":true,
+                 "width":32,
+                 "x":224,
+                 "y":192
+                }, 
+                {
+                 "gid":257,
+                 "height":64,
+                 "id":3,
+                 "name":"Blob",
+                 "properties":[
+                        {
+                         "name":"animations",
+                         "type":"string",
+                         "value":"blob"
+                        }, 
+                        {
+                         "name":"brain",
+                         "type":"string",
+                         "value":"blob"
+                        }, 
+                        {
+                         "name":"shadow.offset",
+                         "type":"string",
+                         "value":"-31,-54"
+                        }, 
+                        {
+                         "name":"sprite.offset",
+                         "type":"string",
+                         "value":"-32,-37"
+                        }],
+                 "rotation":0,
+                 "type":"Entity",
+                 "visible":true,
+                 "width":64,
+                 "x":288,
+                 "y":224
+                }],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
@@ -130,7 +175,7 @@
          "y":0
         }],
  "nextlayerid":4,
- "nextobjectid":2,
+ "nextobjectid":4,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.10.2",
@@ -148,6 +193,19 @@
          "tilecount":256,
          "tileheight":32,
          "tilewidth":32
+        }, 
+        {
+         "columns":3,
+         "firstgid":257,
+         "image":"assets\/sprites\/blob2.png",
+         "imageheight":256,
+         "imagewidth":192,
+         "margin":0,
+         "name":"blob",
+         "spacing":0,
+         "tilecount":12,
+         "tileheight":64,
+         "tilewidth":64
         }],
  "tilewidth":32,
  "type":"map",

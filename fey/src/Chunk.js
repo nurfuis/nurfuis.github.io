@@ -55,7 +55,13 @@ function addTiles(chunk, tileWidth, tileHeight, tilesets) {
 
     // only add tile if data > 0 ??
 
-    const newTile = new Tile(chunk, i, tilesets, tileWidth, tileHeight, coords);
+    const newTile = new Tile(
+      chunk.data[i],
+      tilesets,
+      tileWidth,
+      tileHeight,
+      coords
+    );
 
     chunk.addChild(newTile);
   }

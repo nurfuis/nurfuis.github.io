@@ -45,10 +45,9 @@ export const NUMPAD9 = "NUMPAD9";
 export const NUMPAD0 = "NUMPAD0";
 
 export class Input {
-  constructor(tileWidth, tileHeight, camera) {
+  constructor(tileWidth, tileHeight) {
     this.windowWidth = window.innerWidth;
     this.windowHeight = window.innerHeight;
-    this.camera = camera;
     this.tileWidth = tileWidth;
     this.tileHeight = tileHeight;
 
@@ -204,6 +203,7 @@ export class Input {
       }
       if (e.code === "F1") {
         e.preventDefault();
+        console.log("Pressed F1");
         events.emit("F1");
       }
       if (e.code === "F2") {
@@ -286,106 +286,99 @@ export class Input {
       }
     });
 
-    window.addEventListener("mousemove", (event) => {
-      const x = event.clientX;
-      const y = event.clientY;
-      // console.log(`Mouse position: X=${x}, Y=${y}`);
+    // window.addEventListener("mousemove", (event) => {
+    //   const x = event.clientX;
+    //   const y = event.clientY;
+    //   // console.log(`Mouse position: X=${x}, Y=${y}`);
 
-      const offsetX = Math.floor(this.camera.position.x / this.tileWidth);
-      const offsetY = Math.floor(this.camera.position.y / this.tileHeight);
+    //   const offsetX = Math.floor(this.camera.position.x / this.tileWidth);
+    //   const offsetY = Math.floor(this.camera.position.y / this.tileHeight);
 
-      const tilesAcross = gameParams.width / this.tileWidth;
-      const tilesDown = gameParams.height / this.tileHeight;
+    //   const tilesAcross = gameParams.width / this.tileWidth;
+    //   const tilesDown = gameParams.height / this.tileHeight;
 
-      const cameraOffset = this.tileWidth / 2;
+    //   const cameraOffset = this.tileWidth / 2;
 
-      const cursorX = event.clientX + cameraOffset;
-      const cursorY = event.clientY - cameraOffset;
+    //   const cursorX = event.clientX + cameraOffset;
+    //   const cursorY = event.clientY - cameraOffset;
 
-      const windowX = window.innerWidth;
+    //   const windowX = window.innerWidth;
 
-      const scale = windowX / gameParams.width;
+    //   const scale = windowX / gameParams.width;
 
-      const windowY = gameParams.height * scale;
+    //   const windowY = gameParams.height * scale;
 
-      // size of scaled tiles
-      const scaledX = Math.floor(windowX / tilesAcross); // should be equal
-      const scaledY = Math.floor(windowY / tilesDown); // to each other
+    //   // size of scaled tiles
+    //   const scaledX = Math.floor(windowX / tilesAcross); // should be equal
+    //   const scaledY = Math.floor(windowY / tilesDown); // to each other
 
-      // grid cell
-      const tileX = Math.floor(cursorX / scaledX) - 1; // magic adjustment
-      const tileY = Math.floor(cursorY / scaledY);
+    //   // grid cell
+    //   const tileX = Math.floor(cursorX / scaledX) - 1; // magic adjustment
+    //   const tileY = Math.floor(cursorY / scaledY);
 
-      // tile coordinates
-      const posX = (tileX - offsetX) * this.tileWidth;
-      const posY = (tileY - offsetY) * this.tileHeight;
+    //   // tile coordinates
+    //   const posX = (tileX - offsetX) * this.tileWidth;
+    //   const posY = (tileY - offsetY) * this.tileHeight;
 
-      // console.log("Cursor:", posX, posY);
-    });
+    //   // console.log("Cursor:", posX, posY);
+    // });
+    // document.addEventListener("mousedown", (e) => {
+    // document.addEventListener("mousedown", (e) => {
+    //   if (
+    //     this.isTextFocused ||
+    //     e.target.localName == "button" ||
+    //     e.target.localName == "input"
+    //   ) {
+    //     return false;
+    //   }
 
-    document.addEventListener("mousedown", (e) => {
-      if (
-        this.isTextFocused ||
-        e.target.localName == "button" ||
-        e.target.localName == "input"
-      ) {
-        return false;
-      }
+    //   this.isClicking = true;
+    //   if (e.button === 2) {
+    //     // right click
+    //   }
 
-      this.isClicking = true;
-      if (e.button === 2) {
-        // right click
-      }
+    //   //   const offsetX = Math.floor(this.camera.position.x / this.tileWidth);
+    //   //   const offsetY = Math.floor(this.camera.position.y / this.tileHeight);
 
-      //   const offsetX = Math.floor(this.camera.position.x / this.tileWidth);
-      //   const offsetY = Math.floor(this.camera.position.y / this.tileHeight);
+    //   const offsetX = e.clientX / this.tileWidth;
+    //   const offsetY = e.clientY / this.tileHeight;
 
-      const offsetX = e.clientX / this.tileWidth;
-      const offsetY = e.clientY / this.tileHeight;
+    //   const tilesAcross = gameParams.width / this.tileWidth;
+    //   const tilesDown = gameParams.height / this.tileHeight;
 
-      const tilesAcross = gameParams.width / this.tileWidth;
-      const tilesDown = gameParams.height / this.tileHeight;
+    //   // center grid on player
+    //   const cameraOffset = this.tileWidth / 2;
 
-      // center grid on player
-      const cameraOffset = this.tileWidth / 2;
+    //   // click coordinates (x is offset by half of a tile)
+    //   const clickX = e.clientX + cameraOffset;
+    //   const clickY = e.clientY - cameraOffset;
 
-      // click coordinates (x is offset by half of a tile)
-      const clickX = e.clientX + cameraOffset;
-      const clickY = e.clientY - cameraOffset;
+    //   const windowX = window.innerWidth;
+    //   const scale = windowX / gameParams.width;
+    //   const windowY = gameParams.height * scale;
 
-      const windowX = window.innerWidth;
-      const scale = windowX / gameParams.width;
-      const windowY = gameParams.height * scale;
+    //   // size of scaled tiles
+    //   const scaledX = Math.floor(windowX / tilesAcross); // should be equal
+    //   const scaledY = Math.floor(windowY / tilesDown); // to each other
 
-      // size of scaled tiles
-      const scaledX = Math.floor(windowX / tilesAcross); // should be equal
-      const scaledY = Math.floor(windowY / tilesDown); // to each other
+    //   // grid cell
+    //   const tileX = Math.floor(clickX / scaledX) - 1; // magic adjustment
+    //   const tileY = Math.floor(clickY / scaledY);
 
-      // grid cell
-      const tileX = Math.floor(clickX / scaledX) - 1; // magic adjustment
-      const tileY = Math.floor(clickY / scaledY);
+    //   // tile coordinates
+    //   const posX = (tileX - offsetX) * this.tileWidth;
+    //   const posY = (tileY - offsetY) * this.tileHeight;
 
-      // tile coordinates
-      const posX = (tileX - offsetX) * this.tileWidth;
-      const posY = (tileY - offsetY) * this.tileHeight;
+    //   this.onClick({ x: posX, y: posY, event: e });
+    //   if (debug) {
+    //     console.log("click event:", e);
+    //     console.log("target element:", e.target.get.EIGHT);
 
-      this.onClick({ x: posX, y: posY, event: e });
-      if (debug) {
-        console.log("click event:", e);
-        console.log("target element:", e.target);
-        console.log("click position:", posX, posY);
-        console.log("click time:", Date.now());
-      }
-    });
-    document.addEventListener("mouseup", (e) => {
-      this.isClicking = false; // Set isClicking to false on mouseup
-    });
-    document.addEventListener("contextmenu", (event) => {
-      event.preventDefault();
-    });
-    document.addEventListener("mouseup", (e) => {
-      this.isClicking = false; // Set isClicking to false on mouseup
-    });
+    //   }
+    // });
+    // document.addEventListener("mouseup", (e) => {
+    //   this.isClicking = false; // Set isClicking to false on mouseup
+    // });
     document.addEventListener("contextmenu", (event) => {
       event.preventDefault();
     });

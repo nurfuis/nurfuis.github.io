@@ -10,14 +10,13 @@ export class World extends GameObject {
 
   async build(mapData) {
     for (const tileSet of mapData["tilesets"]) {
-      const a = await loadTilesets(tileSet);
+      const a = loadTilesets(tileSet);
 
       this.tilesets.push({
         firstgid: tileSet["firstgid"],
         source: a,
       });
     }
-
     this.tileWidth = mapData["tilewidth"];
     this.tileHeight = mapData["tileheight"];
 
@@ -31,7 +30,7 @@ export class World extends GameObject {
       this.addChild(newLayer);
     }
 
-    async function loadTilesets(tileSet) {
+    function loadTilesets(tileSet) {
       const img = new Image();
       img.src = tileSet["image"];
 

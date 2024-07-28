@@ -13,7 +13,15 @@ export class GameObject {
     this.parent = null;
     this.hasReadyBeenCalled = false;
   }
-
+  get center() {
+    if (this.position && this.width && this.height) {
+      const x = Math.floor(this.position.x + this.width / 2);
+      const y = Math.floor(this.position.y + this.height / 2);
+      return new Vector2(x, y);
+    } else {
+      return this.position.duplicate();
+    }
+  }
   stepEntry(delta, root) {
     this.children.forEach((child) => child.stepEntry(delta, root));
 
@@ -23,7 +31,7 @@ export class GameObject {
     }
     this.step(delta, root);
   }
-  
+
   draw(ctx, x, y) {
     const drawPosX = x + this.position.x;
     const drawPosY = y + this.position.y;

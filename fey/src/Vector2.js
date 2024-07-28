@@ -3,7 +3,14 @@ export class Vector2 {
     this.x = x;
     this.y = y;
   }
+  distanceTo(position) {
+    const dx = this.x - position.x;
+    const dy = this.y - position.y;
 
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    return distance;
+  }
   validate() {
     if (
       this.x === null ||
@@ -14,7 +21,11 @@ export class Vector2 {
       isNaN(this.y)
     ) {
       throw new Error(
-        "Invalid position: " + this.x + " and " + this.y + " must be finite numbers."
+        "Invalid position: " +
+          this.x +
+          " and " +
+          this.y +
+          " must be finite numbers."
       );
     }
     return this; // Return the validated Vector2 instance

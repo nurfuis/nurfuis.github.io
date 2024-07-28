@@ -1,5 +1,8 @@
 import { GameObject } from "./GameObject.js";
 import { Chunk } from "./Chunk.js";
+import { events } from "./Events.js";
+import { Vector2 } from "./Vector2.js";
+import { Tile } from "./Tile.js";
 
 export class Layer extends GameObject {
   constructor(layer, tileWidth, tileHeight, tileSets) {
@@ -30,6 +33,29 @@ export class Layer extends GameObject {
         this.addChild(chunk);
       }
     } else if (layer["type"] == "objectgroup") {
+      layer["objects"].forEach((object) => {
+        const newPosition = new Vector2(object.x, object.y);
+        switch (object.type) {
+          case "Entity":
+            events.emit("SPAWN", {
+              data: object,
+              tileSets: tileSets,
+            });
+            break;
+
+          case "Tile":
+            const newTile = new Tile(
+              object.gid,
+              this.tileSets,
+              object.width,
+              object.height,
+              newPosition
+            );
+            this.addChild(newTile);
+            break;
+          default:
+        }
+      });
     }
   }
   drawImage(ctx) {
