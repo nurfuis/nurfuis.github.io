@@ -16,7 +16,7 @@ import { GameLoop } from "./src/GameLoop.js";
 import { Camera } from "./src/Camera.js";
 import { Input } from "./src/Input.js";
 import { AUTO_START, BACKGROUND_COLOR } from "./src/constants.js";
-import { Head } from "./src/head.js";
+import { Head } from "./src/Head.js";
 
 let main;
 
