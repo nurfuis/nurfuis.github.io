@@ -203,6 +203,7 @@ export class Head extends GameObject {
     if (this.mouthBusy) return;
     if (this.speakingCooldown && this.speakingCount <= 0) {
       this.speakingCooldown = false;
+      this.openMouth.visible = true;
     }
 
     if (this.speakingCooldown && this.speakingCount > 0) {
@@ -211,6 +212,7 @@ export class Head extends GameObject {
     }
     if (this.speakingCount > 20) {
       this.speakingCooldown = true;
+      this.openMouth.visible = false;
       this.speakingCount = 300;
     }
 
