@@ -12,16 +12,16 @@ class ResourceLoader {
     this.images = {};
 
     this.imageList = {
-      eyebrows: "/assets/sprites/eyebrows.png",
-      eyes: "/assets/sprites/eyes.png",
-      face: "/assets/sprites/face.png",
-      hair: "/assets/sprites/hair.png",
-      head: "/assets/sprites/head.png",
-      mouth: "/assets/sprites/mouth.png",
-      mustache: "/assets/sprites/mustache.png",
-      openMouth: "/assets/sprites/open-mouth.png",
-      redEyes: "/assets/sprites/red-eyes.png",
-      wideEyes: "/assets/sprites/wide-eyes.png",
+      eyebrows: "../../assets/sprites/eyebrows.png",
+      eyes: "../../assets/sprites/eyes.png",
+      face: "../../assets/sprites/face.png",
+      hair: "../../assets/sprites/hair.png",
+      head: "../../assets/sprites/head.png",
+      mouth: "../../assets/sprites/mouth.png",
+      mustache: "../../assets/sprites/mustache.png",
+      openMouth: "../../assets/sprites/open-mouth.png",
+      redEyes: "../../assets/sprites/red-eyes.png",
+      wideEyes: "../../assets/sprites/wide-eyes.png",
     };
 
     Object.keys(this.imageList).forEach((key) => {
