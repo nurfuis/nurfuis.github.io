@@ -388,6 +388,35 @@ export class Input {
     }
   };
   addCanvas(gameCanvasMain) {
+    gameCanvasMain.addEventListener("touchstart", (e) => {
+      // Emit MOUSE_MOVED event for each touch point
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        const touch = e.changedTouches[i];
+        const rect = gameCanvasMain.getBoundingClientRect();
+        const offsetX = Math.round(touch.clientX - rect.left);
+        const offsetY = Math.round(touch.clientY - rect.top);
+        events.emit("MOUSE_MOVED", new Vector2(offsetX, offsetY));
+      }
+    });
+
+    gameCanvasMain.addEventListener("touchmove", (e) => {
+      // Emit MOUSE_MOVED event for each active touch point
+      for (let i = 0; i < e.touches.length; i++) {
+        const touch = e.touches[i];
+        const rect = gameCanvasMain.getBoundingClientRect();
+        const offsetX = Math.round(touch.clientX - rect.left);
+        const offsetY = Math.round(touch.clientY - rect.top);
+        events.emit("MOUSE_MOVED", new Vector2(offsetX, offsetY));
+      }
+    });
+
+    gameCanvasMain.addEventListener("touchend", (e) => {
+      // Check if all touches have ended (no active touches)
+      if (e.touches.length === 0) {
+        events.emit("MOUSE_OUT");
+      }
+    });
+
     gameCanvasMain.addEventListener("mouseout", (e) => {
       console.log("Mouse left the canvas");
       const rect = gameCanvasMain.getBoundingClientRect();
