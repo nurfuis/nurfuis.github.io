@@ -15,9 +15,9 @@ function textFillAnimation(elementId, screenId) {
 	textIsPlaying = true;
 	const animationScreen = document.getElementById(screenId);
 	const screenDisplay = getComputedStyle(animationScreen) 
-	const characterLimit = 190;
+	const characterLimit = 290;
 	var i = 0;
-	var delay = 50;
+	var delay = 6;
 
 	// Sound
 	const textFillSoundEffect = "effect7";
