@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Project</title>
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+
+<body>
+    <div class="splash-screen" id="splash-screen">
+        <h1>Welcome to Game Project</h1>
+        <p>Click anywhere to start</p>
+    </div>
+    <div class="menu" id="menu" style="display: none;">
+        <canvas id="menuCanvas"></canvas>
+        <h1>Game Title</h1>
+        <button id="start-button" class="menu-item">Start Game</button>
+        <button id="options-button" class="menu-item">Options</button>
+        <button id="exit-button" class="menu-item">Exit</button>
+    </div>
+    <div class="options-menu" style="display: none;">
+        <h2>Options</h2>
+        <label for="map-style">Map Style:</label>
+        <select id="map-style">
+            <option value="perlin">Perlin Noise</option>
+            <option value="world">World Map</option>
+        </select>
+        <button id="back-button" class="menu-item">Back</button>
+    </div>
+    <div class="game-interface" style="display: none;">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div class="legend">
+            <h2>Legend</h2>
+            <div class="legend-item player-color">Player</div>
+            <div class="legend-item opponent-color">Opponent</div>
+            <div class="legend-item dark-grey">Dark Grey Tile</div>
+            <div class="legend-item grey">Grey Tile</div>
+            <div class="legend-item light-grey">Light Grey Tile</div>
+            <div class="legend-item brown">Brown Tile</div>
+        </div>
+
+        <div class="health-bar">
+            <h2>Combat Readiness</h2>
+            <div class="health-container">
+                <div id="health" class="health" style="width: 100%;"></div>
+            </div>
+        </div>
+        <div class="unit-stats">
+            <h2 id="active-unit-name">Unit Stats</h2>
+            <p id="unit-level">Level: 1</p>
+            <p id="unit-experience">Experience: 0</p>
+        </div>
+        <div class="action-bar">
+            <button id="move-button">Move</button> 
+            <button id="attack-button">Attack</button>
+            <button id="defend-button">Defend</button>
+            <button id="item-button">Use Item</button>
+            <button id="damage-button">Take Damage</button>
+            <button id="heal-button">Heal</button>
+            <button id="menu-button">Menu</button>
+            <button id="end-turn-button">End Turn</button>
+        </div>
+        <div class="turn-order">
+            <h2>Turn Order</h2>
+            <ul id="turn-order"></ul>
+        </div>
+    </div>
+    <audio id="intro-audio" src="audio/intro.ogg" preload="auto"></audio>
+    <script src="scripts/game-utils.js"></script>
+    <script src="scripts/game-objects.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/menu-animation.js"></script>
+</body>
+
+</html>
