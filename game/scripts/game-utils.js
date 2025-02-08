@@ -56,6 +56,7 @@ for (let i = 0; i < 256; i++) {
     p[256 + i] = p[i] = permutation[i];
 }
 
+
 function updateHealthBar(unit) {
     const healthBar = document.getElementById('health');
     const healthPercentage = (unit.health / unit.maxHealth) * 100;
@@ -73,10 +74,14 @@ function updateUnitStats(unit) {
     updateHealthBar(unit);
 }
 
-function takeDamage(unit, amount) {
-    unit.health = Math.max(0, unit.health - amount);
-    updateHealthBar(unit);
-    updateUnitStats(unit);
+function takeDamage(unit, damage) {
+    unit.health -= damage;
+    if (unit.health <= 0) {
+        unit.health = 0;
+        // Implement unit death logic here
+        console.log(unit.name, 'has died!');
+    }
+    console.log(unit.name, 'took', damage, 'damage. Health:', unit.health);
 }
 
 function heal(unit, amount) {
@@ -99,10 +104,178 @@ function toggleUIVisibility(hide) {
     healthBarContainer.style.zIndex = zIndex;
     actionBar.style.zIndex = zIndex;
 }
+// Resize canvas to fit window
+function resizeCanvas(canvas) {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
 
-// Ensure these functions are globally accessible
-window.updateHealthBar = updateHealthBar;
-window.updateUnitStats = updateUnitStats;
-window.takeDamage = takeDamage;
-window.heal = heal;
-window.toggleUIVisibility = toggleUIVisibility;
+function toggleActionBarButtons(movePending, attackPending) {
+    const actionBarButtons = document.querySelectorAll('.action-bar button');
+    actionBarButtons.forEach(button => {
+        if (movePending && button.id !== 'move-button') {
+            button.disabled = true;
+        } else if (attackPending && button.id !== 'attack-button') {
+            button.disabled = true;
+        } else {
+            button.disabled = false;
+        }
+    });
+
+    const loadMenu = document.getElementById('load-menu');
+    loadMenu.style.display = 'none';
+}
+
+function populateAttackMenu(unit) {
+    const attackMenu = document.getElementById('attack-menu');
+    attackMenu.innerHTML = ''; // Clear previous buttons
+    unit.attacks.forEach(attack => {
+        const button = document.createElement('button');
+        button.textContent = attack.name;
+        button.addEventListener('click', () => {
+            console.log(unit.name, 'selected attack:', attack.name);
+            unit.selectedAttack = attack;
+            unit.attackReady = true;
+            attackMenu.style.display = 'none'; // Hide the menu after selection
+        });
+        attackMenu.appendChild(button);
+    });
+}
+
+function raycast(x1, y1, x2, y2, gameObjects) {
+    let closestObject = null;
+    let closestDistance = Infinity;
+
+    for (const obj of gameObjects) {
+        // Skip the attacking unit
+        if (obj.x === x1 && obj.y === y1) continue;
+
+        // Check if the ray intersects the object's bounding box
+        const intersects = intersectsRect(x1, y1, x2, y2, obj.x, obj.y, obj.size, obj.size);
+
+        if (intersects) {
+            // Calculate the distance to the object
+            const distance = Math.sqrt((obj.x - x1) ** 2 + (obj.y - y1) ** 2);
+
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestObject = obj;
+            }
+        }
+    }
+
+    return closestObject;
+}
+
+function intersectsRect(x1, y1, x2, y2, rx, ry, rw, rh) {
+    // Calculate the direction vector of the ray
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+
+    // Calculate the t values for the intersection with the vertical sides of the rectangle
+    let tNear = (rx - x1) / dx;
+    let tFar = (rx + rw - x1) / dx;
+
+    // If tNear is greater than tFar, swap them
+    if (tNear > tFar) {
+        [tNear, tFar] = [tFar, tNear];
+    }
+
+    // Calculate the t values for the intersection with the horizontal sides of the rectangle
+    let tNearY = (ry - y1) / dy;
+    let tFarY = (ry + rh - y1) / dy;
+
+    // If tNearY is greater than tFarY, swap them
+    if (tNearY > tFarY) {
+        [tNearY, tFarY] = [tFarY, tNearY];
+    }
+
+    // If the intervals do not overlap, there is no intersection
+    if (tNear > tFarY || tNearY > tFar) {
+        return false;
+    }
+
+    // Update tNear and tFar to the overlapping interval
+    tNear = Math.max(tNear, tNearY);
+    tFar = Math.min(tFar, tFarY);
+
+    // If tFar is negative, the rectangle is behind the ray
+    if (tFar < 0) {
+        return false;
+    }
+
+    // There is an intersection
+    return true;
+}
+
+function aoeAttack(x, y, radius, gameObjects) {
+    const targets = [];
+    for (const obj of gameObjects) {
+        const distance = Math.sqrt((obj.x - x) ** 2 + (obj.y - y) ** 2);
+        if (distance <= radius) {
+            targets.push(obj);
+        }
+    }
+    return targets;
+}
+
+let selectedVehicle = null; // Track the selected vehicle
+let vehicleControlsMenu = document.getElementById('vehicle-controls-menu'); // Get the vehicle controls menu
+
+function showLoadMenu(unit, vehicle) {
+    console.log(unit.name, 'is near', vehicle.name);
+
+    const loadMenu = document.getElementById('load-menu');
+    loadMenu.innerHTML = ''; // Clear previous buttons
+
+    for (let i = 0; i < vehicle.capacity; i++) {
+        if (!vehicle.occupiedSeats[i]) {
+            const button = document.createElement('button');
+            button.textContent = `Seat ${i + 1}`;
+            button.addEventListener('click', () => {
+                if (vehicle.loadUnit(unit, i)) {
+                    console.log(unit.name, 'loaded into seat', i + 1);
+                    loadMenu.style.display = 'none';
+                    selectedVehicle = null;
+
+                    showVehicleControls(vehicle, unit);
+
+                    // If the unit is the driver, show the vehicle controls
+                    if (i === 0) {
+                        //
+                    }
+                } else {
+                    console.log('Failed to load unit into seat', i + 1);
+                }
+            });
+            loadMenu.appendChild(button);
+        }
+    }
+
+    loadMenu.style.display = 'flex';
+    selectedVehicle = vehicle;
+}
+
+function showVehicleControls(vehicle, unit) {
+    vehicleControlsMenu.innerHTML = ''; // Clear previous buttons
+
+    // Add unload button only if the unit has been loaded for 1 or more turns
+    if (unit.turnsLoaded >= 1) {
+        const unloadButton = document.createElement('button');
+        unloadButton.textContent = 'Unload';
+        unloadButton.addEventListener('click', () => {
+            // Find the first occupied seat
+            const seatIndex = vehicle.occupiedSeats.findIndex(seat => seat !== null);
+            if (seatIndex !== -1) {
+                const unit = vehicle.occupiedSeats[seatIndex];
+                if (vehicle.unloadUnit(seatIndex)) {
+                    console.log(unit.name, 'unloaded from vehicle');
+                    vehicleControlsMenu.style.display = 'none';
+                }
+            }
+        });
+        vehicleControlsMenu.appendChild(unloadButton);
+    }
+
+    vehicleControlsMenu.style.display = 'flex';
+}

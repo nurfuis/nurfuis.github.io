@@ -36,10 +36,14 @@
             <h2>Legend</h2>
             <div class="legend-item player-color">Player</div>
             <div class="legend-item opponent-color">Opponent</div>
+            <div class="legend-item neutral-color">Neutral</div>
+            <div class="legend-item fort-color">Fort</div>
+            <div class="legend-color vehicle-color">Vehicle</div>
             <div class="legend-item dark-grey">Dark Grey Tile</div>
             <div class="legend-item grey">Grey Tile</div>
             <div class="legend-item light-grey">Light Grey Tile</div>
             <div class="legend-item brown">Brown Tile</div>
+
         </div>
 
         <div class="health-bar">
@@ -67,10 +71,25 @@
             <h2>Turn Order</h2>
             <ul id="turn-order"></ul>
         </div>
+        <div id="attack-menu">
+        </div>
     </div>
+    <div id="load-menu" >
+    </div>
+
+    <div id="vehicle-controls-menu">
+    </div>
+
     <audio id="intro-audio" src="audio/intro.ogg" preload="auto"></audio>
+    <script src="scripts/Vector2.js"></script>
+    <script src="scripts/Events.js"></script>
     <script src="scripts/game-utils.js"></script>
+    <script src="scripts/Input.js"></script>
+    <script src="scripts/event-listeners.js"></script>
     <script src="scripts/game-objects.js"></script>
+    <script src="scripts/Unit.js"></script>
+    <script src="scripts/game-camera.js"></script>
+    <script src="scripts/GameLoop.js"></script>
     <script src="scripts/main.js"></script>
     <script src="scripts/menu-animation.js"></script>
 </body>

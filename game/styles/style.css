@@ -1,4 +1,3 @@
-/* Importing Trocchi font */
 @font-face {
     font-family: 'Trocchi';
     src: url('fonts/Trocchi/Trocchi-Regular.ttf') format('truetype');
@@ -6,7 +5,6 @@
     font-style: normal;
 }
 
-/* Importing Oswald font */
 @font-face {
     font-family: 'Oswald';
     src: url('fonts/Oswald/Oswald-VariableFont_wght.ttf') format('truetype');
@@ -56,7 +54,6 @@
     font-style: normal;
 }
 
-/* Color classes */
 .dark-grey {
     background-color: #4d4d4d;
 }
@@ -81,13 +78,25 @@
     background-color: red;
 }
 
-/* General styles */
+.neutral-color {
+    background-color: gray;
+}
+
+.fort-color {
+    background-color: green;
+}
+.vehicle-color {
+    background-color: rgba(139, 69, 19, 0.75); /* Brown */
+    border: 1px solid brown;
+}
+
 body,
 html {
     margin: 0;
     padding: 0;
     overflow: hidden;
     font-family: 'Trocchi', serif;
+    user-select: none;
 }
 
 body {
@@ -242,7 +251,6 @@ p {
     /* Reset shadow on click */
 }
 
-/* Optional: Add a subtle glow on hover (might be performance intensive) */
 .menu button:hover {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25), 0 0 10px rgba(255, 255, 255, 0.2);
     /* Glow */
@@ -302,6 +310,11 @@ p {
         position: absolute;
         bottom: 0;
         width: 100%;
+    }
+
+    .action-bar button.active {
+        background-color: yellow; /* Highlight color */
+        color: black;
     }
 
     .unit-stats {
@@ -411,4 +424,70 @@ p {
     /* Added box shadow for active unit */
     font-weight: bold;
     /* Ensure the active unit is bold */
+}
+#attack-menu {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #333;
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 10;
+}
+#attack-menu button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#load-menu button, #vehicle-controls-menu button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+#load-menu {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #333;
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 10;
+}
+#vehicle-controls-menu {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #333;
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 10;
 }
