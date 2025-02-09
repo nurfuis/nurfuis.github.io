@@ -4,18 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Project</title>
+    <title>Disputed Territory Tactics</title>
     <link rel="stylesheet" href="styles/style.css">
 </head>
 
 <body>
     <div class="splash-screen" id="splash-screen">
-        <h1>Welcome to Game Project</h1>
+        <h1>nurfuis games</h1>
         <p>Click anywhere to start</p>
     </div>
     <div class="menu" id="menu" style="display: none;">
         <canvas id="menuCanvas"></canvas>
-        <h1>Game Title</h1>
+        <h1>Disputed Territory</h1>
         <button id="start-button" class="menu-item">Start Game</button>
         <button id="options-button" class="menu-item">Options</button>
         <button id="exit-button" class="menu-item">Exit</button>
@@ -38,24 +38,28 @@
             <div class="legend-item opponent-color">Opponent</div>
             <div class="legend-item neutral-color">Neutral</div>
             <div class="legend-item fort-color">Fort</div>
-            <div class="legend-color vehicle-color">Vehicle</div>
+            <div class="legend-item vehicle-color">Vehicle</div>
             <div class="legend-item dark-grey">Dark Grey Tile</div>
             <div class="legend-item grey">Grey Tile</div>
             <div class="legend-item light-grey">Light Grey Tile</div>
             <div class="legend-item brown">Brown Tile</div>
-
         </div>
 
         <div class="health-bar">
             <h2>Combat Readiness</h2>
             <div class="health-container">
-                <div id="health" class="health" style="width: 100%;"></div>
+                <div id="health" class="health"></div>
             </div>
         </div>
         <div class="unit-stats">
             <h2 id="active-unit-name">Unit Stats</h2>
             <p id="unit-level">Level: 1</p>
             <p id="unit-experience">Experience: 0</p>
+        </div>
+        <div class="tile-stats">
+            <h2 id="tile-stats-title">Tile</h2>
+            <p id="tile-type">Type: Unknown</p>
+            <p id="tile-location">Location: (0, 0)</p>
         </div>
         <div class="action-bar">
             <button id="move-button">Move</button> 

@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const mapSize = {
-        width: 3000,
-        height: 3000,
+        width: 800, // Reduced map width
+        height: 800, // Reduced map height
         tileSize: 64
     };
 
@@ -30,46 +30,53 @@ document.addEventListener('DOMContentLoaded', () => {
     game.map = map;
 
 
-    const playerTeam = new Team('player-color', canvas, camera);
-    const opponentTeam = new Team('opponent-color', canvas, camera);
-    game.playerTeam = playerTeam;
-    game.opponentTeam = opponentTeam;
-
-
-    game.playerTeam.addUnit(new Unit(150, 150, 32, 'player-color', 5, 'Alpha', canvas, camera, mapSize));
-    game.playerTeam.addUnit(new Unit(200, 150, 32, 'player-color', 4, 'Bravo', canvas, camera, mapSize));
-    game.playerTeam.addUnit(new Unit(150, 200, 32, 'player-color', 3, 'Charlie', canvas, camera, mapSize));
-    game.playerTeam.addUnit(new Unit(200, 200, 32, 'player-color', 2, 'Delta', canvas, camera, mapSize));
-    game.playerTeam.addUnit(new Unit(250, 150, 32, 'player-color', 1, 'Echo', canvas, camera, mapSize));
-
-    // Add units to opponent team near opponent fort
-    game.opponentTeam.addUnit(new Unit(2750, 150, 32, 'opponent-color', 5, 'Foxtrot', canvas, camera, mapSize));
-    game.opponentTeam.addUnit(new Unit(2800, 150, 32, 'opponent-color', 4, 'Golf', canvas, camera, mapSize));
-    game.opponentTeam.addUnit(new Unit(2750, 200, 32, 'opponent-color', 3, 'Hotel', canvas, camera, mapSize));
-    game.opponentTeam.addUnit(new Unit(2800, 200, 32, 'opponent-color', 2, 'India', canvas, camera, mapSize));
-    game.opponentTeam.addUnit(new Unit(2850, 150, 32, 'opponent-color', 1, 'Juliet', canvas, camera, mapSize));
-
-    game.map.addChild(game.playerTeam);
-    game.map.addChild(game.opponentTeam);
 
     const buildings = [];
     game.buildings = buildings;
-
-    const fort = new Fort(100, 100, 64, 'player-color', canvas, camera, mapSize);
-    const opponentFort = new Fort(2900, 100, 64, 'opponent-color', canvas, camera, mapSize);
-    const neutralFort = new Fort(1500, 1500, 64, 'neutral-color', canvas, camera, mapSize);
+    // Adjusted building positions to fit within the new map size and align with the grid
+    const fort = new Fort(64, 64, 64, 'player-color', canvas, camera, mapSize);
+    const opponentFort = new Fort(704, 64, 64, 'opponent-color', canvas, camera, mapSize);
+    const neutralFort = new Fort(384, 384, 64, 'neutral-color', canvas, camera, mapSize);
     game.map.addChild(fort);
     game.map.addChild(opponentFort);
     game.map.addChild(neutralFort);
     game.buildings.push(fort);
 
-
-
     const vehicles = [];
-    const newVehicle = new Vehicle(200, 100, 64, 3, 3, canvas, camera, mapSize);
+    // Adjusted vehicle position to fit within the new map size and align with the grid
+    // x, y, size, capacity, speed, canvas, mapSize
+    const newVehicle = new Vehicle(192, 64, 64, 3, 3, canvas, mapSize);
     game.map.addChild(newVehicle);
     vehicles.push(newVehicle);
     game.vehicles = vehicles;
+
+
+
+    const playerTeam = new Team('player-color', canvas, camera);
+    const opponentTeam = new Team('opponent-color', canvas, camera);
+    game.playerTeam = playerTeam;
+    game.opponentTeam = opponentTeam;
+
+    // Adjusted unit positions to fit within the new map size and align with the grid
+    game.playerTeam.addUnit(new Unit(64, 64, 32, 'player-color', 5, 'Alpha', canvas, camera, mapSize));
+    game.playerTeam.addUnit(new Unit(64, 64, 32, 'player-color', 4, 'Bravo', canvas, camera, mapSize));
+    game.playerTeam.addUnit(new Unit(64, 64, 32, 'player-color', 3, 'Charlie', canvas, camera, mapSize));
+    game.playerTeam.addUnit(new Unit(64, 64, 32, 'player-color', 2, 'Delta', canvas, camera, mapSize));
+    game.playerTeam.addUnit(new Unit(64, 64, 32, 'player-color', 1, 'Echo', canvas, camera, mapSize));
+
+    // Adjusted opponent unit positions to fit within the new map size and align with the grid
+    game.opponentTeam.addUnit(new Unit(640, 128, 32, 'opponent-color', 5, 'Foxtrot', canvas, camera, mapSize));
+    game.opponentTeam.addUnit(new Unit(704, 128, 32, 'opponent-color', 4, 'Golf', canvas, camera, mapSize));
+    game.opponentTeam.addUnit(new Unit(640, 192, 32, 'opponent-color', 3, 'Hotel', canvas, camera, mapSize));
+    game.opponentTeam.addUnit(new Unit(704, 192, 32, 'opponent-color', 2, 'India', canvas, camera, mapSize));
+    game.opponentTeam.addUnit(new Unit(768, 128, 32, 'opponent-color', 1, 'Juliet', canvas, camera, mapSize));
+
+    game.map.addChild(game.playerTeam);
+    game.map.addChild(game.opponentTeam);
+
+
+
+
 
     const coverLayer = new CoverLayer(mapSize, mapSize.tileSize);
     game.addChild(coverLayer);
@@ -79,26 +86,24 @@ document.addEventListener('DOMContentLoaded', () => {
     game.addChild(fogLayer);
     game.fogLayer = fogLayer;
 
-    function createRandomCover () {
+    function createRandomCover() {
         const x = Math.random() * mapSize.width;
         const y = Math.random() * mapSize.height;
         const width = Math.random() * 100 + 50;
         const height = Math.random() * 100 + 50;
         game.coverLayer.addCover(x, y, width, height);
     }
-    const randomCoverAmount = 50;
+    const randomCoverAmount = 2; // Reduced the amount of random cover for the smaller map
     for (let i = 0; i < randomCoverAmount; i++) {
         createRandomCover();
     }
 
     game.addChild(map);
 
-
     initializeTurnOrder(game, playerTeam, opponentTeam, camera, mapSize);
 
     const input = new Input(canvas, camera, game, mapSize);
     game.input = input;
-
 
     const particles = [];
 
@@ -121,7 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameLoop = new GameLoop(update, draw);
 
     const initialScreen = 'game'; // Options: 'splash', 'menu', 'game'
-
 
     function showInitialScreen() {
         const splashScreen = document.getElementById('splash-screen');
@@ -166,6 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
             nextTurn();
         }
     });
+
     function initializeTurnOrder(game, playerTeam, opponentTeam, camera, mapSize) {
         game.turnOrder = [...playerTeam.children, ...opponentTeam.children];
         game.turnOrder.sort((a, b) => b.speed - a.speed);
@@ -173,14 +178,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Center the camera on the first unit to move
         const firstUnit = game.turnOrder[0];
-        camera.x = firstUnit.x - camera.width / 2 + firstUnit.size / 2;
-        camera.y = firstUnit.y - camera.height / 2 + firstUnit.size / 2;
-
-        // Constrain camera within the map boundaries
-        if (camera.x < 0) camera.x = 0;
-        if (camera.y < 0) camera.y = 0;
-        if (camera.x + camera.width > mapSize.width) camera.x = mapSize.width - camera.width;
-        if (camera.y + camera.height > mapSize.height) camera.y = mapSize.height - camera.height;
 
         updateUnitStats(firstUnit); // Update unit stats for the first unit
     }
@@ -223,7 +220,6 @@ document.addEventListener('DOMContentLoaded', () => {
             currentUnit.turnsLoaded++;
         }
 
-
         updateUnitStats(currentUnit); // Update unit stats for the active unit
 
         // Update initial position and max distance at the start of the turn
@@ -236,6 +232,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (currentUnit.colorClass === 'opponent-color') {
+            nextTurn(); // Skip the opponent's turn
+            return;
             // Automate opponent's unit movement
             let targetPosition;
             do {
@@ -256,16 +254,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+    // Add event listener to update tile stats on canvas click
+    canvas.addEventListener('click', (event) => {
+        const x = event.clientX - camera.position.x;
+        const y = event.clientY - camera.position.y;
 
+        const tile = game.map.getTileAtCoordinates(x, y);
+        const tileType = tile.type;
+        const tileLocation = tile.x + ', ' + tile.y;
+        document.getElementById('tile-type').textContent = `Type: ${tileType}`;
+        document.getElementById('tile-location').textContent = `Location: ${tileLocation}`;
+    });
 
     initializeEventListeners();
-
-
     showInitialScreen();
 
 
-
-
-
-
 });
+

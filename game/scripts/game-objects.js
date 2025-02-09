@@ -70,50 +70,63 @@ class Map extends GameObject {
         super(canvas);
         this.x = 0;
         this.y = 0;
-        this.tileSize = 64;
+        this.tileSize = 64; // Size of the square tiles
         this.canvas = canvas;
         this.mapSize = mapSize;
         this.camera = camera;
+        this.tiles = this.generateTiles();
     }
 
-    generateTile(x, y) {
-        const noiseValue = perlin(x / 10, y / 10);
-        let colorClass;
-        let walkable = true;
-        if (noiseValue < -0.2) {
-            colorClass = 'dark-grey'; // Dark grey
-            walkable = false;
-        } else if (noiseValue < 0) {
-            colorClass = 'grey'; // Grey
-        } else if (noiseValue < 0.2) {
-            colorClass = 'light-grey'; // Light grey
-        } else {
-            colorClass = 'brown'; // Brown
+    generateTiles() {
+        const tiles = [];
+        const rows = Math.ceil(this.mapSize.height / this.tileSize);
+        const cols = Math.ceil(this.mapSize.width / this.tileSize);
+
+        for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+                const noiseValue = perlin(x / 10, y / 10);
+                let colorClass;
+                let walkable = true;
+                let type = 'grass';
+                if (noiseValue < -0.2) {
+                    colorClass = 'dark-grey'; // Dark grey
+                    walkable = false;
+                    type = 'water';
+                } else if (noiseValue < 0) {
+                    colorClass = 'grey'; // Grey
+                    type = 'grass';
+                } else if (noiseValue < 0.2) {
+                    colorClass = 'light-grey'; // Light grey
+                    type = 'rock';
+                } else {
+                    colorClass = 'brown'; // Brown
+                    type = 'hill';
+                }
+                const color = getComputedStyle(document.querySelector(`.${colorClass}`)).backgroundColor;
+                const drawX = x * this.tileSize;
+                const drawY = y * this.tileSize;
+                tiles.push({ x: drawX, y: drawY, color, walkable, type });
+            }
         }
-        const color = getComputedStyle(document.querySelector(`.${colorClass}`)).backgroundColor;
-        return { x, y, color, walkable };
+        return tiles;
+    }
+    getTileAtCoordinates(x, y) {
+        const col = Math.floor(x / this.tileSize);
+        const row = Math.floor(y / this.tileSize);
+        const index = row * Math.ceil(this.mapSize.width / this.tileSize) + col;
+        return this.tiles[index];
+    }
+    drawSquare(ctx, x, y, size, color) {
+        ctx.fillStyle = color;
+        ctx.fillRect(x, y, size, size);
     }
 
     drawImage(ctx, offsetX, offsetY) {
-        const startX = Math.floor((offsetX) / this.tileSize);
-        const startY = Math.floor((offsetY) / this.tileSize);
-        const endX = startX + Math.ceil(this.mapSize.width / this.tileSize);
-        const endY = startY + Math.ceil(this.mapSize.height / this.tileSize);
-
-        for (let y = startY; y <= endY; y++) {
-            for (let x = startX; x <= endX; x++) {
-                // Check if the tile is within the map boundaries
-                if (x * this.tileSize < this.mapSize.width &&
-                    x * this.tileSize >= 0 &&
-                    y * this.tileSize < this.mapSize.height &&
-                    y * this.tileSize >= 0) {
-
-                    const tile = this.generateTile(x, y);
-                    ctx.fillStyle = tile.color;
-                    ctx.fillRect(tile.x * this.tileSize - offsetX, tile.y * this.tileSize - offsetY, this.tileSize, this.tileSize);
-                }
-            }
-        }
+        this.tiles.forEach(tile => {
+            const drawX = tile.x - offsetX;
+            const drawY = tile.y - offsetY;
+            this.drawSquare(ctx, drawX, drawY, this.tileSize, tile.color);
+        });
     }
 }
 
@@ -169,7 +182,7 @@ class Fort extends GameObject {
         this.colorClass = colorClass;
         this.mapSize = mapSize;
         this.owner = null; // Initially neutral
-        this.perceptionRange = 200; // Define the perception range
+        this.perceptionRange = 128; // Define the perception range
     }
 
     update() {
@@ -200,7 +213,10 @@ class Vehicle extends GameObject {
         this.isMoving = false;
         this.colorClass = 'vehicle-color'; // Assign the vehicle-color class
         this.name = 'Vehicle'; // Assign a default name
-        this.perceptionRange = 150; // Define the perception range
+        this.perceptionRange = 0; // Define the perception range
+        this.maxDistance = 256; // Define the maximum distance the vehicle can travel
+        this.targetPosition = null; // Store the target position
+        this.active = false; // Flag to indicate if the vehicle is active
     }
 
     loadUnit(unit, seatIndex) {
@@ -233,45 +249,94 @@ class Vehicle extends GameObject {
         return false;
     }
 
+
     drive(keysPressed) {
+        if (this.isMoving) return; // Prevent input or actions while moving
         let dx = 0;
         let dy = 0;
 
         if (keysPressed.includes('w')) {
-            dy -= 1;
+            dy -= this.mapSize.tileSize; // Move up one tile
         }
         if (keysPressed.includes('s')) {
-            dy += 1;
+            dy += this.mapSize.tileSize; // Move down one tile
         }
         if (keysPressed.includes('a')) {
-            dx -= 1;
+            dx -= this.mapSize.tileSize; // Move left one tile
         }
         if (keysPressed.includes('d')) {
-            dx += 1;
+            dx += this.mapSize.tileSize; // Move right one tile
         }
 
-        const magnitude = Math.sqrt(dx * dx + dy * dy);
-        if (magnitude > 0) {
-            dx /= magnitude;
-            dy /= magnitude;
-        }
+        const targetX = Math.floor(this.x + dx);
+        const targetY = Math.floor(this.y + dy);
 
-        this.x += dx * this.speed;
-        this.y += dy * this.speed;
+        // Ensure the target position is within the map boundaries and walkable
 
-        // Constrain vehicle within the map boundaries
-        if (this.x < 0) this.x = 0;
-        if (this.y < 0) this.y = 0;
-        if (this.x + this.size > this.mapSize.width) this.x = this.mapSize.width - this.size;
-        if (this.y + this.size > this.mapSize.height) this.y = this.mapSize.height - this.size;
+        this.targetPosition = { x: targetX, y: targetY };
+        this.isMoving = true;
+    }
 
-        // Update unit positions if loaded
-        this.occupiedSeats.forEach((unit, index) => {
-            if (unit) {
-                unit.x = this.x + index * (this.size / this.capacity); // Simple positioning
-                unit.y = this.y + this.size;
+    moveTowards(unit, destinationPosition, speed) {
+        let distanceToTravelX = destinationPosition.x - unit.x;
+        let distanceToTravelY = destinationPosition.y - unit.y;
+        let distance = Math.sqrt(distanceToTravelX ** 2 + distanceToTravelY ** 2);
+        if (distance <= speed) {
+            unit.x = destinationPosition.x;
+            unit.y = destinationPosition.y;
+            this.targetPosition = null;
+            this.isMoving = false;
+        } else {
+            let normalizedX = distanceToTravelX / distance;
+            let normalizedY = distanceToTravelY / distance;
+
+            const newX = unit.x + normalizedX * speed;
+            const newY = unit.y + normalizedY * speed;
+
+            if (newX > 0) {
+                unit.x = newX;
             }
-        });
+            if (newY > 0) {
+                unit.y = newY;
+            }
+
+        }
+        return distance;
+    }
+    canMoveTo(x, y) {
+        const distance = Math.sqrt((x - this.initialX) ** 2 + (y - this.initialY) ** 2);
+        return distance <= this.maxDistance;
+    }
+    step(delta, root) {
+        const driver = this.occupiedSeats[0];
+        if (driver) {
+            const isActive = driver.active;
+            if (isActive) {
+                this.active = true;
+            } else if (!isActive) {
+                this.active = false;
+            }
+        } else if (!driver) {
+            this.active = false;
+        }
+
+        if (root.input.keysPressed.length > 0 && this.active && root.movePending) {
+            this.drive(root.input.keysPressed);
+        }
+
+        // Move towards the target position if set
+        if (this.isMoving && this.targetPosition) {
+
+            this.moveTowards(this, this.targetPosition, this.speed);
+
+            this.occupiedSeats.forEach((unit, index) => {
+                if (unit) {
+                    unit.x = this.x; // Simple positioning
+                    unit.y = this.y;
+                }
+            });
+        }
+
     }
 
     draw(ctx) {
@@ -313,7 +378,9 @@ class FogOfWar extends GameObject {
 
         // Update fog based on units
         units.children.forEach(unit => {
-            this.clearFog(unit.x, unit.y, unit.perceptionRange);
+            const newX = unit.x + unit.size;
+            const newY = unit.y + unit.size;
+            this.clearFog(newX, newY, unit.perceptionRange);
         });
 
         // Update fog based on vehicles
@@ -345,7 +412,7 @@ class FogOfWar extends GameObject {
     }
 
     draw(ctx) {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'; // Semi-transparent black for fog
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.9)'; // Semi-transparent black for fog
         for (let y = 0; y < this.fogLayer.length; y++) {
             for (let x = 0; x < this.fogLayer[y].length; x++) {
                 if (this.fogLayer[y][x]) {

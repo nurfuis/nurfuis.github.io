@@ -3,7 +3,9 @@ class Camera extends GameObject {
         super(canvas);
         this.canvas = canvas;
         this.mapSize = mapSize;
-        this.position = new Vector2(0, 0);
+        const newX = Math.floor(canvas.width / 2 - mapSize.width / 2);
+        const newY = Math.floor(canvas.height / 2 - mapSize.height / 2);
+        this.position = new Vector2(newX, newY);
         this.panSpeed = 15; // Adjust panning speed as needed
     }
 

@@ -1,32 +1,32 @@
 const attackTypes = [
     {
         name: 'Basic Attack',
-        range: 64,
+        range: 128,
         damage: 10,
         cost: 0
     },
     {
         name: 'Long Range Attack',
-        range: 228,
+        range: 512,
         damage: 5,
         cost: 5
     },
     {
         name: 'AOE Attack',
-        range: 32,
+        range: 256,
         damage: 15,
         cost: 10
     },
     {
         name: 'Heal',
-        range: 32,
+        range: 128,
         damage: -10,
         cost: 5
     }
 ];
 
 class Unit extends GameObject {
-    constructor(x, y, size, colorClass, speed, name, canvas, mapSize, level = 1, experience = 0, health = 100) {
+    constructor(x, y, size, colorClass, speed, name, canvas, camera, mapSize, level = 1, experience = 0, health = 100) {
         super(canvas);
         this.x = x;
         this.y = y;
@@ -55,10 +55,11 @@ class Unit extends GameObject {
         this.attackReady = false; // Add a flag to indicate if the unit is ready
         this.maxAttacks = 2; // Maximum number of attacks the unit can make
         this.remainingAttacks = this.maxAttacks; // Initialize remaining attacks
-        this.perceptionRange = 100; // Range for detecting other units
+        this.perceptionRange = 128; // Range for detecting other units
+        this.isMoving = false; // Add a flag to indicate if the unit is currently moving
     }
-    canMoveTo(x, y) {
 
+    canMoveTo(x, y) {
         const distance = Math.sqrt((x - this.initialX) ** 2 + (y - this.initialY) ** 2);
         return distance <= this.maxDistance;
     }
@@ -85,7 +86,8 @@ class Unit extends GameObject {
             const allTargets = [...root.playerTeam.children, ...root.opponentTeam.children];
 
             if (this.selectedAttack.name === 'AOE Attack') {
-                const targets = aoeAttack(x, y, this.selectedAttack.range, allTargets);
+                const aoeRad = this.selectedAttack.range / 4;
+                const targets = aoeAttack(x, y, aoeRad, allTargets);
                 targets.forEach(target => {
                     if (target !== this) {
                         takeDamage(target, this.selectedAttack.damage);
@@ -116,72 +118,100 @@ class Unit extends GameObject {
     }
 
     move(keysPressed) {
+        if (this.isMoving) return; // Prevent input or actions while moving
+
         let dx = 0;
         let dy = 0;
 
         if (keysPressed.includes('w')) {
-            dy -= 1;
+            dy -= this.mapSize.tileSize; // Move up one tile
         }
         if (keysPressed.includes('s')) {
-            dy += 1;
+            dy += this.mapSize.tileSize; // Move down one tile
         }
         if (keysPressed.includes('a')) {
-            dx -= 1;
+            dx -= this.mapSize.tileSize; // Move left one tile
         }
         if (keysPressed.includes('d')) {
-            dx += 1;
+            dx += this.mapSize.tileSize; // Move right one tile
         }
 
-        const magnitude = Math.sqrt(dx * dx + dy * dy);
-        if (magnitude > 0) {
-            dx /= magnitude;
-            dy /= magnitude;
+        const targetX = Math.floor(this.x + dx);
+        const targetY = Math.floor(this.y + dy);
+
+        const canMove = this.canMoveTo(targetX, targetY);
+        // Ensure the target position is within the map boundaries and walkable
+
+        if (targetX >= 0 && targetX < this.mapSize.width && targetY >= 0 && targetY < this.mapSize.height && canMove) {
+            this.targetPosition = { x: targetX, y: targetY };
+            this.isMoving = true;
         }
+    }
+    moveTowards(unit, destinationPosition, speed) {
+        let distanceToTravelX = destinationPosition.x - unit.x;
+        let distanceToTravelY = destinationPosition.y - unit.y;
 
-        this.x += dx * this.speed;
-        this.y += dy * this.speed;
+        let distance = Math.sqrt(distanceToTravelX ** 2 + distanceToTravelY ** 2);
 
-        // Calculate distance from initial position
-        const distance = Math.sqrt((this.x - this.initialX) ** 2 + (this.y - this.initialY) ** 2);
+        if (distance <= speed) {
+            unit.x = destinationPosition.x;
+            unit.y = destinationPosition.y;
+            this.targetPosition = null;
+            this.isMoving = false;
+        } else {
+            let normalizedX = distanceToTravelX / distance;
+            let normalizedY = distanceToTravelY / distance;
 
-        // Constrain unit within the move range
-        if (distance > this.maxDistance) {
-            const angle = Math.atan2(this.y - this.initialY, this.x - this.initialX);
-            this.x = this.initialX + Math.cos(angle) * this.maxDistance;
-            this.y = this.initialY + Math.sin(angle) * this.maxDistance;
+            const newX = unit.x + normalizedX * speed;
+            const newY = unit.y + normalizedY * speed;
+
+            if (newX > 0) {
+                unit.x = newX;
+            }
+            if (newY > 0) {
+                unit.y = newY;
+            }
+
         }
-
-        // Constrain unit within the map boundaries
-        if (this.x < 0) this.x = 0;
-        if (this.y < 0) this.y = 0;
-        if (this.x + this.size > this.mapSize.width) this.x = this.mapSize.width - this.size;
-        if (this.y + this.size > this.mapSize.height) this.y = this.mapSize.height - this.size;
+        return distance;
     }
 
     step(delta, root) {
-
+        const overlappingUnits = root.turnOrder.filter(unit => unit !== this && unit.x === this.x && unit.y === this.y);
+        if (overlappingUnits.length == 0) {
+            this.overlappingUnits = [];
+        } else if (overlappingUnits.length > 0) {
+            this.overlappingUnits = overlappingUnits;
+        }
 
         this.movePending = root.movePending;
         this.attackPending = root.attackPending;
         this.currentUnit = root.turnOrder[root.currentTurnIndex];
 
+        if (this.currentUnit === this) {
+            this.active = true;
+        } else {
+            this.active = false;
+        }
+
         const keysPressed = root.input.keysPressed;
 
         if (this.movePending && this.currentUnit === this) {
             if (this.isLoaded) {
-                this.vehicle.drive(keysPressed);
+                // this.vehicle.drive(keysPressed);
                 if (this.turnsLoaded == 0) {
                     document.getElementById('vehicle-controls-menu').style.display = 'none';
                 }
-
-            } 
+            }
             if (!this.isLoaded) {
                 if (this.unloaded) {
                     this.initialX = this.x;
                     this.initialY = this.y;
                     this.unloaded = false;
                 }
-                this.move(keysPressed);
+                if (keysPressed.length > 0) {
+                    this.move(keysPressed);
+                }
             }
 
             const x = this.x;
@@ -219,7 +249,8 @@ class Unit extends GameObject {
 
         if (this.attackPending && this.currentUnit === this && this.attackReady) {
             const click = root.input.canvasClicks[0];
-            if (click) {
+            const isClicking = root.input.isDragging || root.input.isClicking;
+            if (click && isClicking) {
                 this.handleClick(click, root);
             }
         } else if (this.attackPending && this.currentUnit === this && !this.attackReady) {
@@ -228,36 +259,127 @@ class Unit extends GameObject {
                 this.selectedAttack = this.attacks[0];
                 populateAttackMenu(this);
                 attackMenu.style.display = 'flex';
-                root.input.canvasClicks = [];
             }
         } else if (!this.attackPending && this.currentUnit === this) {
             this.selectedAttack = null;
             this.attackReady = false;
         }
+
+        // Move towards the target position if set
+        if (this.isMoving && this.targetPosition) {
+            this.moveTowards(this, this.targetPosition, this.speed);
+        }
+    }
+
+    highlightMoveRange(ctx) {
+        const tilesInRange = [];
+        const tileSize = this.mapSize.tileSize;
+
+        for (let dx = -this.maxDistance; dx <= this.maxDistance; dx += tileSize) {
+            for (let dy = -this.maxDistance; dy <= this.maxDistance; dy += tileSize) {
+                const targetX = this.initialX + dx;
+                const targetY = this.initialY + dy;
+                const distance = Math.sqrt(dx ** 2 + dy ** 2);
+
+                if (distance <= this.maxDistance &&
+                    targetX >= 0 && targetX < this.mapSize.width &&
+                    targetY >= 0 && targetY < this.mapSize.height) {
+                    tilesInRange.push({ x: targetX, y: targetY });
+                }
+            }
+        }
+
+        ctx.fillStyle = 'rgba(255, 238, 0, 0.5)'; // Semi-transparent green for move range
+        tilesInRange.forEach(tile => {
+            ctx.fillRect(tile.x, tile.y, tileSize, tileSize);
+        });
+    }
+
+    highlightAttackRange(ctx) {
+        const tilesInRange = [];
+        const tileSize = this.mapSize.tileSize;
+        const attackRange = this.selectedAttack ? this.selectedAttack.range : 0;
+
+        for (let dx = -attackRange; dx <= attackRange; dx += tileSize) {
+            for (let dy = -attackRange; dy <= attackRange; dy += tileSize) {
+                const targetX = this.x + dx;
+                const targetY = this.y + dy;
+                const distance = Math.sqrt(dx ** 2 + dy ** 2);
+
+                if (distance <= attackRange &&
+                    targetX >= 0 && targetX < this.mapSize.width &&
+                    targetY >= 0 && targetY < this.mapSize.height) {
+                    tilesInRange.push({ x: targetX, y: targetY });
+                }
+            }
+        }
+
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.7)'; // Semi-transparent red for attack range
+        tilesInRange.forEach(tile => {
+            ctx.fillRect(tile.x, tile.y, tileSize, tileSize);
+        });
     }
 
     draw(ctx) {
         if (this.isLoaded) return; // Skip drawing if loaded in a vehicle
 
-        ctx.fillStyle = getComputedStyle(document.querySelector(`.${this.colorClass}`)).backgroundColor;
-        ctx.fillRect(this.x, this.y, this.size, this.size);
-
-        // Draw move range indicator if move is pending and this is the current unit
         if (this.movePending && this.currentUnit === this) {
-            ctx.strokeStyle = 'rgba(0, 255, 0, 0.5)';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.arc(this.initialX + this.size / 2, this.initialY + this.size / 2, this.maxDistance, 0, Math.PI * 2);
-            ctx.stroke();
+            this.highlightMoveRange(ctx);
+        }
+        if (this.attackPending && this.currentUnit === this && this.attackReady) {
+            this.highlightAttackRange(ctx);
         }
 
-        // Draw attack range indicator if attack is pending and this is the current unit
-        if (this.attackPending && this.currentUnit === this && this.attackReady) {
-            ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.arc(this.x + this.size / 2, this.y + this.size / 2, this.selectedAttack.range, 0, Math.PI * 2);
-            ctx.stroke();
+        let offsetX = 0;
+        let offsetY = 0;
+
+        const numOverlappingUnits = this.overlappingUnits.length;
+        if (numOverlappingUnits == 1 && !this.active) {
+            offsetX = 16;
+            offsetY = 16;
+        }
+        if (numOverlappingUnits == 2 && !this.active) {
+            offsetX = 16;
+            offsetY = 16;
+        }
+        if (numOverlappingUnits == 3 && !this.active) {
+            offsetX = 16;
+            offsetY = 16;
+        }
+        if (numOverlappingUnits == 4 && !this.active) {
+            offsetX = 16;
+            offsetY = 16;
+        }
+
+
+        ctx.fillStyle = getComputedStyle(document.querySelector(`.${this.colorClass}`)).backgroundColor;
+        ctx.fillRect(this.x + offsetX, this.y + offsetY, this.size, this.size);
+
+        if (this.active) {
+            ctx.strokeStyle = 'yellow'; // Yellow border for active unit
+            ctx.lineWidth = 3;
+            ctx.strokeRect(this.x + offsetX, this.y + offsetY, this.size, this.size);
+        } else {
+            ctx.strokeStyle = 'black'; // Black border for inactive units
+            ctx.lineWidth = 1;
+            ctx.strokeRect(this.x + offsetX, this.y + offsetY, this.size, this.size);
+        }
+
+        // Draw dots to indicate the number of overlapping units
+        if (numOverlappingUnits > 0 && !this.active) {
+            ctx.fillStyle = 'white';
+            const dotPositions = [
+                { x: this.x + offsetX + 5, y: this.y + offsetY + 5 }, // Top-left
+                { x: this.x + offsetX + this.size - 5, y: this.y + offsetY + 5 }, // Top-right
+                { x: this.x + offsetX + 5, y: this.y + offsetY + this.size - 5 }, // Bottom-left
+                { x: this.x + offsetX + this.size - 5, y: this.y + offsetY + this.size - 5 }, // Bottom-right
+                { x: this.x + offsetX + this.size / 2, y: this.y + offsetY + this.size / 2 } // Center
+            ];
+            for (let i = 0; i < Math.min(numOverlappingUnits + 1, 5); i++) {
+                ctx.beginPath();
+                ctx.arc(dotPositions[i].x, dotPositions[i].y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
     }
 }

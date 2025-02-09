@@ -334,6 +334,22 @@ p {
 
     }
 
+    .tile-stats {
+        background-color: #666;
+        padding: 10px;
+        margin: 10px;
+        border-radius: 5px;
+        position: absolute;
+        bottom: 50px;
+        /* Adjust this value to control the spacing between unit stats and action bar */
+        width: 20%;
+        left: 25%;
+    }
+    .tile-stats p {
+        margin: 5px 0;
+        text-align: left;
+    }
+    
     .health-bar {
         margin: 10px;
         height: 20px;
