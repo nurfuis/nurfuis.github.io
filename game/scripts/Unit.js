@@ -203,8 +203,8 @@ class Unit extends GameObject {
         }
 
         if (this.isFalling) { // If the unit is falling, move it down by 64 pixels per second until it reaches the ground level or a walkable tile below it
-            if (root.input.keysPressed.includes('w')) { // If the up key is pressed, stop falling and move the unit up by 64 pixels
-                return; // Return early to prevent moving while jumping
+            if (root.input.keysPressed.includes('w')) { 
+                // 
             } 
             this.y += 8;
             return; // Return early to prevent other actions while falling
