@@ -156,30 +156,31 @@ class Input {
 
         this.canvas.addEventListener('mousemove', (event) => {
             if (!this.isDragging) return
-            const dx = event.clientX - this.dragStartX;
-            const dy = event.clientY - this.dragStartY;
 
-            let newX = this.camera.position.x + dx;
-            let newY = this.camera.position.y + dy;
+            // const dx = event.clientX - this.dragStartX;
+            // const dy = event.clientY - this.dragStartY;
+
+            // let newX = this.camera.position.x + dx;
+            // let newY = this.camera.position.y + dy;
 
 
             this.dragStartX = event.clientX;
             this.dragStartY = event.clientY;
 
             // Allow the camera to pan past the mapSize by half the screen width and height
-            const panExtensionX = this.canvas.width / 2;
-            const panExtensionY = this.canvas.height / 2;
+            // const panExtensionX = this.canvas.width / 2;
+            // const panExtensionY = this.canvas.height / 2;
 
-            const minX = this.canvas.width - this.mapSize.width - panExtensionX;
-            const minY = this.canvas.height - this.mapSize.height - panExtensionY;
-            const maxX = panExtensionX;
-            const maxY = panExtensionY;
+            // const minX = this.canvas.width - this.mapSize.width - panExtensionX;
+            // const minY = this.canvas.height - this.mapSize.height - panExtensionY;
+            // const maxX = panExtensionX;
+            // const maxY = panExtensionY;
 
-            newX = Math.max(minX, Math.min(newX, maxX));
-            newY = Math.max(minY, Math.min(newY, maxY));
+            // newX = Math.max(minX, Math.min(newX, maxX));
+            // newY = Math.max(minY, Math.min(newY, maxY));
 
-            this.camera.position.x = Math.floor(newX);
-            this.camera.position.y = Math.floor(newY);
+            // this.camera.position.x = Math.floor(newX);
+            // this.camera.position.y = Math.floor(newY);
         });
 
         this.canvas.addEventListener('mouseup', () => {
@@ -194,11 +195,7 @@ class Input {
             const x = event.clientX - this.camera.position.x;
             const y = event.clientY - this.camera.position.y;
             this.canvasClicks.unshift({ x, y });
-            this.clickProcessed = false;
         });
     }
-    get click() {
-        if (this.canvasClicks.length === 0) return null;
-        return this.canvasClicks.pop();
-    }
+
 }

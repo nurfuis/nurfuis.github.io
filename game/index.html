@@ -9,30 +9,10 @@
 </head>
 
 <body>
-    <div class="splash-screen" id="splash-screen">
-        <h1>nurfuis games</h1>
-        <p>Click anywhere to start</p>
-    </div>
-    <div class="menu" id="menu" style="display: none;">
-        <canvas id="menuCanvas"></canvas>
-        <h1>Disputed Territory</h1>
-        <button id="start-button" class="menu-item">Start Game</button>
-        <button id="options-button" class="menu-item">Options</button>
-        <button id="exit-button" class="menu-item">Exit</button>
-    </div>
-    <div class="options-menu" style="display: none;">
-        <h2>Options</h2>
-        <label for="map-style">Map Style:</label>
-        <select id="map-style">
-            <option value="perlin">Perlin Noise</option>
-            <option value="world">World Map</option>
-        </select>
-        <button id="back-button" class="menu-item">Back</button>
-    </div>
-    <div class="game-interface" style="display: none;">
+    <div class="game-interface">
         <canvas id="gameCanvas"></canvas>
         
-        <div class="legend">
+        <div class="legend hidden">
             <h2>Legend</h2>
             <div class="legend-item player-color">Player</div>
             <div class="legend-item opponent-color">Opponent</div>
@@ -56,7 +36,7 @@
             <p id="unit-level">Level: 1</p>
             <p id="unit-experience">Experience: 0</p>
         </div>
-        <div class="tile-stats">
+        <div class="tile-stats hidden">
             <h2 id="tile-stats-title">Tile</h2>
             <p id="tile-type">Type: Unknown</p>
             <p id="tile-location">Location: (0, 0)</p>
@@ -71,7 +51,7 @@
             <button id="menu-button">Menu</button>
             <button id="end-turn-button">End Turn</button>
         </div>
-        <div class="turn-order">
+        <div class="turn-order hidden">
             <h2>Turn Order</h2>
             <ul id="turn-order"></ul>
         </div>
@@ -84,7 +64,6 @@
     <div id="vehicle-controls-menu">
     </div>
 
-    <audio id="intro-audio" src="audio/intro.ogg" preload="auto"></audio>
     <script src="scripts/Vector2.js"></script>
     <script src="scripts/Events.js"></script>
     <script src="scripts/game-utils.js"></script>
@@ -95,7 +74,6 @@
     <script src="scripts/game-camera.js"></script>
     <script src="scripts/GameLoop.js"></script>
     <script src="scripts/main.js"></script>
-    <script src="scripts/menu-animation.js"></script>
 </body>
 
 </html>

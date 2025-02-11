@@ -25,6 +25,8 @@ const attackTypes = [
     }
 ];
 
+const groundLevel = 100; // Define the ground level for units
+
 class Unit extends GameObject {
     constructor(x, y, size, colorClass, speed, name, canvas, camera, mapSize, level = 1, experience = 0, health = 100) {
         super(canvas);
@@ -57,11 +59,17 @@ class Unit extends GameObject {
         this.remainingAttacks = this.maxAttacks; // Initialize remaining attacks
         this.perceptionRange = 128; // Range for detecting other units
         this.isMoving = false; // Add a flag to indicate if the unit is currently moving
+        this.isFalling = false; // Add a flag to indicate if the unit is falling
+        this.facingDirection = 'right'; // Add a property to track the facing direction
+
+        this.image = new Image();
+        this.image.src = 'images/guy.png';
+
     }
 
     canMoveTo(x, y) {
-        const distance = Math.sqrt((x - this.initialX) ** 2 + (y - this.initialY) ** 2);
-        return distance <= this.maxDistance;
+
+        return true; // Return true if the tile is walkable, false otherwise
     }
 
     getRandomAttacks(count) {
@@ -131,9 +139,11 @@ class Unit extends GameObject {
         }
         if (keysPressed.includes('a')) {
             dx -= this.mapSize.tileSize; // Move left one tile
+            this.facingDirection = 'left'; // Update facing direction to left
         }
         if (keysPressed.includes('d')) {
             dx += this.mapSize.tileSize; // Move right one tile
+            this.facingDirection = 'right'; // Update facing direction to right
         }
 
         const targetX = Math.floor(this.x + dx);
@@ -177,97 +187,46 @@ class Unit extends GameObject {
     }
 
     step(delta, root) {
-        const overlappingUnits = root.turnOrder.filter(unit => unit !== this && unit.x === this.x && unit.y === this.y);
-        if (overlappingUnits.length == 0) {
-            this.overlappingUnits = [];
-        } else if (overlappingUnits.length > 0) {
-            this.overlappingUnits = overlappingUnits;
+        if (this.delay > 0) { // If there is a delay, decrement it by the delta time    
+            this.delay -= delta; // Decrement the delay by the delta time
+            return; // Return early to prevent moving while changing direction
+        }
+        const tile = root.map.getTileAtCoordinates(this.x, this.y); // Get the tile the unit is currently on
+        const tileBelow = root.map.getTileAtCoordinates(this.x, this.y + 64) || { walkable: true }; // Check the tile below the unit
+
+        if (!tile.walkable && !tileBelow.walkable && !this.isMoving) { // If the tile below is not walkable and the unit is not moving and no keys are pressed, move the unit down by 64 pixels
+            this.isFalling = true; // Set the isFalling flag to true
         }
 
-        this.movePending = root.movePending;
-        this.attackPending = root.attackPending;
-        this.currentUnit = root.turnOrder[root.currentTurnIndex];
-
-        if (this.currentUnit === this) {
-            this.active = true;
-        } else {
-            this.active = false;
+        if (tileBelow.walkable || tile.walkable) { // If the tile below is walkable or the unit has reached the ground level, stop falling and set the isFalling flag to false
+            this.isFalling = false; // Set the isFalling flag to false
         }
 
-        const keysPressed = root.input.keysPressed;
-
-        if (this.movePending && this.currentUnit === this) {
-            if (this.isLoaded) {
-                // this.vehicle.drive(keysPressed);
-                if (this.turnsLoaded == 0) {
-                    document.getElementById('vehicle-controls-menu').style.display = 'none';
-                }
-            }
-            if (!this.isLoaded) {
-                if (this.unloaded) {
-                    this.initialX = this.x;
-                    this.initialY = this.y;
-                    this.unloaded = false;
-                }
-                if (keysPressed.length > 0) {
-                    this.move(keysPressed);
-                }
-            }
-
-            const x = this.x;
-            const y = this.y;
-
-            let vehicleInRange = false;
-
-            // Check if a vehicle is nearby and show the load menu
-            if (!this.isLoaded) {
-                for (const obj of root.vehicles) {
-                    if (obj instanceof Vehicle) {
-                        const vehicleDistance = Math.sqrt((x - obj.x) ** 2 + (y - obj.y) ** 2);
-                        const unitDistance = Math.sqrt((this.x - obj.x) ** 2 + (this.y - obj.y) ** 2);
-                        if (vehicleDistance <= obj.loadRange && unitDistance <= obj.loadRange) {
-                            if (!this.loadReady) {
-                                console.log('Unit is ready to load');
-                                this.loadReady = true;
-                                showLoadMenu(this, obj);
-
-                            }
-                            vehicleInRange = true;
-                            break; // Exit the loop after showing the load menu
-                        }
-                    }
-                }
-            }
-
-            // Hide the load menu if no vehicle is in range
-            if (!vehicleInRange) {
-                const loadMenu = document.getElementById('load-menu');
-                loadMenu.style.display = 'none';
-                this.loadReady = false;
-            }
+        if (this.isFalling) { // If the unit is falling, move it down by 64 pixels per second until it reaches the ground level or a walkable tile below it
+            if (root.input.keysPressed.includes('w')) { // If the up key is pressed, stop falling and move the unit up by 64 pixels
+                return; // Return early to prevent moving while jumping
+            } 
+            this.y += 8;
+            return; // Return early to prevent other actions while falling
         }
 
-        if (this.attackPending && this.currentUnit === this && this.attackReady) {
-            const click = root.input.canvasClicks[0];
-            const isClicking = root.input.isDragging || root.input.isClicking;
-            if (click && isClicking) {
-                this.handleClick(click, root);
+
+        if (root.input.keysPressed.length > 0 && !this.isMoving) {
+            if (this.facingDirection === 'left' && root.input.keysPressed.includes('d')) { // If the unit is facing left and the right key is pressed, update the facing direction to right
+                this.facingDirection = 'right'; // Update facing direction to right
+                this.delay = 250;
+                return; // Return early to prevent moving while changing direction
+            } else if (this.facingDirection === 'right' && root.input.keysPressed.includes('a')) { // If the unit is facing right and the left key is pressed, update the facing direction to left   
+                this.facingDirection = 'left'; // Update facing direction to left
+                this.delay = 250;
+                return; // Return early to prevent moving while changing direction
             }
-        } else if (this.attackPending && this.currentUnit === this && !this.attackReady) {
-            const attackMenu = document.getElementById('attack-menu');
-            if (!this.selectedAttack) {
-                this.selectedAttack = this.attacks[0];
-                populateAttackMenu(this);
-                attackMenu.style.display = 'flex';
-            }
-        } else if (!this.attackPending && this.currentUnit === this) {
-            this.selectedAttack = null;
-            this.attackReady = false;
+            const keysPressed = root.input.keysPressed;
+            this.move(keysPressed); // Move the unit based on input keys
         }
 
-        // Move towards the target position if set
         if (this.isMoving && this.targetPosition) {
-            this.moveTowards(this, this.targetPosition, this.speed);
+            const distance = this.moveTowards(this, this.targetPosition, this.speed);
         }
     }
 
@@ -321,65 +280,20 @@ class Unit extends GameObject {
     }
 
     draw(ctx) {
-        if (this.isLoaded) return; // Skip drawing if loaded in a vehicle
+        let offsetX = -32;
+        let offsetY = -18; // Adjust these values to center the image on the unit's position
 
-        if (this.movePending && this.currentUnit === this) {
-            this.highlightMoveRange(ctx);
-        }
-        if (this.attackPending && this.currentUnit === this && this.attackReady) {
-            this.highlightAttackRange(ctx);
-        }
+        const scaleFactor = 2; // Adjust this value to scale the image
 
-        let offsetX = 0;
-        let offsetY = 0;
+        ctx.save(); // Save the current state of the canvas
 
-        const numOverlappingUnits = this.overlappingUnits.length;
-        if (numOverlappingUnits == 1 && !this.active) {
-            offsetX = 16;
-            offsetY = 16;
-        }
-        if (numOverlappingUnits == 2 && !this.active) {
-            offsetX = 16;
-            offsetY = 16;
-        }
-        if (numOverlappingUnits == 3 && !this.active) {
-            offsetX = 16;
-            offsetY = 16;
-        }
-        if (numOverlappingUnits == 4 && !this.active) {
-            offsetX = 16;
-            offsetY = 16;
-        }
-
-
-        ctx.fillStyle = getComputedStyle(document.querySelector(`.${this.colorClass}`)).backgroundColor;
-        ctx.fillRect(this.x + offsetX, this.y + offsetY, this.size, this.size);
-
-        if (this.active) {
-            ctx.strokeStyle = 'yellow'; // Yellow border for active unit
-            ctx.lineWidth = 3;
-            ctx.strokeRect(this.x + offsetX, this.y + offsetY, this.size, this.size);
+        if (this.facingDirection === 'left') {
+            ctx.scale(-1, 1); // Flip the image horizontally
+            ctx.drawImage(this.image, -this.x - offsetX - this.size * scaleFactor, this.y + offsetY, this.size * scaleFactor, this.size * scaleFactor);
         } else {
-            ctx.strokeStyle = 'black'; // Black border for inactive units
-            ctx.lineWidth = 1;
-            ctx.strokeRect(this.x + offsetX, this.y + offsetY, this.size, this.size);
+            ctx.drawImage(this.image, this.x + offsetX, this.y + offsetY, this.size * scaleFactor, this.size * scaleFactor);
         }
 
-        // Draw dots to indicate the number of overlapping units
-        if (numOverlappingUnits > 0 && !this.active) {
-            ctx.fillStyle = 'white';
-            const dotPositions = [
-                { x: this.x + offsetX + 5, y: this.y + offsetY + 5 }, // Top-left
-                { x: this.x + offsetX + this.size - 5, y: this.y + offsetY + 5 }, // Top-right
-                { x: this.x + offsetX + 5, y: this.y + offsetY + this.size - 5 }, // Bottom-left
-                { x: this.x + offsetX + this.size - 5, y: this.y + offsetY + this.size - 5 }, // Bottom-right
-                { x: this.x + offsetX + this.size / 2, y: this.y + offsetY + this.size / 2 } // Center
-            ];
-            for (let i = 0; i < Math.min(numOverlappingUnits + 1, 5); i++) {
-                ctx.beginPath();
-                ctx.arc(dotPositions[i].x, dotPositions[i].y, 3, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
+        ctx.restore(); // Restore the canvas state
     }
 }
