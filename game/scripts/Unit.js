@@ -216,6 +216,11 @@ class Unit extends GameObject {
         }
 
         if (tileBelow.walkable || tile.walkable) { // If the tile below is walkable or the unit has reached the ground level, stop falling and set the isFalling flag to false
+            if (this.isFalling) { // If the unit is falling, move it down by 64 pixels until it reaches the ground level or a walkable tile below it
+                this.isFalling = false; // Set the isFalling flag to false
+                console.log("Unit has reached the ground level or a walkable tile below it"); // Log a message to the console
+                events.emit("CAMERA_SHAKE", { position: { x: this.x, y: this.y }, destinationPosition: { x: this.x, y: this.y - 32 } }); // Emit the camera shake event to the server
+            }
             this.isFalling = false; // Set the isFalling flag to false
         }
 

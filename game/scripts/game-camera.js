@@ -13,34 +13,34 @@ class Camera extends GameObject {
 
         this.previousPosition = null;
         this.homePosition = new Vector2(0, 0);
-    
+
         this.movementSpeed = 3;
         this.isPanning = false;
-    
+
         this.screenShift = "ready"; // ready |  complete | charging
         this.shiftTiming = 0; // frames
         this.shiftDistance = 64; // pixels
         this.shiftCounter = this.shiftDistance;
-    
+
         const tileWidth = mapSize.tileSize; // Adjust tile width as needed
         this.halfTile = tileWidth / 2;
         this.halfWidth = -this.halfTile + canvas.width / 2;
         this.halfHeight = -this.halfTile + canvas.height / 2;
-    
-        events.on("SHAKE_CAMERA", this, (event) => {
-          this.hasShake = true;
-          const shakeX = event.position.x - event.destinationPosition.x;
-          const shakeY = event.position.y - event.destinationPosition.y;
-          const magnitude = 0.25; // TODO set by something else
-          this.shakeCamera(shakeX, shakeY, magnitude);
+
+        events.on("CAMERA_SHAKE", this, (event) => {
+            this.hasShake = true;
+            const shakeX = event.position.x - event.destinationPosition.x;
+            const shakeY = event.position.y - event.destinationPosition.y;
+            const magnitude = 0.25; // TODO set by something else
+            this.shakeCamera(shakeX, shakeY, magnitude);
         });
-    
+
         events.on("PLAYER_POSITION", this, (position) => {
-          this.shiftTiming = 0;
-          if (position.cause === "teleport") {
-            this.isPanning = false;
-          }
-          this.updateView(position);
+            this.shiftTiming = 0;
+            if (position.cause === "teleport") {
+                this.isPanning = false;
+            }
+            this.updateView(position);
         });
 
     }
@@ -152,7 +152,6 @@ class Camera extends GameObject {
         // Calculate new positions with shake applied, but don't update yet
         const newPositionX = this.position.x + x * magnitude;
         const newPositionY = this.position.y + y * magnitude;
-
         // Check if any value is valid
         if (isNaN(x) || isNaN(y) || isNaN(magnitude)) {
             // No shake applied if any value is invalid
@@ -160,11 +159,11 @@ class Camera extends GameObject {
         } else if (x === 0 && y === 0) {
             // No shake applied if both x and y are 0
             return;
+        } else {
+            // Apply the shake only if at least one value is valid
+            this.position.x = newPositionX;
+            this.position.y = newPositionY;
         }
-
-        // Apply the shake only if at least one value is valid
-        this.position.x = newPositionX;
-        this.position.y = newPositionY;
     }
     updateView(position) {
         const transformX = Math.round(-position.x + this.halfWidth);
@@ -203,7 +202,7 @@ class Camera extends GameObject {
         if (this.hasShake) {
             this.hasShake = false;
             this.shakeCamera();
-          }
+        }
         const keysPressed = root.input.keysPressed;
 
         if (!keysPressed) return;
