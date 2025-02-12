@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const mapSize = {
-        width: 800, // Reduced map width
-        height: 800, // Reduced map height
+        width: 500, // Reduced map width
+        height: 500, // Reduced map height
         tileSize: 64
     };
 
