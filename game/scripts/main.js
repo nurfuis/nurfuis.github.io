@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const mapSize = {
-        width: 400, // Reduced map width
-        height: 400, // Reduced map height
+        width: 12800, // Reduced map width
+        height: 600, // Reduced map height
         tileSize: 64
     };
 
@@ -35,8 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
     game.map.addChild(game.playerTeam);
     game.map.addChild(game.opponentTeam);
 
-    const player = new Unit(64, 0, 64, 'player-color', 4, 'Player', canvas, camera, mapSize);
-        game.playerTeam.addChild(player);
+    const player = new Unit(0, 0, 64, 'player-color', 4, 'Player', canvas, camera, mapSize);
+    game.player = player;
+    game.playerTeam.addChild(player);
 
 
     game.addChild(map);
@@ -53,9 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const draw = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.save();
-
         game.camera.follow(ctx, 0, 0);
-
         game.draw(ctx, 0, 0);
 
         ctx.restore();

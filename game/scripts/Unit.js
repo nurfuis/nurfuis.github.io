@@ -61,7 +61,7 @@ class Unit extends GameObject {
         this.isMoving = false; // Add a flag to indicate if the unit is currently moving
         this.isFalling = false; // Add a flag to indicate if the unit is falling
         this.facingDirection = 'right'; // Add a property to track the facing direction
-
+        this.screenNumber = 0; // Initialize screen number to 0
         this.image = new Image();
         this.image.src = 'images/guy.png';
 
@@ -124,7 +124,18 @@ class Unit extends GameObject {
             return;
         }
     }
-
+    tryEmitPosition() {
+        if (this.lastX == this.x && this.lastY == this.y) {
+          return;
+        }
+        this.lastX = this.x;
+        this.lastY = this.y;
+    
+        events.emit("PLAYER_POSITION", {
+          x: this.x,
+          y: this.y,
+        });
+      }
     move(keysPressed) {
         if (this.isMoving) return; // Prevent input or actions while moving
 
@@ -152,10 +163,11 @@ class Unit extends GameObject {
         const canMove = this.canMoveTo(targetX, targetY);
         // Ensure the target position is within the map boundaries and walkable
 
-        if (targetX >= 0 && targetX < this.mapSize.width && targetY >= 0 && targetY < this.mapSize.height && canMove) {
+        if (targetX >= 0 && targetY >= 0 && targetY < this.mapSize.height) {
             this.targetPosition = { x: targetX, y: targetY };
             this.isMoving = true;
-        }
+        } 
+
     }
     moveTowards(unit, destinationPosition, speed) {
         let distanceToTravelX = destinationPosition.x - unit.x;
@@ -176,9 +188,11 @@ class Unit extends GameObject {
             const newY = unit.y + normalizedY * speed;
 
             if (newX > 0) {
+                unit.lastX = unit.x; // Store the last position before moving
                 unit.x = newX;
             }
             if (newY > 0) {
+                unit.lastY = unit.y; // Store the last position before moving
                 unit.y = newY;
             }
 
@@ -191,7 +205,10 @@ class Unit extends GameObject {
             this.delay -= delta; // Decrement the delay by the delta time
             return; // Return early to prevent moving while changing direction
         }
+        this.tryEmitPosition(); // Emit the position of the unit to the server
         const tile = root.map.getTileAtCoordinates(this.x, this.y); // Get the tile the unit is currently on
+        if (!tile) return; // If the tile is not found, return early to prevent errors
+
         const tileBelow = root.map.getTileAtCoordinates(this.x, this.y + 64) || { walkable: true }; // Check the tile below the unit
 
         if (!tile.walkable && !tileBelow.walkable && !this.isMoving) { // If the tile below is not walkable and the unit is not moving and no keys are pressed, move the unit down by 64 pixels
