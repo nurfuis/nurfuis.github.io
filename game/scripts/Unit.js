@@ -61,15 +61,21 @@ class Unit extends GameObject {
         this.isMoving = false; // Add a flag to indicate if the unit is currently moving
         this.isFalling = false; // Add a flag to indicate if the unit is falling
         this.facingDirection = 'right'; // Add a property to track the facing direction
-        this.screenNumber = 0; // Initialize screen number to 0
         this.image = new Image();
         this.image.src = 'images/guy.png';
-
+        this.fallingDamage = 0; // Initialize falling damage to 0
+        const oxygen = 800;
+        this.oxygen = oxygen; // Initialize oxygen to 1000
+        this.maxOxygen = oxygen; // Set the maximum oxygen to 1000
     }
 
     canMoveTo(x, y) {
+        const map = this.parent.parent; // Access the map object through the parent chain
+        const tile = map.getTileAtCoordinates(x, y); // Get the tile at the target position
+        if (!tile) return false; // If the tile is not found, return false to prevent errors
 
-        return true; // Return true if the tile is walkable, false otherwise
+        return tile; // Return true if the tile is passable, false otherwise
+
     }
 
     getRandomAttacks(count) {
@@ -126,16 +132,16 @@ class Unit extends GameObject {
     }
     tryEmitPosition() {
         if (this.lastX == this.x && this.lastY == this.y) {
-          return;
+            return;
         }
         this.lastX = this.x;
         this.lastY = this.y;
-    
+
         events.emit("PLAYER_POSITION", {
-          x: this.x,
-          y: this.y,
+            x: this.x,
+            y: this.y,
         });
-      }
+    }
     move(keysPressed) {
         if (this.isMoving) return; // Prevent input or actions while moving
 
@@ -160,13 +166,25 @@ class Unit extends GameObject {
         const targetX = Math.floor(this.x + dx);
         const targetY = Math.floor(this.y + dy);
 
-        const canMove = this.canMoveTo(targetX, targetY);
-        // Ensure the target position is within the map boundaries and walkable
+        const target = this.canMoveTo(targetX, targetY);
+        const canMove = target.passable; // Check if the target tile is passable
+        // Ensure the target position is within the map boundaries and solid
 
-        if (targetX >= 0 && targetY >= 0 && targetY < this.mapSize.height) {
+        if (targetX >= 0 && targetY >= 0 && targetY < this.mapSize.height && canMove) {
             this.targetPosition = { x: targetX, y: targetY };
             this.isMoving = true;
-        } 
+        } else if (!canMove) {
+            if (target.durability > 0) { // If the durability of the tile below the unit is greater than 0, decrease the durability of the tile below the unit by 10
+                const randomNumber = Math.random(); // Generate a random number between 0 and 1
+                target.durability -= randomNumber * 2; // Decrease the durability of the tile below the unit by a random number between 0 and 10
+            } else if (target.durability <= 0) { // If the durability of the tile below the unit is less than or equal to 0, remove the tile below the unit from the map and move the unit down by 64 pixels until it reaches the ground level or a solid tile below it    
+                target.type = 'air';
+                target.color = getComputedStyle(document.querySelector('.light-grey')).backgroundColor;
+                target.solid = false;
+                target.passable = true;
+                target.durability = 0; // Set the durability of the tile below the unit to 0
+            }
+        }
 
     }
     moveTowards(unit, destinationPosition, speed) {
@@ -201,34 +219,99 @@ class Unit extends GameObject {
     }
 
     step(delta, root) {
+        this.tryEmitPosition(); // Emit the position of the unit to the server
         if (this.delay > 0) { // If there is a delay, decrement it by the delta time    
             this.delay -= delta; // Decrement the delay by the delta time
             return; // Return early to prevent moving while changing direction
         }
-        this.tryEmitPosition(); // Emit the position of the unit to the server
         const tile = root.map.getTileAtCoordinates(this.x, this.y); // Get the tile the unit is currently on
         if (!tile) return; // If the tile is not found, return early to prevent errors
 
-        const tileBelow = root.map.getTileAtCoordinates(this.x, this.y + 64) || { walkable: true }; // Check the tile below the unit
+        const tileBelow = root.map.getTileAtCoordinates(this.x, this.y + 64) || { solid: true }; // Check the tile below the unit
 
-        if (!tile.walkable && !tileBelow.walkable && !this.isMoving) { // If the tile below is not walkable and the unit is not moving and no keys are pressed, move the unit down by 64 pixels
-            this.isFalling = true; // Set the isFalling flag to true
+        if (tile.type === 'water') { // If the tile the unit is on is water, move the unit down by 64 pixels until it reaches the ground level or a solid tile below it 
+            takeBreath(this, 1); // Deal damage to the unit based on the falling damage value
+            if (this.oxygen <= 0) { // If the oxygen is less than or equal to 0, deal damage to the unit based on the falling damage value
+                takeDamage(this, 0.35); // Deal damage to the unit based on the falling damage value
+            }
         }
 
-        if (tileBelow.walkable || tile.walkable) { // If the tile below is walkable or the unit has reached the ground level, stop falling and set the isFalling flag to false
-            if (this.isFalling) { // If the unit is falling, move it down by 64 pixels until it reaches the ground level or a walkable tile below it
-                this.isFalling = false; // Set the isFalling flag to false
-                console.log("Unit has reached the ground level or a walkable tile below it"); // Log a message to the console
+        if (tile.type === 'air') {
+            if (this.oxygen < this.maxOxygen) { // If the oxygen is less than the maximum oxygen, increment it by 1 per second until it reaches the maximum oxygen value
+                this.oxygen += 1; // Increment the oxygen by 1 per second until it reaches the maximum oxygen value
+                updateOxygenBar(this.oxygen, this.maxOxygen); // Update the oxygen bar to reflect the current oxygen value
+            }
+
+            if (this.oxygen >= this.maxOxygen) { // If the oxygen is greater than or equal to the maximum oxygen, set it to the maximum oxygen value and stop incrementing it by 1 per second until it reaches the maximum oxygen value
+                this.oxygen = this.maxOxygen; // Set the oxygen to the maximum oxygen value and stop incrementing it by 1 per second until it reaches the maximum oxygen value
+            }
+
+            if (this.health < this.maxHealth && this.oxygen >= this.maxOxygen / 2 && root.input.keysPressed == 0) { // If the health is less than the maximum health, increment it by 1 per second until it reaches the maximum health value
+                heal(this, 0.02); // Increment the health by 1 per second until it reaches the maximum health value
+            }
+        }
+
+
+        if (!tile.solid && !tileBelow.solid && !this.isMoving) { // If the tile below is not solid and the unit is not moving and no keys are pressed, move the unit down by 64 pixels
+            if (!tile.climbable) { // If the tile below is not climbable, move the unit down by 64 pixels until it reaches the ground level or a solid tile below it
+                this.isFalling = true; // Set the isFalling flag to true
+            } else if (!root.input.keysPressed.includes('w') && tile.climbable) { // If the tile below is climbable, move the unit up by 64 pixels until it reaches the ground level or a solid tile below it
+                if (this.hangtime > 0) { // If the hangtime is greater than 0, decrement it by the delta time
+                    this.hangtime -= delta; // Decrement the hangtime by the delta time
+                } else { // If the hangtime is less than or equal to 0, move the unit down by 64 pixels until it reaches the ground level or a solid tile below it
+                    this.isFalling = true; // Set the isFalling flag to true
+                }
+            }
+        }
+
+        if (tileBelow.solid) { // If the tile below is solid or the unit has reached the ground level, stop falling and set the isFalling flag to false
+            if (this.isFalling) { // If the unit is falling, move it down by 64 pixels until it reaches the ground level or a solid tile below it
+                console.log("Unit has reached the ground level or a solid tile below it"); // Log a message to the console
                 events.emit("CAMERA_SHAKE", { position: { x: this.x, y: this.y }, destinationPosition: { x: this.x, y: this.y - 32 } }); // Emit the camera shake event to the server
+                if (tileBelow.durability > 0) { // If the durability of the tile below the unit is greater than 0, decrease the durability of the tile below the unit by 10
+                    tileBelow.durability -= 35;
+                    if (tileBelow.type === 'earth') { // If the tile below the unit is earth, deal damage to the unit based on the falling damage value
+                        this.fallingDamage = 0; 
+                    }
+                    if (this.fallingDamage > 3) {
+                        takeDamage(this, this.fallingDamage); // Deal damage to the unit based on the falling damage value
+                    };
+                    this.fallingDamage = 0; // Reset the falling damage value to 0 after dealing damage to the unit
+                
+                } else if (tileBelow.durability <= 0) { // If the durability of the tile below the unit is less than or equal to 0, remove the tile below the unit from the map and move the unit down by 64 pixels until it reaches the ground level or a solid tile below it    
+                    tileBelow.type = 'air';
+                    tileBelow.color = getComputedStyle(document.querySelector('.light-grey')).backgroundColor;
+                    tileBelow.solid = false;
+                    tileBelow.passable = true;
+                    tileBelow.durability = 0; // Set the durability of the tile below the unit to 0
+                    this.fallingDamage = 0;
+                }
+                this.isFalling = false; // Set the isFalling flag to false
+
+
             }
             this.isFalling = false; // Set the isFalling flag to false
         }
 
-        if (this.isFalling) { // If the unit is falling, move it down by 64 pixels per second until it reaches the ground level or a walkable tile below it
-            if (root.input.keysPressed.includes('w')) { 
-                // 
-            } 
+        if (this.isFalling) { // If the unit is falling, move it down by 64 pixels per second until it reaches the ground level or a solid tile below it
+            if (root.input.keysPressed.includes('w')) {
+                if (tile.climbable) { // If the tile below is climbable, move the unit up by 64 pixels until it reaches the ground level or a solid tile below it
+                    this.hangtime = 350; // Reset the hangtime to 0 when the unit reaches the ground level or a solid tile below it
+                    this.isFalling = false; // Set the isFalling flag to false
+                    this.fallingDamage = 0; // Reset the falling damage value to 0 after dealing damage to the unit
+                }
+            }
+            if (tile.climbable) { // If the tile below is climbable, move the unit up by 64 pixels until it reaches the ground level or a solid tile below it
+                if (root.input.keysPressed.includes('s')) {
+                    this.y += 8; // Move the unit up by 64 pixels per second until it reaches the ground level or a solid tile below it
+                    return; // Return early to prevent other actions while falling
+                }
+                this.y += 1; // Move the unit up by 64 pixels per second until it reaches the ground level or a solid tile below it
+                return; // Return early to prevent other actions while falling
+            }
+
             this.y += 8;
+            this.fallingDamage += 0.25; // Increase the falling damage by 1 per second until the unit reaches the ground level or a solid tile below it
             return; // Return early to prevent other actions while falling
         }
 

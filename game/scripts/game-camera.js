@@ -200,8 +200,14 @@ class Camera extends GameObject {
     step(delta, root) {
         this.shiftCamera();
         if (this.hasShake) {
-            this.hasShake = false;
-            this.shakeCamera();
+            if (this.shakeCooldown > 0) {
+                this.shakeCooldown -= 1; // Decrease the cooldown by 1 frame per step
+            }
+            if (this.shakeCooldown === 0) {
+                this.hasShake = false;
+                this.shakeCamera();
+                this.shakeCooldown = 40; // Set the cooldown duration in frames (e.g., 20 frames = 0.33 seconds at 60 FPS)
+            }
         }
         const keysPressed = root.input.keysPressed;
 

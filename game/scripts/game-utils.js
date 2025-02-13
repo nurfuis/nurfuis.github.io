@@ -60,8 +60,8 @@ for (let i = 0; i < 256; i++) {
 function updateHealthBar(unit) {
     const healthBar = document.getElementById('health');
     const healthPercentage = (unit.health / unit.maxHealth) * 100;
-    healthBar.style.width = healthPercentage + '%';
-    healthBar.innerText = healthPercentage + '%';
+    healthBar.style.width = Math.floor(healthPercentage) + '%';
+    healthBar.innerText = Math.floor(healthPercentage) + '%';
 }
 
 function updateUnitStats(unit) {
@@ -81,7 +81,24 @@ function takeDamage(unit, damage) {
         // Implement unit death logic here
         console.log(unit.name, 'has died!');
     }
-    console.log(unit.name, 'took', damage, 'damage. Health:', unit.health);
+    updateHealthBar(unit);
+    console.log(unit.name, 'took', Math.floor(damage), 'damage. Health:', unit.health);
+}
+
+ function updateOxygenBar(oxygen, maxOxygen) {
+    const oxygenBar = document.getElementById('oxygen');
+    const oxygenPercentage = (oxygen / maxOxygen) * 100;
+    oxygenBar.style.width = Math.floor(oxygenPercentage) + '%';
+    oxygenBar.innerText = Math.floor(oxygenPercentage) + '%';
+}
+
+function takeBreath(unit, oxygen) {
+    unit.oxygen -= oxygen;
+    if (unit.oxygen <= 0) {
+        unit.oxygen = 0;
+        console.log(unit.name, 'has died!');
+    }
+    updateOxygenBar(unit.oxygen, unit.maxOxygen);
 }
 
 function heal(unit, amount) {

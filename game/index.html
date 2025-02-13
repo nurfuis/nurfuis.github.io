@@ -36,23 +36,25 @@
     <div class="game-interface">
         <canvas id="gameCanvas"></canvas>
 
-        <div class="legend hidden">
+        <div class="legend">
             <h2>Legend</h2>
             <div class="legend-item player-color">Player</div>
-            <div class="legend-item opponent-color">Opponent</div>
-            <div class="legend-item neutral-color">Neutral</div>
-            <div class="legend-item fort-color">Fort</div>
-            <div class="legend-item vehicle-color">Vehicle</div>
-            <div class="legend-item dark-grey">Dark Grey Tile</div>
-            <div class="legend-item grey">Grey Tile</div>
-            <div class="legend-item light-grey">Light Grey Tile</div>
-            <div class="legend-item brown">Brown Tile</div>
+            <div class="legend-item dark-grey">Water</div>
+            <div class="legend-item grey">Wood</div>
+            <div class="legend-item light-grey">Air</div>
+            <div class="legend-item brown">Sap</div>
         </div>
 
-        <div class="health-bar hidden">
-            <h2>Combat Readiness</h2>
+        <div class="health-bar">
+            <h2>Heart</h2>
             <div class="health-container">
                 <div id="health" class="health"></div>
+            </div>
+        </div>
+        <div class="oxygen-bar">
+            <h2>Lungs</h2>
+            <div class="oxygen-container">
+                <div id="oxygen" class="oxygen"></div>
             </div>
         </div>
         <div class="unit-stats hidden">
@@ -89,13 +91,13 @@
     </div>
 
     <!-- Overlay div with instructions -->
-    <div class="overlay" id="instruction-overlay">
+    <!-- <div class="overlay hidden" id="instruction-overlay">
         <h2>Welcome to Tactics</h2>
         <p>Use WASD to move your character.</p>
-        <p>Use E and the arrow keys to select tiles.</p>
-        <p>Use Q to interact with tiles (lay dirt or remove selected) </p>
+        <p>Use E and the arrow keys to targetl</p>
+        <p>Use Q to place sticky sap.</p>
         <button onclick="document.getElementById('instruction-overlay').style.display='none'">Got it!</button>
-    </div>
+    </div> -->
 
     <script src="scripts/Vector2.js"></script>
     <script src="scripts/Events.js"></script>

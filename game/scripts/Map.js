@@ -25,63 +25,68 @@ class Map extends GameObject {
     }
 
     step(delta, root) {
-        const editRange = this.tileSize * 2;
-
         const input = root.input;
-        const x = input.mouse.x;
-        const y = input.mouse.y;
-        this.mousePosition = { x, y };
+
         const keysPressed = input.keysPressed;
+        
         if (this.delay > 0) {
             this.delay -= delta; // Decrease the delay by the delta time
             return; // Exit the function if the delay is still active
         }
 
-        if (this.editMode && keysPressed.length > 0 && !!this.selectedTile) {
-            this.delay = 250; // Delay in milliseconds (e.g., 250ms = 0.25 seconds)
+        if (this.editMode) {
+            const editRange = this.tileSize * 2;
 
             // Handle arrow key presses
-            let newX = this.selectedTile.x;
-            let newY = this.selectedTile.y;
+            if (keysPressed.length > 0 && !!this.selectedTile) {
+                this.delay = 250; // Delay in milliseconds (e.g., 250ms = 0.25 seconds)
+                let newX = this.selectedTile.x;
+                let newY = this.selectedTile.y;
 
-            if (input.keysPressed.includes('ArrowUp')) {
-                newY -= this.tileSize;
-            } else if (input.keysPressed.includes('ArrowDown')) {
-                newY += this.tileSize;
-            } else if (input.keysPressed.includes('ArrowLeft')) {
-                newX -= this.tileSize;
-            } else if (input.keysPressed.includes('ArrowRight')) {
-                newX += this.tileSize;
-            }
-
-            const distance = Math.sqrt(
-                (newX - this.playerPosition.x) ** 2 +
-                (newY - this.playerPosition.y) ** 2
-            );
-
-            // Check if the new position is within the edit range and map boundaries
-            if (distance <= editRange &&
-                newX >= 0 && newX < this.mapSize.width &&
-                newY >= 0 && newY < this.mapSize.height) {
-                this.selectedTile = this.getTileAtCoordinates(newX, newY);
-            } else {
-                return; // Return early if the updated position is outside the edit range or map boundaries
-            }
-
-
-            // Handle 'q' key press to change the selected tile to air
-            if (input.keysPressed.includes('q') && this.selectedTile) {
-                if (distance <= editRange) {
-                    if (this.selectedTile.type === 'air') {
-                        this.selectedTile.type = 'earth';
-                        this.selectedTile.color = getComputedStyle(document.querySelector('.brown')).backgroundColor;
-                        this.selectedTile.walkable = true;
-                    } else {
-                        this.selectedTile.type = 'air';
-                        this.selectedTile.color = getComputedStyle(document.querySelector('.light-grey')).backgroundColor;
-                        this.selectedTile.walkable = false;
-                    }
+                if (input.keysPressed.includes('ArrowUp')) {
+                    newY -= this.tileSize;
+                } else if (input.keysPressed.includes('ArrowDown')) {
+                    newY += this.tileSize;
+                } else if (input.keysPressed.includes('ArrowLeft')) {
+                    newX -= this.tileSize;
+                } else if (input.keysPressed.includes('ArrowRight')) {
+                    newX += this.tileSize;
                 }
+
+                const distance = Math.sqrt(
+                    (newX - this.playerPosition.x) ** 2 +
+                    (newY - this.playerPosition.y) ** 2
+                );
+
+                // Check if the new position is within the edit range and map boundaries
+                if (distance <= editRange &&
+                    newX >= 0 && newX < this.mapSize.width &&
+                    newY >= 0 && newY < this.mapSize.height) {
+                    this.useArrowKeys = true;
+                    this.selectedTile = this.getTileAtCoordinates(newX, newY);
+                } else {
+                    this.useArrowKeys = false;
+                    return; // Return early if the updated position is outside the edit range or map boundaries
+                }
+            }
+
+
+
+            // Handle 'q' key press to change the selected tile to air or earth
+            if (input.keysPressed.includes('q') && this.selectedTile) {
+                const distance = Math.sqrt(
+                    (this.selectedTile.x - this.playerPosition.x) ** 2 +
+                    (this.selectedTile.y - this.playerPosition.y) ** 2
+                );
+
+                if (distance <= editRange) {
+                    this.selectedTile.type = 'earth';
+                    this.selectedTile.color = getComputedStyle(document.querySelector('.brown')).backgroundColor;
+                    this.selectedTile.solid = true;
+                    this.selectedTile.passable = true; // Earth is not passable
+                    this.selectedTile.durability = 200; // Earth has durability
+                }
+
             }
         }
     }
@@ -100,30 +105,37 @@ class Map extends GameObject {
             for (let x = 0; x < cols; x++) {
                 const noiseValue = perlin(x / 10, y / 10);
                 let colorClass;
-                let walkable = false;
+                let solid = false;
                 let type = 'grass';
+                let passable = true;
+                let durability = 100;
+                let climbable = false; // Default to not climbable
 
                 if (y > rows - 2) {
                     colorClass = 'brown'; // Brown
                     type = 'hill';
-                    walkable = true;
+                    solid = true;
+                    passable = false; // Hills are not passable
                 } else if (noiseValue < -0.2) {
                     colorClass = 'dark-grey'; // Dark grey
                     type = 'water';
-                    walkable = true;
+                    solid = false;
+                    climbable = true;
                 } else if (noiseValue < 0) {
                     colorClass = 'grey'; // Grey
-                    type = 'grass';
-                    walkable = true;
+                    type = 'wood';
+                    solid = true;
+                    passable = false;
                 } else {
                     colorClass = 'light-grey'; // Light grey
                     type = 'air';
+                    durability = -2; // Air has no durability
                 }
 
                 const color = getComputedStyle(document.querySelector(`.${colorClass}`)).backgroundColor;
                 const drawX = x * this.tileSize;
                 const drawY = y * this.tileSize;
-                tiles.push({ x: drawX, y: drawY, color, walkable, type });
+                tiles.push({ x: drawX, y: drawY, color, solid, type, passable, durability, climbable });
             }
         }
         return tiles;
@@ -139,6 +151,18 @@ class Map extends GameObject {
     drawSquare(ctx, x, y, size, color) {
         ctx.fillStyle = color;
         ctx.fillRect(x, y, size, size);
+    }
+
+    updateTileVisibility(tile) {
+        const maxDurability = 100; // Assuming 100 is the maximum durability
+        const sizeFactor = Math.min(tile.durability, maxDurability) / maxDurability;
+        const newSize = this.tileSize * sizeFactor;
+
+        // Center the tile as it shrinks
+        const offsetX = (this.tileSize - newSize) / 2;
+        const offsetY = (this.tileSize - newSize) / 2;
+
+        return { newSize, offsetX, offsetY };
     }
 
     highlightEditRange(ctx) {
@@ -175,16 +199,16 @@ class Map extends GameObject {
 
     drawImage(ctx, offsetX, offsetY) {
         this.tiles.forEach(tile => {
-            const drawX = tile.x - offsetX;
-            const drawY = tile.y - offsetY;
-            this.drawSquare(ctx, drawX, drawY, this.tileSize, tile.color);
+            const { newSize, offsetX: tileOffsetX, offsetY: tileOffsetY } = this.updateTileVisibility(tile);
+            const drawX = tile.x - offsetX + tileOffsetX;
+            const drawY = tile.y - offsetY + tileOffsetY;
+            this.drawSquare(ctx, drawX, drawY, newSize, tile.color);
         });
 
         if (this.editMode) {
             this.highlightEditRange(ctx);
 
             // Highlight the tile in the center position on the player
-
             this.highlightSelectedTile(ctx);
         }
     }

@@ -71,7 +71,7 @@
 }
 
 .player-color {
-    background-color: blue;
+    background-color: rgba(0, 0, 255, 0.1);
 }
 
 .opponent-color {
@@ -375,6 +375,42 @@ p {
     .health {
         background-color: #4caf50;
         /* Color for the health bar */
+        height: 100%;
+        padding: 4px;
+        /* Add padding to the container */
+
+        transition: width 0.3s;
+        /* Smooth transition for width changes */
+        box-sizing: border-box;
+        /* Ensure it fits within the container */
+    }
+
+    .oxygen-bar {
+        margin: 10px;
+        height: 20px;
+        border-radius: 5px;
+        width: 20%;
+        position: absolute;
+        bottom: 400px;
+        /* Position the oxygen bar directly above the unit stats */
+    }
+
+    .oxygen-container {
+        width: 100%;
+        background-color: #ccc;
+        /* Background to indicate missing oxygen */
+        border: 1px solid #000;
+        /* Border for the oxygen bar */
+        position: relative;
+        height: 30px;
+        /* Adjust height as needed */
+        box-sizing: border-box;
+        /* Ensure padding is included in the width */
+    }
+
+    .oxygen {
+        background-color: #8030ff;
+        /* Color for the oxygen bar */
         height: 100%;
         padding: 4px;
         /* Add padding to the container */
