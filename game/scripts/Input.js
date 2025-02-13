@@ -24,7 +24,7 @@ class Input {
         this.mapSize = mapSize;
         this.canvasClicks = [];
         this.clickProcessed = true;
-
+        
 
         moveButton.addEventListener('click', () => {
             if (this.unloaded) return; // Prevent moving while unloaded
@@ -132,7 +132,12 @@ class Input {
                     console.log(`${currentUnit.name} has no remaining attacks.`);
                 }
             }
-
+            if (event.key ==='e') {
+                events.emit("EDIT_TILES"); // Emit the event to toggle tile editing mode
+            }
+            if (event.key === 'q') {
+                //
+            }
 
         });
 
@@ -155,7 +160,11 @@ class Input {
         });
 
         this.canvas.addEventListener('mousemove', (event) => {
-            if (!this.isDragging) return
+            if (!this.isDragging) {
+                this.mouse.x = event.clientX; // Update mouse position
+                this.mouse.y = event.clientY; // Update mouse position
+                return;
+            }
 
             // const dx = event.clientX - this.dragStartX;
             // const dy = event.clientY - this.dragStartY;
@@ -166,7 +175,6 @@ class Input {
 
             this.dragStartX = event.clientX;
             this.dragStartY = event.clientY;
-
             // Allow the camera to pan past the mapSize by half the screen width and height
             // const panExtensionX = this.canvas.width / 2;
             // const panExtensionY = this.canvas.height / 2;
