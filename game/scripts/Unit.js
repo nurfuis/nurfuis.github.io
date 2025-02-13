@@ -181,21 +181,20 @@ class Unit extends GameObject {
     }
     move(keysPressed) {
         if (this.isMoving) return; // Prevent input or actions while moving
-
         let dx = 0;
         let dy = 0;
 
-        if (keysPressed.includes('w')) {
+        if (keysPressed.includes('w')) { // Check for both 'w' and 'ArrowUp' keys
             dy -= this.mapSize.tileSize; // Move up one tile
         }
-        if (keysPressed.includes('s')) {
+        if (keysPressed.includes('s')) { // Check for both 's' and 'ArrowDown' keys
             dy += this.mapSize.tileSize; // Move down one tile
         }
-        if (keysPressed.includes('a')) {
+        if (keysPressed.includes('a')) { // Check for both 'a' and 'ArrowLeft' keys
             dx -= this.mapSize.tileSize; // Move left one tile
             this.facingDirection = 'left'; // Update facing direction to left
         }
-        if (keysPressed.includes('d')) {
+        if (keysPressed.includes('d')) { // Check for both 'd' and 'ArrowRight' keys
             dx += this.mapSize.tileSize; // Move right one tile
             this.facingDirection = 'right'; // Update facing direction to right
         }

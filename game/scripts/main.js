@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     game.map.addChild(game.playerTeam);
     game.map.addChild(game.opponentTeam);
 
-    const player = new Unit(0, 0, 64, 'player-color', 4, 'Player', canvas, camera, mapSize);
+    const player = new Unit(mapSize.tileSize * 32, mapSize.tileSize * 30, 64, 'player-color', 4, 'Player', canvas, camera, mapSize);
     game.player = player;
     game.playerTeam.addChild(player);
 
@@ -46,9 +46,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const input = new Input(canvas, camera, game, mapSize);
     game.input = input;
 
+    const items = []; // Array to store items
+
+    const numItems = 4; 
+
+    function generateItems() {
+        for (let i = 0; i < numItems; i++) {
+            const x = Math.floor(Math.random() * (mapSize.width / 4));
+            const y = Math.floor(Math.random() * (mapSize.height / 4));
+            const item = new GameItem(gameItems[i].name, gameItems[i].description, gameItems[i].image, gameItems[i].value); // Create a new GameItem object at the random position)
+            item.position = new Vector2(x, y);
+            items.push(item);
+            game.addChild(item);}
+    }
+    generateItems();
+
+
     const darknessLayer = new DarknessLayer(canvas, player, mapSize);
     game.darknessLayer = darknessLayer;
     game.addChild(darknessLayer);
+
+
+
 
     const update = (delta) => {
         game.stepEntry(delta, game);

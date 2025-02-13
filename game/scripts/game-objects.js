@@ -148,7 +148,7 @@ class DarknessLayer extends GameObject {
             this.player.x, this.player.y, 500
         );
         gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0.8)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0.9)');
 
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, this.mapSize.width, this.mapSize.height);
@@ -165,7 +165,7 @@ class DarknessLayer extends GameObject {
             const randomY = Math.random() * 10 - 5; // Random shake offset in Y direction
             torchX += randomX; // Apply shake offset to the torchlight position
             torchY += randomY; // Apply shake offset to the torchlight position
-            
+
         }
         const torchGradient = ctx.createRadialGradient(
             torchX, torchY, 0,

@@ -237,10 +237,7 @@ class Map extends GameObject {
             this.highlightSelectedTile(ctx);
         }
 
-        for (const sap of this.saps) {
-            sap.draw(ctx, offsetX, offsetY); // Draw each sap with the camera offset
 
-        }
 
         
     }

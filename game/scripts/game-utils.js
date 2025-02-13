@@ -82,7 +82,6 @@ function takeDamage(unit, damage) {
         console.log(unit.name, 'has died!');
     }
     updateHealthBar(unit);
-    console.log(unit.name, 'took', Math.floor(damage), 'damage. Health:', unit.health);
 }
 
  function updateOxygenBar(oxygen, maxOxygen) {
