@@ -39,7 +39,7 @@ class Map extends GameObject {
 
             // Handle arrow key presses
             if (keysPressed.length > 0 && !!this.selectedTile) {
-                this.delay = 250; // Delay in milliseconds (e.g., 250ms = 0.25 seconds)
+                this.delay = 200; // Delay in milliseconds (e.g., 200ms = 0.25 seconds)
                 let newX = this.selectedTile.x;
                 let newY = this.selectedTile.y;
 
@@ -80,11 +80,21 @@ class Map extends GameObject {
                 );
 
                 if (distance <= editRange) {
+                    if (this.selectedTile.type != 'earth') {
                     this.selectedTile.type = 'earth';
                     this.selectedTile.color = getComputedStyle(document.querySelector('.brown')).backgroundColor;
                     this.selectedTile.solid = true;
-                    this.selectedTile.passable = true; // Earth is not passable
+                    this.selectedTile.passable = false; // Earth is not passable
+                    this.selectedTile.breakable = false
                     this.selectedTile.durability = 200; // Earth has durability
+                    } else if (this.selectedTile.type != 'air') {
+                        this.selectedTile.type = 'air';
+                        this.selectedTile.color = getComputedStyle(document.querySelector('.light-grey')).backgroundColor;
+                        this.selectedTile.solid = false;
+                        this.selectedTile.passable = true; // Air is passable
+
+                        this.selectedTile.durability = -2; // Air has no durability
+                    }
                 }
 
             }
@@ -110,12 +120,14 @@ class Map extends GameObject {
                 let passable = true;
                 let durability = 100;
                 let climbable = false; // Default to not climbable
+                let breakable = true; // Default to breakable
 
                 if (y > rows - 2) {
                     colorClass = 'brown'; // Brown
-                    type = 'hill';
+                    type = 'earth';
                     solid = true;
                     passable = false; // Hills are not passable
+                    breakable = false; // Hills are not breakable
                 } else if (noiseValue < -0.2) {
                     colorClass = 'dark-grey'; // Dark grey
                     type = 'water';
@@ -135,7 +147,7 @@ class Map extends GameObject {
                 const color = getComputedStyle(document.querySelector(`.${colorClass}`)).backgroundColor;
                 const drawX = x * this.tileSize;
                 const drawY = y * this.tileSize;
-                tiles.push({ x: drawX, y: drawY, color, solid, type, passable, durability, climbable });
+                tiles.push({ x: drawX, y: drawY, color, solid, type, passable, durability, climbable, breakable });
             }
         }
         return tiles;
@@ -184,7 +196,7 @@ class Map extends GameObject {
             }
         }
 
-        ctx.fillStyle = 'rgba(255, 0, 0, 0.1)'; // Semi-transparent red for edit range
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.2)'; // Semi-transparent red for edit range
         tilesInRange.forEach(tile => {
             ctx.fillRect(tile.x, tile.y, tileSize, tileSize);
         });
@@ -192,7 +204,7 @@ class Map extends GameObject {
 
     highlightSelectedTile(ctx) {
         if (this.selectedTile) {
-            ctx.fillStyle = 'rgba(0, 0, 255, 0.1)'; // Semi-transparent green for selected tile
+            ctx.fillStyle = 'rgba(0, 0, 255, 0.3)'; // Semi-transparent green for selected tile
             ctx.fillRect(this.selectedTile.x, this.selectedTile.y, this.tileSize, this.tileSize);
         }
     }

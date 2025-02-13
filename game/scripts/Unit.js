@@ -174,7 +174,7 @@ class Unit extends GameObject {
             this.targetPosition = { x: targetX, y: targetY };
             this.isMoving = true;
         } else if (!canMove) {
-            if (target.durability > 0) { // If the durability of the tile below the unit is greater than 0, decrease the durability of the tile below the unit by 10
+            if (target.durability > 0 && target.breakable) { // If the durability of the tile below the unit is greater than 0, decrease the durability of the tile below the unit by 10
                 const randomNumber = Math.random(); // Generate a random number between 0 and 1
                 target.durability -= randomNumber * 2; // Decrease the durability of the tile below the unit by a random number between 0 and 10
             } else if (target.durability <= 0) { // If the durability of the tile below the unit is less than or equal to 0, remove the tile below the unit from the map and move the unit down by 64 pixels until it reaches the ground level or a solid tile below it    
@@ -268,16 +268,18 @@ class Unit extends GameObject {
             if (this.isFalling) { // If the unit is falling, move it down by 64 pixels until it reaches the ground level or a solid tile below it
                 console.log("Unit has reached the ground level or a solid tile below it"); // Log a message to the console
                 events.emit("CAMERA_SHAKE", { position: { x: this.x, y: this.y }, destinationPosition: { x: this.x, y: this.y - 32 } }); // Emit the camera shake event to the server
+
                 if (tileBelow.durability > 0) { // If the durability of the tile below the unit is greater than 0, decrease the durability of the tile below the unit by 10
-                    tileBelow.durability -= 35;
-                    if (tileBelow.type === 'earth') { // If the tile below the unit is earth, deal damage to the unit based on the falling damage value
-                        this.fallingDamage = 0; 
+
+                    if (tileBelow.breakable) {
+                        tileBelow.durability -= 35;
                     }
+
                     if (this.fallingDamage > 3) {
                         takeDamage(this, this.fallingDamage); // Deal damage to the unit based on the falling damage value
                     };
                     this.fallingDamage = 0; // Reset the falling damage value to 0 after dealing damage to the unit
-                
+
                 } else if (tileBelow.durability <= 0) { // If the durability of the tile below the unit is less than or equal to 0, remove the tile below the unit from the map and move the unit down by 64 pixels until it reaches the ground level or a solid tile below it    
                     tileBelow.type = 'air';
                     tileBelow.color = getComputedStyle(document.querySelector('.light-grey')).backgroundColor;
@@ -319,11 +321,11 @@ class Unit extends GameObject {
         if (root.input.keysPressed.length > 0 && !this.isMoving) {
             if (this.facingDirection === 'left' && root.input.keysPressed.includes('d')) { // If the unit is facing left and the right key is pressed, update the facing direction to right
                 this.facingDirection = 'right'; // Update facing direction to right
-                this.delay = 250;
+                this.delay = 200;
                 return; // Return early to prevent moving while changing direction
             } else if (this.facingDirection === 'right' && root.input.keysPressed.includes('a')) { // If the unit is facing right and the left key is pressed, update the facing direction to left   
                 this.facingDirection = 'left'; // Update facing direction to left
-                this.delay = 250;
+                this.delay = 200;
                 return; // Return early to prevent moving while changing direction
             }
             const keysPressed = root.input.keysPressed;
