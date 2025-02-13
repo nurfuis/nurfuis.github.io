@@ -78,7 +78,7 @@ function takeDamage(unit, damage) {
     unit.health -= damage;
     if (unit.health <= 0) {
         unit.health = 0;
-        // Implement unit death logic here
+        unit.die(); // Call the die method of the unit to handle death logic
         console.log(unit.name, 'has died!');
     }
     updateHealthBar(unit);

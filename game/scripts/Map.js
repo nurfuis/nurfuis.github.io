@@ -10,7 +10,7 @@ class Map extends GameObject {
         this.tiles = this.generateTiles();
         this.editMode = false;
         this.selectedTile = null;
-        this.useArrowKeys = false;
+        this.saps = []; // Array to store sap objects
 
         events.on('PLAYER_POSITION', this, (data) => {
             this.playerPosition = data;
@@ -143,11 +143,23 @@ class Map extends GameObject {
                     type = 'air';
                     durability = -2; // Air has no durability
                 }
-
+                
                 const color = getComputedStyle(document.querySelector(`.${colorClass}`)).backgroundColor;
                 const drawX = x * this.tileSize;
                 const drawY = y * this.tileSize;
+                
                 tiles.push({ x: drawX, y: drawY, color, solid, type, passable, durability, climbable, breakable });
+
+                const random = Math.random(); // Generate a random number between 0 and 1
+                if (type === 'wood' && random < 0.03) { // 5% chance to spawn a sap on wood tiles
+                    const sap = new Sap(this.canvas, new Vector2(drawX, drawY)); // Create a new Sap object at the tile position)
+                    this.addChild(sap); // Add the sap to the map's children array
+                    }  
+                    
+                if (type === 'water' && random < 0.02) { // 5% chance to spawn a sap on water tiles
+                    const air = new AirBubble(this.canvas, new Vector2(drawX, drawY)); // Create a new AirBubble object at the tile position)
+                    this.addChild(air); // Add the air to the map's children array
+                }
             }
         }
         return tiles;
@@ -210,6 +222,7 @@ class Map extends GameObject {
     }
 
     drawImage(ctx, offsetX, offsetY) {
+
         this.tiles.forEach(tile => {
             const { newSize, offsetX: tileOffsetX, offsetY: tileOffsetY } = this.updateTileVisibility(tile);
             const drawX = tile.x - offsetX + tileOffsetX;
@@ -222,6 +235,11 @@ class Map extends GameObject {
 
             // Highlight the tile in the center position on the player
             this.highlightSelectedTile(ctx);
+        }
+
+        for (const sap of this.saps) {
+            sap.draw(ctx, offsetX, offsetY); // Draw each sap with the camera offset
+
         }
     }
 }

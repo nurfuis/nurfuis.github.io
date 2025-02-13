@@ -67,6 +67,43 @@ class Unit extends GameObject {
         const oxygen = 800;
         this.oxygen = oxygen; // Initialize oxygen to 1000
         this.maxOxygen = oxygen; // Set the maximum oxygen to 1000
+
+        events.on('SAP_COLLECTED', this, (sap) => { // Listen for sap collected events  
+            heal(this, 10); // Heal the unit by 10 health points when a sap is collected
+        });
+        events.on('AIR_COLLECTED', this, (airBubble) => { // Listen for airBubble collected events
+            this.oxygen += 100; // Increase the oxygen of the unit by 100 when an airBubble is collected
+            if (this.oxygen > this.maxOxygen) { // If the oxygen is greater than the maximum oxygen, set it to the maximum oxygen value and stop incrementing it by 1 per second until it reaches the maximum oxygen value
+                this.oxygen = this.maxOxygen; // Set the oxygen to the maximum oxygen value and stop incrementing it by 1 per second until it reaches the maximum oxygen value
+            }
+            updateOxygenBar(this.oxygen, this.maxOxygen); // Update the oxygen bar to reflect the current oxygen value
+
+        });
+    }
+    ready() {
+        this.startingposition = new Vector2(this.x, this.y); // Store the starting position of the unit
+    }
+    die() {
+        this.isAlive = false; // Set the isAlive flag to false
+        this.respawnTimer = 1000; // Set the respawn timer to 2 seconds (2000 milliseconds
+        this.isFalling = false; // Set the isFalling flag to false
+        this.isMoving = false; // Set the isMoving flag to false
+        this.targetPosition = null; // Clear the target position of the unit
+        this.health = 0; // Set the health of the unit to 0 after dealing damage to the unit
+        this.oxygen = 0; // Set the oxygen of the unit to 0 after dealing damage to the unit
+        this.fallingDamage = 0; // Reset the falling damage value to 0 after dealing damage to the unit
+        updateOxygenBar(this.oxygen, this.maxOxygen); // Update the oxygen bar to reflect the current oxygen value
+    }
+    spawn() {
+        this.x = this.startingposition.x; // Reset the position of the unit to the starting position
+        this.y = this.startingposition.y; // Reset the position of the unit to the starting position
+        this.targetPosition = null; // Clear the target position of the unit after respawning the unit and resetting the respawn timer to 2 seconds (2000 milliseconds)
+        heal(this, this.maxHealth); // Reset the health of the unit to the maximum health value
+        this.oxygen = this.maxOxygen; // Reset the oxygen of the unit to the maximum oxygen
+        updateOxygenBar(this.oxygen, this.maxOxygen); // Update the oxygen bar to reflect the current oxygen value
+        this.isAlive = true; // Set the isAlive flag to true to respawn the unit and reset the respawn timer to 2 seconds (2000 milliseconds)
+        this.respawnTimer = 0; // Reset the respawn timer to 0 after respawning the unit and resetting the respawn timer to 2 seconds (2000 milliseconds
+        events.emit("PLAYER_POSITION", { x: this.x, y: this.y }); // Emit the position of the unit to the server
     }
 
     canMoveTo(x, y) {
@@ -219,6 +256,16 @@ class Unit extends GameObject {
     }
 
     step(delta, root) {
+        if (!this.isAlive) { // If the unit is not alive, return early to prevent errors
+            if (this.respawnTimer > 0) { // If the respawn timer is greater than 0, decrement it by the delta time
+                this.respawnTimer -= delta; // Decrement the respawn timer by the delta time
+            } else { // If the respawn timer is less than or equal to 0, respawn the unit and reset the respawn timer to 2 seconds (2000 milliseconds)
+                this.spawn(); // Respawn the unit and reset the respawn timer to 2 seconds (2000 milliseconds
+            }
+
+            return;
+        }
+
         this.tryEmitPosition(); // Emit the position of the unit to the server
         if (this.delay > 0) { // If there is a delay, decrement it by the delta time    
             this.delay -= delta; // Decrement the delay by the delta time
@@ -387,6 +434,7 @@ class Unit extends GameObject {
     }
 
     draw(ctx) {
+        if (!this.isAlive) return; // If the unit is not alive, return early to prevent drawing it on the canvas
         let offsetX = -32;
         let offsetY = -18; // Adjust these values to center the image on the unit's position
 
