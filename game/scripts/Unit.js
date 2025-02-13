@@ -67,6 +67,7 @@ class Unit extends GameObject {
         const oxygen = 800;
         this.oxygen = oxygen; // Initialize oxygen to 1000
         this.maxOxygen = oxygen; // Set the maximum oxygen to 1000
+        this.isAlive = true; // Add a flag to indicate if the unit is alive or dead
 
         events.on('SAP_COLLECTED', this, (sap) => { // Listen for sap collected events  
             heal(this, 10); // Heal the unit by 10 health points when a sap is collected
@@ -85,25 +86,24 @@ class Unit extends GameObject {
     }
     die() {
         this.isAlive = false; // Set the isAlive flag to false
-        this.respawnTimer = 1000; // Set the respawn timer to 2 seconds (2000 milliseconds
         this.isFalling = false; // Set the isFalling flag to false
         this.isMoving = false; // Set the isMoving flag to false
         this.targetPosition = null; // Clear the target position of the unit
         this.health = 0; // Set the health of the unit to 0 after dealing damage to the unit
         this.oxygen = 0; // Set the oxygen of the unit to 0 after dealing damage to the unit
         this.fallingDamage = 0; // Reset the falling damage value to 0 after dealing damage to the unit
-        updateOxygenBar(this.oxygen, this.maxOxygen); // Update the oxygen bar to reflect the current oxygen value
-    }
-    spawn() {
         this.x = this.startingposition.x; // Reset the position of the unit to the starting position
         this.y = this.startingposition.y; // Reset the position of the unit to the starting position
-        this.targetPosition = null; // Clear the target position of the unit after respawning the unit and resetting the respawn timer to 2 seconds (2000 milliseconds)
+        updateOxygenBar(this.oxygen, this.maxOxygen); // Update the oxygen bar to reflect the current oxygen value
+        this.delay = 5000;
+
+    }
+    spawn() {
         heal(this, this.maxHealth); // Reset the health of the unit to the maximum health value
         this.oxygen = this.maxOxygen; // Reset the oxygen of the unit to the maximum oxygen
         updateOxygenBar(this.oxygen, this.maxOxygen); // Update the oxygen bar to reflect the current oxygen value
         this.isAlive = true; // Set the isAlive flag to true to respawn the unit and reset the respawn timer to 2 seconds (2000 milliseconds)
-        this.respawnTimer = 0; // Reset the respawn timer to 0 after respawning the unit and resetting the respawn timer to 2 seconds (2000 milliseconds
-        events.emit("PLAYER_POSITION", { x: this.x, y: this.y }); // Emit the position of the unit to the server
+        events.emit("PLAYER_POSITION", { x: this.x, y: this.y, cause: "spawn" }); // Emit the position of the unit to the server
     }
 
     canMoveTo(x, y) {
@@ -256,22 +256,19 @@ class Unit extends GameObject {
     }
 
     step(delta, root) {
-        if (!this.isAlive) { // If the unit is not alive, return early to prevent errors
-            if (this.respawnTimer > 0) { // If the respawn timer is greater than 0, decrement it by the delta time
-                this.respawnTimer -= delta; // Decrement the respawn timer by the delta time
-            } else { // If the respawn timer is less than or equal to 0, respawn the unit and reset the respawn timer to 2 seconds (2000 milliseconds)
-                this.spawn(); // Respawn the unit and reset the respawn timer to 2 seconds (2000 milliseconds
-            }
-
-            return;
-        }
-
-        this.tryEmitPosition(); // Emit the position of the unit to the server
         if (this.delay > 0) { // If there is a delay, decrement it by the delta time    
             this.delay -= delta; // Decrement the delay by the delta time
             return; // Return early to prevent moving while changing direction
         }
+
+        if (!this.isAlive) { 
+            this.spawn(); // Respawn the unit after 2 seconds (2000 milliseconds
+        }
+
+        this.tryEmitPosition(); // Emit the position of the unit to the server
+        
         const tile = root.map.getTileAtCoordinates(this.x, this.y); // Get the tile the unit is currently on
+        
         if (!tile) return; // If the tile is not found, return early to prevent errors
 
         const tileBelow = root.map.getTileAtCoordinates(this.x, this.y + 64) || { solid: true }; // Check the tile below the unit

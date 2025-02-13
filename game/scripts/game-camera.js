@@ -37,7 +37,7 @@ class Camera extends GameObject {
 
         events.on("PLAYER_POSITION", this, (position) => {
             this.shiftTiming = 0;
-            if (position.cause === "teleport") {
+            if (position.cause === "spawn") {
                 this.isPanning = false;
             }
             this.updateView(position);

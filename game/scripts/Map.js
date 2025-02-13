@@ -122,7 +122,7 @@ class Map extends GameObject {
                 let climbable = false; // Default to not climbable
                 let breakable = true; // Default to breakable
 
-                if (y > rows - 2) {
+                if (noiseValue > 0.2) {
                     colorClass = 'brown'; // Brown
                     type = 'earth';
                     solid = true;
@@ -241,5 +241,7 @@ class Map extends GameObject {
             sap.draw(ctx, offsetX, offsetY); // Draw each sap with the camera offset
 
         }
+
+        
     }
 }

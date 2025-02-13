@@ -111,3 +111,70 @@ class Particle {
     }
 }
 
+class DarknessLayer extends GameObject {
+    constructor(canvas, player, mapSize) {
+        super(canvas);
+        this.player = player;
+        this.canvas = canvas;
+        this.mapSize = mapSize;
+
+        this.torchRadius = 150; // Initial torch radius
+        this.torchFlicker = 0; // Flicker effect
+
+        events.on("CAMERA_SHAKE", this, (data) => {
+            this.hasShake = true;
+            this.shakeDuration = 200;
+        });
+    }
+
+    step(delta, root) {
+        let flicker = 0.001;
+        if (this.hasShake) {
+            flicker = 0.01; // Increase flicker speed during shake
+            this.shakeDuration -= delta; // Decrease shake duration over time
+            if (this.shakeDuration <= 0) {
+                this.hasShake = false; // Stop shaking after duration ends
+            }
+
+        }
+        // Update torch radius to create a flicker effect
+        this.torchFlicker += delta * flicker; // Adjust the speed of flicker
+        this.torchRadius = 150 + Math.sin(this.torchFlicker) * 10 + Math.random() * 5; // Adjust the range of flicker
+    }
+
+    draw(ctx, x, y) {
+        const gradient = ctx.createRadialGradient(
+            this.player.x, this.player.y, 0,
+            this.player.x, this.player.y, 500
+        );
+        gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0.8)');
+
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, this.mapSize.width, this.mapSize.height);
+
+        // Draw the torchlight effect
+        let torchX = this.player.x; // X position of the torchlight center (player position)
+        let torchY = this.player.y; // Y position of the torchlight center (player position)
+
+        if (this.player.facingDirection === 'right') {
+            torchX += 64; // Adjust the torchlight position based on the player's facing direction
+        } 
+        if (this.hasShake) {
+            const randomX = Math.random() * 10 - 5; // Random shake offset in X direction
+            const randomY = Math.random() * 10 - 5; // Random shake offset in Y direction
+            torchX += randomX; // Apply shake offset to the torchlight position
+            torchY += randomY; // Apply shake offset to the torchlight position
+            
+        }
+        const torchGradient = ctx.createRadialGradient(
+            torchX, torchY, 0,
+            torchX, torchY, this.torchRadius
+        );
+        torchGradient.addColorStop(0, 'rgba(255, 140, 0, 0.4)'); // Warm glow color
+        torchGradient.addColorStop(1, 'rgba(255, 140, 0, 0)');
+
+        ctx.fillStyle = torchGradient;
+        ctx.fillRect(0, 0, this.mapSize.width, this.mapSize.height);
+    }
+}

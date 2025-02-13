@@ -46,6 +46,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const input = new Input(canvas, camera, game, mapSize);
     game.input = input;
 
+    const darknessLayer = new DarknessLayer(canvas, player, mapSize);
+    game.darknessLayer = darknessLayer;
+    game.addChild(darknessLayer);
 
     const update = (delta) => {
         game.stepEntry(delta, game);
