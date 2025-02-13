@@ -4,14 +4,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Disputed Territory Tactics</title>
+    <title>Tactics</title>
     <link rel="stylesheet" href="styles/style.css">
+    <style>
+        /* Add styles for the overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .overlay button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
     <div class="game-interface">
         <canvas id="gameCanvas"></canvas>
-        
+
         <div class="legend hidden">
             <h2>Legend</h2>
             <div class="legend-item player-color">Player</div>
@@ -25,13 +49,13 @@
             <div class="legend-item brown">Brown Tile</div>
         </div>
 
-        <div class="health-bar">
+        <div class="health-bar hidden">
             <h2>Combat Readiness</h2>
             <div class="health-container">
                 <div id="health" class="health"></div>
             </div>
         </div>
-        <div class="unit-stats">
+        <div class="unit-stats hidden">
             <h2 id="active-unit-name">Unit Stats</h2>
             <p id="unit-level">Level: 1</p>
             <p id="unit-experience">Experience: 0</p>
@@ -41,8 +65,8 @@
             <p id="tile-type">Type: Unknown</p>
             <p id="tile-location">Location: (0, 0)</p>
         </div>
-        <div class="action-bar">
-            <button id="move-button">Move</button> 
+        <div class="action-bar hidden">
+            <button id="move-button">Move</button>
             <button id="attack-button">Attack</button>
             <button id="defend-button">Defend</button>
             <button id="item-button">Use Item</button>
@@ -58,10 +82,19 @@
         <div id="attack-menu">
         </div>
     </div>
-    <div id="load-menu" >
+    <div id="load-menu">
     </div>
 
     <div id="vehicle-controls-menu">
+    </div>
+
+    <!-- Overlay div with instructions -->
+    <div class="overlay" id="instruction-overlay">
+        <h2>Welcome to Tactics</h2>
+        <p>Use WASD to move your character.</p>
+        <p>Use E and the arrow keys to select tiles.</p>
+        <p>Use Q to interact with tiles (lay dirt or remove selected) </p>
+        <button onclick="document.getElementById('instruction-overlay').style.display='none'">Got it!</button>
     </div>
 
     <script src="scripts/Vector2.js"></script>

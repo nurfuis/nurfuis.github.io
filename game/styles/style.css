@@ -305,7 +305,6 @@ p {
     .action-bar {
         background-color: #555;
         padding: 10px;
-        display: flex;
         justify-content: space-around;
         position: absolute;
         bottom: 0;
