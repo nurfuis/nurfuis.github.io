@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const mapSize = {
-        width: 12800, // Reduced map width
-        height: 12800, // Reduced map height
+        width: 25600, // Reduced map width
+        height: 25600, // Reduced map height
         tileSize: 64
     };
 
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     game.map.addChild(game.playerTeam);
     game.map.addChild(game.opponentTeam);
 
-    const player = new Unit(mapSize.tileSize * 32, mapSize.tileSize * 30, 64, 'player-color', 4, 'Player', canvas, camera, mapSize);
+    const player = new Unit(mapSize.tileSize * 200, mapSize.tileSize * 200, 64, 'player-color', 4, 'Player', canvas, camera, mapSize);
     game.player = player;
     game.playerTeam.addChild(player);
 
@@ -52,10 +52,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function generateItems() {
         for (let i = 0; i < numItems; i++) {
-            const x = Math.floor(Math.random() * (mapSize.width / 4));
-            const y = Math.floor(Math.random() * (mapSize.height / 4));
+            const x = Math.floor(Math.random() * (mapSize.width / 200));
+            const y = Math.floor(Math.random() * (mapSize.height / 200));
             const item = new GameItem(gameItems[i].name, gameItems[i].description, gameItems[i].image, gameItems[i].value); // Create a new GameItem object at the random position)
-            item.position = new Vector2(x, y);
+            item.position = new Vector2(player.x + x, player.y + y);
             items.push(item);
             game.addChild(item);}
     }

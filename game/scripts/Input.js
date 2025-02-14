@@ -83,6 +83,17 @@ class Input {
                     gameInterface.style.display = 'flex';
                 }
             }
+            if (event.key === 'i') {
+                const inventoryMenu = document.getElementById('inventory-menu');
+                if (inventoryMenu.style.display === 'none') {
+                    inventoryMenu.style.display = 'block';
+                    events.emit("INVENTORY_OPENED"); // Emit the event to open the inventory menu
+                } else {
+                    inventoryMenu.style.display = 'none';   
+                    events.emit("INVENTORY_CLOSED"); // Emit the event to close the inventory menu
+                }
+
+            }
 
             // Recenter map to active unit on numpad 0 key press
             if (event.key === '0' && event.location === KeyboardEvent.DOM_KEY_LOCATION_NUMPAD) {

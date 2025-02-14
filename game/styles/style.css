@@ -546,3 +546,61 @@ p {
 .hidden {
     display: none;
 }
+#inventory-menu {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 25%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #333;
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 10;
+}
+.inventory-item {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 2px 2px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 4px;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 34px;
+    height: 34px;
+}
+.inventory-item img {
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+}
+.tooltip {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1000;
+    width: 200px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.tooltip img {
+    width: 128px;
+    height: 128px;
+    margin-bottom: 10px;
+}
+
+.tooltip p {
+    margin: 5px 0;
+}

@@ -143,12 +143,15 @@ class DarknessLayer extends GameObject {
     }
 
     draw(ctx, x, y) {
+        const spread = this.canvas.height / 2; // Adjust the spread of the darkness effect as needed
+
         const gradient = ctx.createRadialGradient(
             this.player.x, this.player.y, 0,
-            this.player.x, this.player.y, 500
+            this.player.x, this.player.y, spread
         );
         gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0.9)');
+        gradient.addColorStop(0.7, 'rgba(0, 0, 0, 0.95)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 1)');
 
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, this.mapSize.width, this.mapSize.height);

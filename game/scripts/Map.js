@@ -3,7 +3,7 @@ class Map extends GameObject {
         super(canvas);
         this.x = 0;
         this.y = 0;
-        this.tileSize = 64; // Size of the square tiles
+        this.tileSize = mapSize.tileSize; // Size of the square tiles
         this.canvas = canvas;
         this.mapSize = mapSize;
         this.camera = camera;
@@ -28,7 +28,7 @@ class Map extends GameObject {
         const input = root.input;
 
         const keysPressed = input.keysPressed;
-        
+
         if (this.delay > 0) {
             this.delay -= delta; // Decrease the delay by the delta time
             return; // Exit the function if the delay is still active
@@ -81,12 +81,12 @@ class Map extends GameObject {
 
                 if (distance <= editRange) {
                     if (this.selectedTile.type != 'earth') {
-                    this.selectedTile.type = 'earth';
-                    this.selectedTile.color = getComputedStyle(document.querySelector('.brown')).backgroundColor;
-                    this.selectedTile.solid = true;
-                    this.selectedTile.passable = false; // Earth is not passable
-                    this.selectedTile.breakable = false
-                    this.selectedTile.durability = 200; // Earth has durability
+                        this.selectedTile.type = 'earth';
+                        this.selectedTile.color = getComputedStyle(document.querySelector('.brown')).backgroundColor;
+                        this.selectedTile.solid = true;
+                        this.selectedTile.passable = false; // Earth is not passable
+                        this.selectedTile.breakable = false
+                        this.selectedTile.durability = 200; // Earth has durability
                     } else if (this.selectedTile.type != 'air') {
                         this.selectedTile.type = 'air';
                         this.selectedTile.color = getComputedStyle(document.querySelector('.light-grey')).backgroundColor;
@@ -143,19 +143,19 @@ class Map extends GameObject {
                     type = 'air';
                     durability = -2; // Air has no durability
                 }
-                
+
                 const color = getComputedStyle(document.querySelector(`.${colorClass}`)).backgroundColor;
                 const drawX = x * this.tileSize;
                 const drawY = y * this.tileSize;
-                
+
                 tiles.push({ x: drawX, y: drawY, color, solid, type, passable, durability, climbable, breakable });
 
                 const random = Math.random(); // Generate a random number between 0 and 1
                 if (type === 'wood' && random < 0.03) { // 5% chance to spawn a sap on wood tiles
                     const sap = new Sap(this.canvas, new Vector2(drawX, drawY)); // Create a new Sap object at the tile position)
                     this.addChild(sap); // Add the sap to the map's children array
-                    }  
-                    
+                }
+
                 if (type === 'water' && random < 0.02) { // 5% chance to spawn a sap on water tiles
                     const air = new AirBubble(this.canvas, new Vector2(drawX, drawY)); // Create a new AirBubble object at the tile position)
                     this.addChild(air); // Add the air to the map's children array
@@ -222,13 +222,27 @@ class Map extends GameObject {
     }
 
     drawImage(ctx, offsetX, offsetY) {
+        const canvasWidth = this.canvas.width;
+        const canvasHeight = this.canvas.height;
+
+        const playerX = this.playerPosition.x;
+        const playerY = this.playerPosition.y;
+
+        const buffer = this.tileSize * 2; // Buffer to draw additional tiles offscreen
 
         this.tiles.forEach(tile => {
+            // Cull tiles that are offscreen, including buffer
+            if (tile.x + this.tileSize < playerX - canvasWidth / 2 - buffer || tile.x > playerX + canvasWidth / 2 + buffer ||
+                tile.y + this.tileSize < playerY - canvasHeight / 2 - buffer || tile.y > playerY + canvasHeight / 2 + buffer) {
+                return;
+            }
+
             const { newSize, offsetX: tileOffsetX, offsetY: tileOffsetY } = this.updateTileVisibility(tile);
             const drawX = tile.x - offsetX + tileOffsetX;
             const drawY = tile.y - offsetY + tileOffsetY;
             this.drawSquare(ctx, drawX, drawY, newSize, tile.color);
         });
+
 
         if (this.editMode) {
             this.highlightEditRange(ctx);
@@ -239,6 +253,6 @@ class Map extends GameObject {
 
 
 
-        
+
     }
 }

@@ -1,31 +1,30 @@
-const attackTypes = [
-    {
-        name: 'Basic Attack',
-        range: 128,
-        damage: 10,
-        cost: 0
-    },
-    {
-        name: 'Long Range Attack',
-        range: 512,
-        damage: 5,
-        cost: 5
-    },
-    {
-        name: 'AOE Attack',
-        range: 256,
-        damage: 15,
-        cost: 10
-    },
-    {
-        name: 'Heal',
-        range: 128,
-        damage: -10,
-        cost: 5
-    }
+const attackTypes = [{
+    name: 'Basic Attack',
+    range: 128,
+    damage: 10,
+    cost: 0
+},
+{
+    name: 'Long Range Attack',
+    range: 512,
+    damage: 5,
+    cost: 5
+},
+{
+    name: 'AOE Attack',
+    range: 256,
+    damage: 15,
+    cost: 10
+},
+{
+    name: 'Heal',
+    range: 128,
+    damage: -10,
+    cost: 5
+}
 ];
 
-const groundLevel = 100; // Define the ground level for units
+const groundLevel = 100; 
 
 class Unit extends GameObject {
     constructor(x, y, size, colorClass, speed, name, canvas, camera, mapSize, level = 1, experience = 0, health = 100) {
@@ -42,81 +41,96 @@ class Unit extends GameObject {
         this.maxHealth = health;
         this.mapSize = mapSize;
         this.targetPosition = null;
-        this.maxDistance = 128; // Default max distance
-        this.initialX = x; // Store initial X position
-        this.initialY = y; // Store initial Y position
-        this.attacks = this.getRandomAttacks(2); // Assign 2 random attacks
+        this.maxDistance = 128; 
+        this.initialX = x; 
+        this.initialY = y; 
+        this.attacks = this.getRandomAttacks(2); 
         this.selectedAttack = null;
-        this.isLoaded = false; // Add a flag to indicate if the unit is loaded
-        this.loadReady = false; // Add a flag to indicate if the unit is ready to load
-        this.turnsLoaded = 0; // Add a counter to track turns loaded
-        this.vehicle = null; // Reference to the vehicle the unit is loaded in
-        this.seatIndex = null; // Index of the seat the unit is occupying
-        this.movePending = false; // Add a flag to indicate if a move is pending
-        this.attackPending = false; // Add a flag to indicate if an attack is pending
-        this.attackReady = false; // Add a flag to indicate if the unit is ready
-        this.maxAttacks = 2; // Maximum number of attacks the unit can make
-        this.remainingAttacks = this.maxAttacks; // Initialize remaining attacks
-        this.perceptionRange = 128; // Range for detecting other units
-        this.isMoving = false; // Add a flag to indicate if the unit is currently moving
-        this.isFalling = false; // Add a flag to indicate if the unit is falling
-        this.facingDirection = 'right'; // Add a property to track the facing direction
+        this.isLoaded = false; 
+        this.loadReady = false; 
+        this.turnsLoaded = 0; 
+        this.vehicle = null; 
+        this.seatIndex = null; 
+        this.movePending = false; 
+        this.attackPending = false; 
+        this.attackReady = false; 
+        this.maxAttacks = 2; 
+        this.remainingAttacks = this.maxAttacks; 
+        this.perceptionRange = 128; 
+        this.isMoving = false; 
+        this.isFalling = false; 
+        this.facingDirection = 'right'; 
         this.image = new Image();
         this.image.src = 'images/guy.png';
-        this.fallingDamage = 0; // Initialize falling damage to 0
+        this.fallingDamage = 0; 
         const oxygen = 800;
-        this.oxygen = oxygen; // Initialize oxygen to 1000
-        this.maxOxygen = oxygen; // Set the maximum oxygen to 1000
-        this.isAlive = true; // Add a flag to indicate if the unit is alive or dead
+        this.oxygen = oxygen; 
+        this.maxOxygen = oxygen; 
+        this.isAlive = true; 
+        this.inventory = new Inventory(); 
+        this.isSinking = false; 
 
-        events.on('SAP_COLLECTED', this, (sap) => { // Listen for sap collected events  
-            heal(this, 10); // Heal the unit by 10 health points when a sap is collected
+        events.on('SAP_COLLECTED', this, (sap) => { 
+            heal(this, 10); 
         });
-        events.on('AIR_COLLECTED', this, (airBubble) => { // Listen for airBubble collected events
-            this.oxygen += 100; // Increase the oxygen of the unit by 100 when an airBubble is collected
-            if (this.oxygen > this.maxOxygen) { // If the oxygen is greater than the maximum oxygen, set it to the maximum oxygen value and stop incrementing it by 1 per second until it reaches the maximum oxygen value
-                this.oxygen = this.maxOxygen; // Set the oxygen to the maximum oxygen value and stop incrementing it by 1 per second until it reaches the maximum oxygen value
+        events.on('AIR_COLLECTED', this, (airBubble) => { 
+            this.oxygen += 100; 
+            if (this.oxygen > this
+                .maxOxygen
+            ) { 
+                this.oxygen = this
+                    .maxOxygen; 
             }
-            updateOxygenBar(this.oxygen, this.maxOxygen); // Update the oxygen bar to reflect the current oxygen value
+            updateOxygenBar(this.oxygen, this
+                .maxOxygen); 
+
+        });
+        events.on('ITEM_COLLECTED', this, (item) => { 
+            this.inventory.addItem(item); 
 
         });
     }
     ready() {
-        this.startingposition = new Vector2(this.x, this.y); // Store the starting position of the unit
+        this.startingposition = new Vector2(this.x, this.y); 
     }
     die() {
-        this.isAlive = false; // Set the isAlive flag to false
-        this.isFalling = false; // Set the isFalling flag to false
-        this.isMoving = false; // Set the isMoving flag to false
-        this.targetPosition = null; // Clear the target position of the unit
-        this.health = 0; // Set the health of the unit to 0 after dealing damage to the unit
-        this.oxygen = 0; // Set the oxygen of the unit to 0 after dealing damage to the unit
-        this.fallingDamage = 0; // Reset the falling damage value to 0 after dealing damage to the unit
-        this.x = this.startingposition.x; // Reset the position of the unit to the starting position
-        this.y = this.startingposition.y; // Reset the position of the unit to the starting position
-        updateOxygenBar(this.oxygen, this.maxOxygen); // Update the oxygen bar to reflect the current oxygen value
+        this.isAlive = false; 
+        this.isFalling = false; 
+        this.isMoving = false; 
+        this.targetPosition = null; 
+        this.health = 0; 
+        this.oxygen = 0; 
+        this.fallingDamage = 0; 
+        this.x = this.startingposition.x; 
+        this.y = this.startingposition.y; 
+        updateOxygenBar(this.oxygen, this.maxOxygen); 
         this.delay = 5000;
 
     }
     spawn() {
-        heal(this, this.maxHealth); // Reset the health of the unit to the maximum health value
-        this.oxygen = this.maxOxygen; // Reset the oxygen of the unit to the maximum oxygen
-        updateOxygenBar(this.oxygen, this.maxOxygen); // Update the oxygen bar to reflect the current oxygen value
-        this.isAlive = true; // Set the isAlive flag to true to respawn the unit and reset the respawn timer to 2 seconds (2000 milliseconds)
-        events.emit("PLAYER_POSITION", { x: this.x, y: this.y, cause: "spawn" }); // Emit the position of the unit to the server
+        heal(this, this.maxHealth); 
+        this.oxygen = this.maxOxygen; 
+        updateOxygenBar(this.oxygen, this.maxOxygen); 
+        this.isAlive =
+            true; 
+        events.emit("PLAYER_POSITION", {
+            x: this.x,
+            y: this.y,
+            cause: "spawn"
+        }); 
     }
 
     canMoveTo(x, y) {
-        const map = this.parent.parent; // Access the map object through the parent chain
-        const tile = map.getTileAtCoordinates(x, y); // Get the tile at the target position
-        if (!tile) return false; // If the tile is not found, return false to prevent errors
+        const map = this.parent.parent; 
+        const tile = map.getTileAtCoordinates(x, y); 
+        if (!tile) return false; 
 
-        return tile; // Return true if the tile is passable, false otherwise
+        return tile; 
 
     }
 
     getRandomAttacks(count) {
-        const availableAttacks = [...attackTypes]; // Copy the array
+        const availableAttacks = [...attackTypes]; 
         const selectedAttacks = [];
         for (let i = 0; i < count; i++) {
             const randomIndex = Math.floor(Math.random() * availableAttacks.length);
@@ -154,15 +168,15 @@ class Unit extends GameObject {
                     console.log('Raycast Attack missed');
                 }
             }
-            this.attackReady = false; // Reset this.attackReady after attack
+            this.attackReady = false; 
 
-            this.attackPending = false; // Reset this.attackPending after attack
+            this.attackPending = false; 
             root.attackPending = false;
-            attackButton.classList.remove('active'); // Remove highlight from the attack button
+            attackButton.classList.remove('active'); 
             toggleActionBarButtons(this.movePending, this.attackPending);
-            attackMenu.style.display = 'none'; // Hide the attack menu
+            attackMenu.style.display = 'none'; 
 
-            this.selectedAttack = null; // Clear selected attack
+            this.selectedAttack = null; 
             this.remainingAttacks--;
             return;
         }
@@ -180,45 +194,47 @@ class Unit extends GameObject {
         });
     }
     move(keysPressed) {
-        if (this.isMoving) return; // Prevent input or actions while moving
+        if (this.isMoving) return; 
         let dx = 0;
         let dy = 0;
 
-        if (keysPressed.includes('w')) { // Check for both 'w' and 'ArrowUp' keys
-            dy -= this.mapSize.tileSize; // Move up one tile
+        if (keysPressed.includes('w')) {
+            dy -= this.mapSize.tileSize;
         }
-        if (keysPressed.includes('s')) { // Check for both 's' and 'ArrowDown' keys
-            dy += this.mapSize.tileSize; // Move down one tile
+        if (keysPressed.includes('s')) {
+            dy += this.mapSize.tileSize;
         }
-        if (keysPressed.includes('a')) { // Check for both 'a' and 'ArrowLeft' keys
-            dx -= this.mapSize.tileSize; // Move left one tile
-            this.facingDirection = 'left'; // Update facing direction to left
+        if (keysPressed.includes('a')) {
+            dx -= this.mapSize.tileSize;
+            this.facingDirection = 'left';
         }
-        if (keysPressed.includes('d')) { // Check for both 'd' and 'ArrowRight' keys
-            dx += this.mapSize.tileSize; // Move right one tile
-            this.facingDirection = 'right'; // Update facing direction to right
+        if (keysPressed.includes('d')) {
+            dx += this.mapSize.tileSize;
+            this.facingDirection = 'right';
         }
 
         const targetX = Math.floor(this.x + dx);
         const targetY = Math.floor(this.y + dy);
 
         const target = this.canMoveTo(targetX, targetY);
-        const canMove = target.passable; // Check if the target tile is passable
-        // Ensure the target position is within the map boundaries and solid
+        const canMove = target.passable;
 
         if (targetX >= 0 && targetY >= 0 && targetY < this.mapSize.height && canMove) {
-            this.targetPosition = { x: targetX, y: targetY };
+            this.targetPosition = {
+                x: targetX,
+                y: targetY
+            };
             this.isMoving = true;
         } else if (!canMove) {
-            if (target.durability > 0 && target.breakable) { // If the durability of the tile below the unit is greater than 0, decrease the durability of the tile below the unit by 10
-                const randomNumber = Math.random(); // Generate a random number between 0 and 1
-                target.durability -= randomNumber * 2; // Decrease the durability of the tile below the unit by a random number between 0 and 10
-            } else if (target.durability <= 0) { // If the durability of the tile below the unit is less than or equal to 0, remove the tile below the unit from the map and move the unit down by 64 pixels until it reaches the ground level or a solid tile below it    
+            if (target.durability > 0 && target.breakable) {
+                const randomNumber = Math.random();
+                target.durability -= randomNumber * 2;
+            } else if (target.durability <= 0) {
                 target.type = 'air';
                 target.color = getComputedStyle(document.querySelector('.light-grey')).backgroundColor;
                 target.solid = false;
                 target.passable = true;
-                target.durability = 0; // Set the durability of the tile below the unit to 0
+                target.durability = 0;
             }
         }
 
@@ -242,11 +258,11 @@ class Unit extends GameObject {
             const newY = unit.y + normalizedY * speed;
 
             if (newX > 0) {
-                unit.lastX = unit.x; // Store the last position before moving
+                unit.lastX = unit.x; 
                 unit.x = newX;
             }
             if (newY > 0) {
-                unit.lastY = unit.y; // Store the last position before moving
+                unit.lastY = unit.y; 
                 unit.y = newY;
             }
 
@@ -255,124 +271,179 @@ class Unit extends GameObject {
     }
 
     step(delta, root) {
-        if (this.delay > 0) { // If there is a delay, decrement it by the delta time    
-            this.delay -= delta; // Decrement the delay by the delta time
-            return; // Return early to prevent moving while changing direction
+        if (this.delay > 0) { 
+            this.delay -= delta; 
+            return; 
         }
 
-        if (!this.isAlive) { 
-            this.spawn(); // Respawn the unit after 2 seconds (2000 milliseconds
+        if (!this.isAlive) {
+            this.spawn(); 
         }
 
-        this.tryEmitPosition(); // Emit the position of the unit to the server
-        
-        const tile = root.map.getTileAtCoordinates(this.x, this.y); // Get the tile the unit is currently on
-        
-        if (!tile) return; // If the tile is not found, return early to prevent errors
+        this.tryEmitPosition(); 
 
-        const tileBelow = root.map.getTileAtCoordinates(this.x, this.y + 64) || { solid: true }; // Check the tile below the unit
+        const tile = root.map.getTileAtCoordinates(this.x, this.y); 
 
-        if (tile.type === 'water') { // If the tile the unit is on is water, move the unit down by 64 pixels until it reaches the ground level or a solid tile below it 
-            takeBreath(this, 1); // Deal damage to the unit based on the falling damage value
-            if (this.oxygen <= 0) { // If the oxygen is less than or equal to 0, deal damage to the unit based on the falling damage value
-                takeDamage(this, 0.35); // Deal damage to the unit based on the falling damage value
+        if (!tile) return; 
+
+        const tileBelow = root.map.getTileAtCoordinates(this.x, this.y + 64) || {
+            solid: true
+        }; 
+
+        if (tile.type ===
+            'water'
+        ) { 
+            takeBreath(this, 1); 
+            if (this.oxygen <=
+                0
+            ) { 
+                takeDamage(this, 0.35); 
             }
         }
 
         if (tile.type === 'air') {
-            if (this.oxygen < this.maxOxygen) { // If the oxygen is less than the maximum oxygen, increment it by 1 per second until it reaches the maximum oxygen value
-                this.oxygen += 1; // Increment the oxygen by 1 per second until it reaches the maximum oxygen value
-                updateOxygenBar(this.oxygen, this.maxOxygen); // Update the oxygen bar to reflect the current oxygen value
+            if (this.oxygen < this
+                .maxOxygen
+            ) { 
+                this.oxygen += 1; 
+                updateOxygenBar(this.oxygen, this
+                    .maxOxygen); 
             }
 
-            if (this.oxygen >= this.maxOxygen) { // If the oxygen is greater than or equal to the maximum oxygen, set it to the maximum oxygen value and stop incrementing it by 1 per second until it reaches the maximum oxygen value
-                this.oxygen = this.maxOxygen; // Set the oxygen to the maximum oxygen value and stop incrementing it by 1 per second until it reaches the maximum oxygen value
+            if (this.oxygen >= this
+                .maxOxygen
+            ) { 
+                this.oxygen = this
+                    .maxOxygen; 
             }
 
-            if (this.health < this.maxHealth && this.oxygen >= this.maxOxygen / 2 && root.input.keysPressed == 0) { // If the health is less than the maximum health, increment it by 1 per second until it reaches the maximum health value
-                heal(this, 0.02); // Increment the health by 1 per second until it reaches the maximum health value
+            if (this.health < this.maxHealth && this.oxygen >= this.maxOxygen / 2 && root.input.keysPressed ==
+                0
+            ) { 
+                heal(this, 0.02); 
             }
         }
 
 
-        if (!tile.solid && !tileBelow.solid && !this.isMoving) { // If the tile below is not solid and the unit is not moving and no keys are pressed, move the unit down by 64 pixels
-            if (!tile.climbable) { // If the tile below is not climbable, move the unit down by 64 pixels until it reaches the ground level or a solid tile below it
-                this.isFalling = true; // Set the isFalling flag to true
-            } else if (!root.input.keysPressed.includes('w') && tile.climbable) { // If the tile below is climbable, move the unit up by 64 pixels until it reaches the ground level or a solid tile below it
-                if (this.hangtime > 0) { // If the hangtime is greater than 0, decrement it by the delta time
-                    this.hangtime -= delta; // Decrement the hangtime by the delta time
-                } else { // If the hangtime is less than or equal to 0, move the unit down by 64 pixels until it reaches the ground level or a solid tile below it
-                    this.isFalling = true; // Set the isFalling flag to true
+        if (!tile.solid && !tileBelow.solid && !this
+            .isMoving
+        ) { 
+            if (!tile
+                .climbable
+            ) { 
+                this.isFalling = true; 
+            } else if (!root.input.keysPressed.includes('w') && tile
+                .climbable
+            ) { 
+                if (this.hangtime > 0) { 
+                    this.hangtime -= delta; 
+                } else { 
+                    this.isSinking = true; 
                 }
             }
         }
 
-        if (tileBelow.solid) { // If the tile below is solid or the unit has reached the ground level, stop falling and set the isFalling flag to false
-            if (this.isFalling) { // If the unit is falling, move it down by 64 pixels until it reaches the ground level or a solid tile below it
-                console.log("Unit has reached the ground level or a solid tile below it"); // Log a message to the console
-                events.emit("CAMERA_SHAKE", { position: { x: this.x, y: this.y }, destinationPosition: { x: this.x, y: this.y - 32 } }); // Emit the camera shake event to the server
+        if (tileBelow
+            .solid
+        ) { 
+            if (this
+                .isFalling
+            ) { 
+                console.log(
+                    "Unit has reached the ground level or a solid tile below it"); 
+                events.emit("CAMERA_SHAKE", {
+                    position: {
+                        x: this.x,
+                        y: this.y
+                    },
+                    destinationPosition: {
+                        x: this.x,
+                        y: this.y - 32
+                    }
+                }); 
 
-                if (tileBelow.durability > 0) { // If the durability of the tile below the unit is greater than 0, decrease the durability of the tile below the unit by 10
+                if (tileBelow.durability >
+                    0
+                ) { 
 
                     if (tileBelow.breakable) {
                         tileBelow.durability -= 35;
                     }
 
                     if (this.fallingDamage > 3) {
-                        takeDamage(this, this.fallingDamage); // Deal damage to the unit based on the falling damage value
+                        takeDamage(this, this
+                            .fallingDamage); 
                     };
-                    this.fallingDamage = 0; // Reset the falling damage value to 0 after dealing damage to the unit
+                    this.fallingDamage = 0; 
 
-                } else if (tileBelow.durability <= 0) { // If the durability of the tile below the unit is less than or equal to 0, remove the tile below the unit from the map and move the unit down by 64 pixels until it reaches the ground level or a solid tile below it    
+                } else if (tileBelow.durability <=
+                    0
+                ) { 
                     tileBelow.type = 'air';
                     tileBelow.color = getComputedStyle(document.querySelector('.light-grey')).backgroundColor;
                     tileBelow.solid = false;
                     tileBelow.passable = true;
-                    tileBelow.durability = 0; // Set the durability of the tile below the unit to 0
+                    tileBelow.durability = 0; 
                     this.fallingDamage = 0;
                 }
-                this.isFalling = false; // Set the isFalling flag to false
+                this.isFalling = false; 
 
 
             }
-            this.isFalling = false; // Set the isFalling flag to false
+            this.isFalling = false; 
         }
 
-        if (this.isFalling) { // If the unit is falling, move it down by 64 pixels per second until it reaches the ground level or a solid tile below it
+        if (this
+            .isSinking) {
             if (root.input.keysPressed.includes('w')) {
-                if (tile.climbable) { // If the tile below is climbable, move the unit up by 64 pixels until it reaches the ground level or a solid tile below it
-                    this.hangtime = 350; // Reset the hangtime to 0 when the unit reaches the ground level or a solid tile below it
-                    this.isFalling = false; // Set the isFalling flag to false
-                    this.fallingDamage = 0; // Reset the falling damage value to 0 after dealing damage to the unit
+                if (tile
+                    .climbable
+                ) {
+                    this.hangtime =
+                        350;
                 }
             }
-            if (tile.climbable) { // If the tile below is climbable, move the unit up by 64 pixels until it reaches the ground level or a solid tile below it
+            if (tile
+                .climbable
+            ) { 
                 if (root.input.keysPressed.includes('s')) {
-                    this.y += 8; // Move the unit up by 64 pixels per second until it reaches the ground level or a solid tile below it
-                    return; // Return early to prevent other actions while falling
+                    this.y +=
+                        8; 
+                    return; 
                 }
-                this.y += 1; // Move the unit up by 64 pixels per second until it reaches the ground level or a solid tile below it
-                return; // Return early to prevent other actions while falling
+                this.y +=
+                    1; 
+                return; 
             }
+        }
 
+
+        if (this
+            .isFalling
+        ) { 
             this.y += 8;
-            this.fallingDamage += 0.25; // Increase the falling damage by 1 per second until the unit reaches the ground level or a solid tile below it
-            return; // Return early to prevent other actions while falling
+            this.fallingDamage +=
+                0.25; 
+            return; 
         }
 
 
         if (root.input.keysPressed.length > 0 && !this.isMoving) {
-            if (this.facingDirection === 'left' && root.input.keysPressed.includes('d')) { // If the unit is facing left and the right key is pressed, update the facing direction to right
-                this.facingDirection = 'right'; // Update facing direction to right
+            if (this.facingDirection === 'left' && root.input.keysPressed.includes(
+                'd'
+            )) { 
+                this.facingDirection = 'right'; 
                 this.delay = 200;
-                return; // Return early to prevent moving while changing direction
-            } else if (this.facingDirection === 'right' && root.input.keysPressed.includes('a')) { // If the unit is facing right and the left key is pressed, update the facing direction to left   
-                this.facingDirection = 'left'; // Update facing direction to left
+                return; 
+            } else if (this.facingDirection === 'right' && root.input.keysPressed.includes(
+                'a'
+            )) { 
+                this.facingDirection = 'left'; 
                 this.delay = 200;
-                return; // Return early to prevent moving while changing direction
+                return; 
             }
             const keysPressed = root.input.keysPressed;
-            this.move(keysPressed); // Move the unit based on input keys
+            this.move(keysPressed); 
         }
 
         if (this.isMoving && this.targetPosition) {
@@ -393,12 +464,15 @@ class Unit extends GameObject {
                 if (distance <= this.maxDistance &&
                     targetX >= 0 && targetX < this.mapSize.width &&
                     targetY >= 0 && targetY < this.mapSize.height) {
-                    tilesInRange.push({ x: targetX, y: targetY });
+                    tilesInRange.push({
+                        x: targetX,
+                        y: targetY
+                    });
                 }
             }
         }
 
-        ctx.fillStyle = 'rgba(255, 238, 0, 0.5)'; // Semi-transparent green for move range
+        ctx.fillStyle = 'rgba(255, 238, 0, 0.5)'; 
         tilesInRange.forEach(tile => {
             ctx.fillRect(tile.x, tile.y, tileSize, tileSize);
         });
@@ -418,33 +492,38 @@ class Unit extends GameObject {
                 if (distance <= attackRange &&
                     targetX >= 0 && targetX < this.mapSize.width &&
                     targetY >= 0 && targetY < this.mapSize.height) {
-                    tilesInRange.push({ x: targetX, y: targetY });
+                    tilesInRange.push({
+                        x: targetX,
+                        y: targetY
+                    });
                 }
             }
         }
 
-        ctx.fillStyle = 'rgba(255, 0, 0, 0.7)'; // Semi-transparent red for attack range
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.7)'; 
         tilesInRange.forEach(tile => {
             ctx.fillRect(tile.x, tile.y, tileSize, tileSize);
         });
     }
 
     draw(ctx) {
-        if (!this.isAlive) return; // If the unit is not alive, return early to prevent drawing it on the canvas
+        if (!this.isAlive) return; 
         let offsetX = -32;
-        let offsetY = -18; // Adjust these values to center the image on the unit's position
+        let offsetY = -18; 
 
-        const scaleFactor = 2; // Adjust this value to scale the image
+        const scaleFactor = 2; 
 
-        ctx.save(); // Save the current state of the canvas
+        ctx.save(); 
 
         if (this.facingDirection === 'left') {
-            ctx.scale(-1, 1); // Flip the image horizontally
-            ctx.drawImage(this.image, -this.x - offsetX - this.size * scaleFactor, this.y + offsetY, this.size * scaleFactor, this.size * scaleFactor);
+            ctx.scale(-1, 1); 
+            ctx.drawImage(this.image, -this.x - offsetX - this.size * scaleFactor, this.y + offsetY, this.size *
+                scaleFactor, this.size * scaleFactor);
         } else {
-            ctx.drawImage(this.image, this.x + offsetX, this.y + offsetY, this.size * scaleFactor, this.size * scaleFactor);
+            ctx.drawImage(this.image, this.x + offsetX, this.y + offsetY, this.size * scaleFactor, this.size *
+                scaleFactor);
         }
 
-        ctx.restore(); // Restore the canvas state
+        ctx.restore(); 
     }
 }
