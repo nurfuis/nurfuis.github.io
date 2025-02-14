@@ -85,31 +85,7 @@ class Team extends GameObject {
         super.draw(ctx);
     }
 }
-class Particle {
-    constructor(x, y, size, lifetime) {
-        this.x = x;
-        this.y = y;
-        this.size = size;
-        this.lifetime = lifetime;
-        this.age = 0;
-    }
 
-    update() {
-        this.age++;
-        if (this.age > this.lifetime) {
-            this.size = 0;
-        }
-    }
-
-    draw(ctx) {
-        if (this.size > 0) {
-            ctx.fillStyle = `rgba(255, 255, 255, ${1 - this.age / this.lifetime})`;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fill();
-        }
-    }
-}
 
 class DarknessLayer extends GameObject {
     constructor(canvas, player, mapSize) {

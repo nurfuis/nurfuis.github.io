@@ -61,11 +61,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     generateItems();
 
+    const particleSystem = new ParticleSystem(canvas, camera, mapSize);
+    game.particleSystem = particleSystem;
+    game.map.addChild(particleSystem);
+
 
     const darknessLayer = new DarknessLayer(canvas, player, mapSize);
     game.darknessLayer = darknessLayer;
     game.addChild(darknessLayer);
-
 
 
 

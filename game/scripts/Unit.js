@@ -24,7 +24,7 @@ const attackTypes = [{
 }
 ];
 
-const groundLevel = 100; 
+const groundLevel = 100;
 
 class Unit extends GameObject {
     constructor(x, y, size, colorClass, speed, name, canvas, camera, mapSize, level = 1, experience = 0, health = 100) {
@@ -41,96 +41,107 @@ class Unit extends GameObject {
         this.maxHealth = health;
         this.mapSize = mapSize;
         this.targetPosition = null;
-        this.maxDistance = 128; 
-        this.initialX = x; 
-        this.initialY = y; 
-        this.attacks = this.getRandomAttacks(2); 
+        this.maxDistance = 128;
+        this.initialX = x;
+        this.initialY = y;
+        this.attacks = this.getRandomAttacks(2);
         this.selectedAttack = null;
-        this.isLoaded = false; 
-        this.loadReady = false; 
-        this.turnsLoaded = 0; 
-        this.vehicle = null; 
-        this.seatIndex = null; 
-        this.movePending = false; 
-        this.attackPending = false; 
-        this.attackReady = false; 
-        this.maxAttacks = 2; 
-        this.remainingAttacks = this.maxAttacks; 
-        this.perceptionRange = 128; 
-        this.isMoving = false; 
-        this.isFalling = false; 
-        this.facingDirection = 'right'; 
+        this.isLoaded = false;
+        this.loadReady = false;
+        this.turnsLoaded = 0;
+        this.vehicle = null;
+        this.seatIndex = null;
+        this.movePending = false;
+        this.attackPending = false;
+        this.attackReady = false;
+        this.maxAttacks = 2;
+        this.remainingAttacks = this.maxAttacks;
+        this.perceptionRange = 128;
+        this.isMoving = false;
+        this.isFalling = false;
+        this.facingDirection = 'right';
         this.image = new Image();
         this.image.src = 'images/guy.png';
-        this.fallingDamage = 0; 
+        this.fallingDamage = 0;
         const oxygen = 800;
-        this.oxygen = oxygen; 
-        this.maxOxygen = oxygen; 
-        this.isAlive = true; 
-        this.inventory = new Inventory(); 
-        this.isSinking = false; 
+        this.oxygen = oxygen;
+        this.maxOxygen = oxygen;
+        this.isAlive = true;
+        this.inventory = new Inventory();
+        this.isSinking = false;
 
-        events.on('SAP_COLLECTED', this, (sap) => { 
-            heal(this, 10); 
+        events.on('SAP_COLLECTED', this, (sap) => {
+            heal(this, 10);
         });
-        events.on('AIR_COLLECTED', this, (airBubble) => { 
-            this.oxygen += 100; 
+        events.on('AIR_COLLECTED', this, (airBubble) => {
+            this.oxygen += 100;
             if (this.oxygen > this
                 .maxOxygen
-            ) { 
+            ) {
                 this.oxygen = this
-                    .maxOxygen; 
+                    .maxOxygen;
             }
             updateOxygenBar(this.oxygen, this
-                .maxOxygen); 
+                .maxOxygen);
 
         });
-        events.on('ITEM_COLLECTED', this, (item) => { 
-            this.inventory.addItem(item); 
+        events.on('ITEM_COLLECTED', this, (item) => {
+            this.inventory.addItem(item);
 
         });
+
+        // Add particle emission cooldowns
+        this.particleCooldowns = {
+            water: {
+                current: 0,
+                max: 1000, // 1 second between bubble bursts
+                burstCount: 3, // Number of particles per burst
+                burstDelay: 100 // Delay between particles in a burst
+            }
+        };
     }
+
     ready() {
-        this.startingposition = new Vector2(this.x, this.y); 
+        this.startingposition = new Vector2(this.x, this.y);
     }
     die() {
-        this.isAlive = false; 
-        this.isFalling = false; 
-        this.isMoving = false; 
-        this.targetPosition = null; 
-        this.health = 0; 
-        this.oxygen = 0; 
-        this.fallingDamage = 0; 
-        this.x = this.startingposition.x; 
-        this.y = this.startingposition.y; 
-        updateOxygenBar(this.oxygen, this.maxOxygen); 
+        this.isAlive = false;
+        this.isFalling = false;
+        this.isMoving = false;
+        this.targetPosition = null;
+        this.health = 0;
+        this.oxygen = 0;
+        this.fallingDamage = 0;
+        this.x = this.startingposition.x;
+        this.y = this.startingposition.y;
+        updateOxygenBar(this.oxygen, this.maxOxygen);
         this.delay = 5000;
 
     }
     spawn() {
-        heal(this, this.maxHealth); 
-        this.oxygen = this.maxOxygen; 
-        updateOxygenBar(this.oxygen, this.maxOxygen); 
+        heal(this, this.maxHealth);
+        this.oxygen = this.maxOxygen;
+        updateOxygenBar(this.oxygen, this.maxOxygen);
         this.isAlive =
-            true; 
+            true;
         events.emit("PLAYER_POSITION", {
             x: this.x,
             y: this.y,
             cause: "spawn"
-        }); 
+        });
     }
 
     canMoveTo(x, y) {
-        const map = this.parent.parent; 
-        const tile = map.getTileAtCoordinates(x, y); 
-        if (!tile) return false; 
+        const map = this.parent.parent;
+        const tile = map.getTileAtCoordinates(x, y);
+        if (!tile) return false;
 
-        return tile; 
+        return tile;
 
     }
 
     getRandomAttacks(count) {
-        const availableAttacks = [...attackTypes]; 
+        const availableAttacks = [...attackTypes];
         const selectedAttacks = [];
         for (let i = 0; i < count; i++) {
             const randomIndex = Math.floor(Math.random() * availableAttacks.length);
@@ -168,15 +179,15 @@ class Unit extends GameObject {
                     console.log('Raycast Attack missed');
                 }
             }
-            this.attackReady = false; 
+            this.attackReady = false;
 
-            this.attackPending = false; 
+            this.attackPending = false;
             root.attackPending = false;
-            attackButton.classList.remove('active'); 
+            attackButton.classList.remove('active');
             toggleActionBarButtons(this.movePending, this.attackPending);
-            attackMenu.style.display = 'none'; 
+            attackMenu.style.display = 'none';
 
-            this.selectedAttack = null; 
+            this.selectedAttack = null;
             this.remainingAttacks--;
             return;
         }
@@ -194,7 +205,7 @@ class Unit extends GameObject {
         });
     }
     move(keysPressed) {
-        if (this.isMoving) return; 
+        if (this.isMoving) return;
         let dx = 0;
         let dy = 0;
 
@@ -229,6 +240,16 @@ class Unit extends GameObject {
             if (target.durability > 0 && target.breakable) {
                 const randomNumber = Math.random();
                 target.durability -= randomNumber * 2;
+                events.emit("PARTICLE_EMIT", {
+                    x: targetX,
+                    y: targetY,
+                    color: 'rgba(255, 255, 255, 0.5)',
+                    size: 4,
+                    duration: 1000,
+                    shape: 'square',
+                    count: 1,
+                });
+
             } else if (target.durability <= 0) {
                 target.type = 'air';
                 target.color = getComputedStyle(document.querySelector('.light-grey')).backgroundColor;
@@ -258,11 +279,11 @@ class Unit extends GameObject {
             const newY = unit.y + normalizedY * speed;
 
             if (newX > 0) {
-                unit.lastX = unit.x; 
+                unit.lastX = unit.x;
                 unit.x = newX;
             }
             if (newY > 0) {
-                unit.lastY = unit.y; 
+                unit.lastY = unit.y;
                 unit.y = newY;
             }
 
@@ -270,87 +291,143 @@ class Unit extends GameObject {
         return distance;
     }
 
+    emitWaterBubbles() {
+        if (this.particleCooldowns.water.current > 0) {
+            return;
+        }
+
+        // Calculate bubble count based on remaining oxygen
+        // More bubbles when oxygen is low, fewer when oxygen is high
+        const oxygenRatio = this.oxygen / this.maxOxygen;
+        const baseBurstCount = this.particleCooldowns.water.burstCount;
+        const actualBurstCount = Math.ceil(baseBurstCount * (1 + (1 - oxygenRatio) * 3));
+
+        // Emit a burst of bubbles
+        for (let i = 0; i < actualBurstCount; i++) {
+            setTimeout(() => {
+                events.emit("PARTICLE_EMIT", {
+                    x: this.x + 32 + (Math.random() - 0.5) * 16,
+                    y: this.y + 8 + (Math.random() - 0.5) * 16,
+                    color: 'rgba(0, 0, 255, 0.5)',
+                    size: 4 + (1 - oxygenRatio) * 2, // Larger bubbles when low on oxygen
+                    duration: 1000,
+                    shape: 'circle',
+                    count: 1,
+                });
+            }, i * this.particleCooldowns.water.burstDelay);
+        }
+
+        // Adjust cooldown based on oxygen level
+        // Shorter cooldown when low on oxygen
+        const cooldownMultiplier = 0.5 + oxygenRatio * 0.5;
+        this.particleCooldowns.water.current = this.particleCooldowns.water.max * cooldownMultiplier;
+    }
+
     step(delta, root) {
-        if (this.delay > 0) { 
-            this.delay -= delta; 
-            return; 
+        if (this.delay > 0) {
+            this.delay -= delta;
+            return;
         }
 
         if (!this.isAlive) {
-            this.spawn(); 
+            this.spawn();
         }
 
-        this.tryEmitPosition(); 
+        this.tryEmitPosition();
 
-        const tile = root.map.getTileAtCoordinates(this.x, this.y); 
+        const tile = root.map.getTileAtCoordinates(this.x, this.y);
 
-        if (!tile) return; 
+        if (!tile) return;
 
         const tileBelow = root.map.getTileAtCoordinates(this.x, this.y + 64) || {
             solid: true
-        }; 
+        };
 
         if (tile.type ===
             'water'
-        ) { 
-            takeBreath(this, 1); 
+        ) {
+            takeBreath(this, 1);
+            this.emitWaterBubbles(); // Replace direct emit with controlled burst
+
             if (this.oxygen <=
                 0
-            ) { 
-                takeDamage(this, 0.35); 
+            ) {
+                takeDamage(this, 0.35);
             }
         }
 
         if (tile.type === 'air') {
             if (this.oxygen < this
                 .maxOxygen
-            ) { 
-                this.oxygen += 1; 
+            ) {
+                this.oxygen += 1;
                 updateOxygenBar(this.oxygen, this
-                    .maxOxygen); 
+                    .maxOxygen);
             }
 
             if (this.oxygen >= this
                 .maxOxygen
-            ) { 
+            ) {
                 this.oxygen = this
-                    .maxOxygen; 
+                    .maxOxygen;
             }
 
             if (this.health < this.maxHealth && this.oxygen >= this.maxOxygen / 2 && root.input.keysPressed ==
                 0
-            ) { 
-                heal(this, 0.02); 
+            ) {
+                heal(this, 0.02);
             }
         }
 
 
         if (!tile.solid && !tileBelow.solid && !this
             .isMoving
-        ) { 
-            if (!tile
-                .climbable
-            ) { 
-                this.isFalling = true; 
-            } else if (!root.input.keysPressed.includes('w') && tile
-                .climbable
-            ) { 
-                if (this.hangtime > 0) { 
-                    this.hangtime -= delta; 
-                } else { 
-                    this.isSinking = true; 
+        ) {
+            if (tile
+                .type == 'air'
+            ) {
+                this.isFalling = true;
+            } else if (!root.input.keysPressed.includes('w') && tile // Is not trying to swim
+                .type == 'water'
+            ) {
+                if (this.hangtime > 0) {
+                    this.hangtime -= delta;
+                } else {
+                    this.isSinking = true;
                 }
             }
         }
 
         if (tileBelow
             .solid
-        ) { 
+        ) {
             if (this
                 .isFalling
-            ) { 
+            ) {
                 console.log(
-                    "Unit has reached the ground level or a solid tile below it"); 
+                    "Unit has reached the ground level or a solid tile below it");
+
+                if (tileBelow.breakable) {
+                    events.emit("PARTICLE_EMIT", {
+                        x: this.x + 32,
+                        y: this.y + 64,
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        size: 4,
+                        duration: 1000,
+                        shape: 'square',
+                        count: 10,
+                    });
+                } else {
+                    events.emit("PARTICLE_EMIT", {
+                        x: this.x + 32,
+                        y: this.y + 32,
+                        color: 'rgba(191, 191, 191, 0.5)',
+                        size: 1,
+                        duration: 1000,
+                        shape: 'circle',
+                        count: 1,
+                    });
+                }
                 events.emit("CAMERA_SHAKE", {
                     position: {
                         x: this.x,
@@ -360,11 +437,11 @@ class Unit extends GameObject {
                         x: this.x,
                         y: this.y - 32
                     }
-                }); 
+                });
 
                 if (tileBelow.durability >
                     0
-                ) { 
+                ) {
 
                     if (tileBelow.breakable) {
                         tileBelow.durability -= 35;
@@ -372,83 +449,107 @@ class Unit extends GameObject {
 
                     if (this.fallingDamage > 3) {
                         takeDamage(this, this
-                            .fallingDamage); 
+                            .fallingDamage);
                     };
-                    this.fallingDamage = 0; 
+                    this.fallingDamage = 0;
 
                 } else if (tileBelow.durability <=
                     0
-                ) { 
+                ) {
                     tileBelow.type = 'air';
                     tileBelow.color = getComputedStyle(document.querySelector('.light-grey')).backgroundColor;
                     tileBelow.solid = false;
                     tileBelow.passable = true;
-                    tileBelow.durability = 0; 
+                    tileBelow.durability = 0;
                     this.fallingDamage = 0;
                 }
-                this.isFalling = false; 
+                this.isFalling = false;
 
 
             }
-            this.isFalling = false; 
+            this.isFalling = false;
         }
 
         if (this
-            .isSinking) {
-            if (root.input.keysPressed.includes('w')) {
-                if (tile
-                    .climbable
-                ) {
-                    this.hangtime =
-                        350;
-                }
+            .isSinking && tile.type == 'water') {
+            if (root.input.keysPressed.includes('w')) { // float
+                this.hangtime =
+                    350;
+                const newX = tile.x;
+                const newY = tile.y;
+                this.targetPosition = {
+                    x: newX,
+                    y: newY
+                };
+                this.isMoving = true;
+                this.isSinking = false;
+                return;
             }
-            if (tile
-                .climbable
-            ) { 
-                if (root.input.keysPressed.includes('s')) {
-                    this.y +=
-                        8; 
-                    return; 
-                }
+
+            if (tileBelow.solid) {
+                const newX = tile.x;
+                const newY = tile.y;
+                this.targetPosition = {
+                    x: newX,
+                    y: newY
+                };
+                this.isMoving = true;
+                this.isSinking = false;
+                return;
+
+            }
+            if (root.input.keysPressed.includes('s')) { // Sink more quickly
                 this.y +=
-                    1; 
-                return; 
+                    8;
+                return;
             }
+            this.y +=
+                1;
+            return;
         }
 
 
         if (this
             .isFalling
-        ) { 
+        ) {
+            if (tile.type == 'water') {
+                this.isSinking = true;
+                this.isFalling = false;
+                return;
+            }
             this.y += 8;
             this.fallingDamage +=
-                0.25; 
-            return; 
+                0.25;
+            return;
         }
 
 
         if (root.input.keysPressed.length > 0 && !this.isMoving) {
             if (this.facingDirection === 'left' && root.input.keysPressed.includes(
                 'd'
-            )) { 
-                this.facingDirection = 'right'; 
+            )) {
+                this.facingDirection = 'right';
                 this.delay = 200;
-                return; 
+                return;
             } else if (this.facingDirection === 'right' && root.input.keysPressed.includes(
                 'a'
-            )) { 
-                this.facingDirection = 'left'; 
+            )) {
+                this.facingDirection = 'left';
                 this.delay = 200;
-                return; 
+                return;
             }
             const keysPressed = root.input.keysPressed;
-            this.move(keysPressed); 
+            this.move(keysPressed);
         }
 
         if (this.isMoving && this.targetPosition) {
             const distance = this.moveTowards(this, this.targetPosition, this.speed);
         }
+
+        // Update cooldowns
+        Object.values(this.particleCooldowns).forEach(cooldown => {
+            cooldown.current = Math.max(0, cooldown.current - delta);
+        });
     }
 
     highlightMoveRange(ctx) {
@@ -472,7 +573,7 @@ class Unit extends GameObject {
             }
         }
 
-        ctx.fillStyle = 'rgba(255, 238, 0, 0.5)'; 
+        ctx.fillStyle = 'rgba(255, 238, 0, 0.5)';
         tilesInRange.forEach(tile => {
             ctx.fillRect(tile.x, tile.y, tileSize, tileSize);
         });
@@ -500,23 +601,23 @@ class Unit extends GameObject {
             }
         }
 
-        ctx.fillStyle = 'rgba(255, 0, 0, 0.7)'; 
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.7)';
         tilesInRange.forEach(tile => {
             ctx.fillRect(tile.x, tile.y, tileSize, tileSize);
         });
     }
 
     draw(ctx) {
-        if (!this.isAlive) return; 
+        if (!this.isAlive) return;
         let offsetX = -32;
-        let offsetY = -18; 
+        let offsetY = -18;
 
-        const scaleFactor = 2; 
+        const scaleFactor = 2;
 
-        ctx.save(); 
+        ctx.save();
 
         if (this.facingDirection === 'left') {
-            ctx.scale(-1, 1); 
+            ctx.scale(-1, 1);
             ctx.drawImage(this.image, -this.x - offsetX - this.size * scaleFactor, this.y + offsetY, this.size *
                 scaleFactor, this.size * scaleFactor);
         } else {
@@ -524,6 +625,6 @@ class Unit extends GameObject {
                 scaleFactor);
         }
 
-        ctx.restore(); 
+        ctx.restore();
     }
 }
