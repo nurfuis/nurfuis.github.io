@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fey Unit</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <style>
+        /* Add styles for the overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .overlay button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-interface">
+        <canvas id="gameCanvas"></canvas>
+
+        <div class="legend hidden">
+            <h2>Legend</h2>
+            <div class="legend-item player-color">Player</div>
+            <div class="legend-item dark-grey">Water</div>
+            <div class="legend-item grey">Wood</div>
+            <div class="legend-item light-grey">Air</div>
+            <div class="legend-item brown">Earth</div>
+        </div>
+
+        <div class="health-bar">
+            <h2>Heart</h2>
+            <div class="health-container">
+                <div id="health" class="health"></div>
+            </div>
+        </div>
+        <div class="oxygen-bar">
+            <h2>Lungs</h2>
+            <div class="oxygen-container">
+                <div id="oxygen" class="oxygen"></div>
+            </div>
+        </div>
+        <div class="stomach-bar">
+            <h2>Stomach</h2>
+            <div class="stomach-container">
+                <div id="stomach" class="stomach"></div>
+            </div>
+        </div>
+        <div class="unit-stats hidden">
+            <h2 id="active-unit-name">Unit Stats</h2>
+            <p id="unit-level">Level: 1</p>
+            <p id="unit-experience">Experience: 0</p>
+        </div>
+        <div class="tile-stats hidden">
+            <h2 id="tile-stats-title">Tile</h2>
+            <p id="tile-type">Type: Unknown</p>
+            <p id="tile-location">Location: (0, 0)</p>
+        </div>
+        <div class="action-bar hidden">
+            <button id="move-button">Move</button>
+            <button id="attack-button">Attack</button>
+            <button id="defend-button">Defend</button>
+            <button id="item-button">Use Item</button>
+            <button id="damage-button">Take Damage</button>
+            <button id="heal-button">Heal</button>
+            <button id="menu-button">Menu</button>
+            <button id="end-turn-button">End Turn</button>
+        </div>
+        <div class="turn-order hidden">
+            <h2>Turn Order</h2>
+            <ul id="turn-order"></ul>
+        </div>
+        <div id="attack-menu">
+        </div>
+        <div class="scoreboard">
+            <div class="score-item">
+                <img src="images/acorn-large.png" alt="Acorn" class="score-icon">
+                <span id="acorn-count" class="score-count">0</span>
+            </div>
+            <div class="score-item">
+                <img src="images/fey-light-large.png" alt="Fey Pollen" class="score-icon">
+                <span id="pollen-count" class="score-count">0</span>
+            </div>
+            <div class="score-item">
+                <img src="images/lumina-sphere-large.png" alt="Lumina Sphere" class="score-icon">
+                <span id="sphere-count" class="score-count">0</span>
+            </div>
+        </div>
+        <div id="inventory-menu" style="display: none;">
+        </div>
+        <div id="load-menu">
+        </div>
+
+        <div id="vehicle-controls-menu">
+        </div>
+    </div>
+    <div id="pause-screen">
+        <h1>Sea Anemone</h1>
+        <p>by Ross Clayton Cramer</p>
+    </div>
+
+
+
+    <div id="debug-menu" style="display: none;"> </div>
+
+    <!-- Overlay div with instructions -->
+    <!-- <div class="overlay hidden" id="instruction-overlay" onclick="document.getElementById('instruction-overlay').style.display='none'">
+        <h2>Welcome to Fey Tactics</h2>
+        <p>Use the arrow keys WASD to move your character.</p>
+        <p>Use E and the arrow keys to target a tile.</p>
+        <p>Use Q to place or remove earth.</p>
+        <button >Got it!</button>
+
+    </div> -->
+
+    <script src="scripts/Vector2.js"></script>
+    <script src="scripts/Events.js"></script>
+    <script src="scripts/game-utils.js"></script>
+    <script src="scripts/Input.js"></script>
+    <script src="scripts/event-listeners.js"></script>
+    <script src="scripts/game-objects.js"></script>
+    <script src="scripts/Particle.js"></script>
+    <script src="scripts/game-items.js"></script>
+    <script src="scripts/Inventory.js"></script>
+    <script src="scripts/Sap.js"></script>
+    <script src="scripts/AirBubble.js"></script>
+    <script src="scripts/Seed.js"></script>
+    <script src="scripts/Acorn.js"></script>
+    <script src="scripts/EvasiveUnit.js"></script>
+    <script src="scripts/GameMap.js"></script>
+    <script src="scripts/Unit.js"></script>
+    <script src="scripts/FeyLight.js"></script>
+    <script src="scripts/LuminaSphere.js"></script>
+    <script src="scripts/Anemone.js"></script>
+    <script src="scripts/PatrolUnit.js"></script>
+    <script src="scripts/game-camera.js"></script>
+    <script src="scripts/GameLoop.js"></script>
+    <script src="scripts/debug.js"></script>
+    <script src="scripts/main.js"></script>
+</body>
+
+</html>
