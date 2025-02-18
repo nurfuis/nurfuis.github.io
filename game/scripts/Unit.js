@@ -200,7 +200,7 @@ class Stomach {
 class Unit extends GameObject {
     constructor(x, y, size, colorClass, speed, name, canvas, camera, mapSize, level = 1, experience = 0, health = 100) {
         super(canvas);
-        this.debug = true;
+        this.debug = false;
         document.addEventListener('keydown', (event) => {
             if (event.key === 'F2') {
                 event.preventDefault();
@@ -289,7 +289,10 @@ class Unit extends GameObject {
 
         this.imageDown = new Image();
         this.imageDown.src = 'images/Sprite-curioustraveler3.png';
-
+        
+        events.on('MAP_CHANGED', this, (map) => {
+            this.moveToSpawn();
+        });
         events.on('PATROL_DEFEATED', this, (patrol) => {
             this.isCollecting = false;
         });
@@ -332,7 +335,7 @@ class Unit extends GameObject {
             this.heart.takeDamage(2);
 
 
-            const safePosition = this.findSafeReturnPosition(this.parent.parent);
+            const safePosition = this.findSafeReturnPosition(this.parent.parent.map);
             if (safePosition) {
                 this.targetPosition = safePosition;
                 this.isMoving = true;
@@ -414,6 +417,54 @@ class Unit extends GameObject {
             }
         });
     }
+
+    moveToSpawn() {
+        this.x = this.startingposition.x;
+        this.y = this.startingposition.y;
+
+        this.lastX = null;
+        this.lastY = null;
+
+        this.lastMovementDirection = { x: 0, y: 0 };
+
+        this.facingDirection = 'right';
+
+        this.isGravityOff = false;
+
+        this.previousTile = null;
+
+        this.tile = this.currentTile;
+
+        this.calculateMooreNeighbors(this.gameMap);
+
+        events.emit("PLAYER_POSITION", {
+            x: this.x,
+            y: this.y,
+            cause: "spawn"
+        });
+
+
+    }
+    updateSpawnPoint(x, y) {
+        this.x = x;
+        this.y = y;
+
+        this.initialX = x;
+        this.initialY = y;
+
+        this.startingposition = new Vector2(x, y);
+
+        this.calculateMooreNeighbors(this.gameMap);
+
+        this.tile = this.currentTile;
+
+        events.emit("PLAYER_POSITION", {
+            x: this.x,
+            y: this.y,
+            cause: "spawn"
+        });
+    }
+
     ready() {
         this.startingposition = new Vector2(this.x, this.y);
 
@@ -488,7 +539,7 @@ class Unit extends GameObject {
         });
     }
     canMoveTo(x, y) {
-        const map = this.parent.parent;
+        const map = this.parent.parent.map;
         const tile = map.getTileAtCoordinates(x, y);
         if (!tile) return false;
 
@@ -626,10 +677,13 @@ class Unit extends GameObject {
             }
         }
 
+        const checkRightBorder = this.x + this.size >= this.mapSize.width;
+        const checkLeftBorder = this.x <= 0;
+
         if (selectedTile) {
             if (selectedTile.passable) {
 
-                
+
                 this.targetPosition = new Vector2(selectedTile.x, selectedTile.y);
                 this.isMoving = true;
 
@@ -640,12 +694,21 @@ class Unit extends GameObject {
                 };
             } else if (selectedTile.breakable) {
                 this.tryBreakBlock(selectedTile);
+            } else if (selectedTile.type === 'border') {
+                if (checkLeftBorder) {
+                    // go back
+                    events.emit('RETREAT_MAP');
+
+                } else if (checkRightBorder) {
+                    // go forward
+                    events.emit('ADVANCE_MAP');
+                }
             }
         }
     }
 
 
-    fallTOwards () {
+    fallTowards() {
 
 
     }
@@ -889,7 +952,7 @@ class Unit extends GameObject {
             sinking = true;
             direction = 'down';
         }
-        
+
 
         if (tile.type === 'air' && tileBelow.type === 'air' && !sinking) {
             direction = 'down';
@@ -915,7 +978,7 @@ class Unit extends GameObject {
             direction = 'center';
         }
 
-        if (tile.type ==='air' && tileBelow.type === 'water') {
+        if (tile.type === 'air' && tileBelow.type === 'water') {
             falling = true;
             sinking = false;
         }
@@ -1140,7 +1203,7 @@ class Unit extends GameObject {
                     ctx.fillText(text, neighbor.x + 10, neighbor.y + 20);
                     ctx.fillText(text2, neighbor.x + 10, neighbor.y + 40);
 
-                } 
+                }
                 if (this.direction) {
                     const directions = { 'up': 1, 'up-right': 2, 'right': 5, 'down-right': 8, 'down': 7, 'down-left': 6, 'left': 3, 'up-left': 0 };
                     const directionIndex = directions[this.direction];
@@ -1173,10 +1236,10 @@ class Unit extends GameObject {
         return new Vector2(this.x, this.y);
     }
     get gameMap() {
-        return this.parent.parent;
+        return this.parent.parent.map;
     }
     get currentTile() {
-        return this.parent.parent.getTileAtCoordinates(this.x, this.y);
+        return this.parent.parent.map.getTileAtCoordinates(this.x, this.y);
     }
     get tileBelow() {
         return this.mooreNeighbors[7];

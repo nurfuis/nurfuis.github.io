@@ -89,16 +89,16 @@ class Team extends GameObject {
 
 
 class DarknessLayer extends GameObject {
-    constructor(canvas, player, mapSize) {
+    constructor(canvas, player, map) {
         super(canvas);
         this.player = player;
         this.canvas = canvas;
-        this.mapSize = mapSize;
+        this.map = map;
 
         this.torchRadius = 150; // Initial torch radius
         this.torchFlicker = 0; // Flicker effect
 
-        this.darknessDistance = 1500; 
+        this.darknessDistance = 1500;
 
         this.debug = false; // Initialize debug mode as disabled
 
@@ -141,7 +141,7 @@ class DarknessLayer extends GameObject {
         gradient.addColorStop(1, 'rgba(0, 0, 0, 1)');
 
         ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, this.mapSize.width, this.mapSize.height);
+        ctx.fillRect(0, 0, this.map.mapSize.width, this.map.mapSize.height);
 
         // Draw the torchlight effect
         let torchX = this.player.x; // X position of the torchlight center (player position)
@@ -149,7 +149,7 @@ class DarknessLayer extends GameObject {
 
         if (this.player.facingDirection === 'right') {
             torchX += 64; // Adjust the torchlight position based on the player's facing direction
-        } 
+        }
         if (this.hasShake) {
             const randomX = Math.random() * 10 - 5; // Random shake offset in X direction
             const randomY = Math.random() * 10 - 5; // Random shake offset in Y direction
@@ -165,7 +165,7 @@ class DarknessLayer extends GameObject {
         torchGradient.addColorStop(1, 'rgba(255, 140, 0, 0)');
 
         ctx.fillStyle = torchGradient;
-        ctx.fillRect(0, 0, this.mapSize.width, this.mapSize.height);
+        ctx.fillRect(0, 0, this.map.mapSize.width, this.map.mapSize.height);
     }
 }
 
@@ -174,10 +174,10 @@ class VignetteLayer extends GameObject {
         super(canvas);
         this.canvas = canvas;
         this.mapSize = mapSize;
-        
+
         // Add extra padding for shake effects
         this.padding = 64;
-        
+
         // Calculate panel sizes based on max pan distance (half canvas)
         this.leftWidth = Math.ceil(canvas.width / 2) + this.padding;
         this.rightWidth = Math.ceil(canvas.width / 2) + this.padding;
@@ -196,34 +196,133 @@ class VignetteLayer extends GameObject {
 
         // Left panel
         ctx.fillRect(
-            -this.leftWidth, 
-            -this.topHeight, 
-            this.leftWidth, 
+            -this.leftWidth,
+            -this.topHeight,
+            this.leftWidth,
             this.mapSize.height + this.topHeight + this.bottomHeight
         );
 
         // Right panel
         ctx.fillRect(
-            this.mapSize.width, 
-            -this.topHeight, 
-            this.rightWidth, 
+            this.mapSize.width,
+            -this.topHeight,
+            this.rightWidth,
             this.mapSize.height + this.topHeight + this.bottomHeight
         );
 
         // Top panel
         ctx.fillRect(
-            0, 
-            -this.topHeight, 
-            this.mapSize.width, 
+            0,
+            -this.topHeight,
+            this.mapSize.width,
             this.topHeight
         );
 
         // Bottom panel
         ctx.fillRect(
-            0, 
-            this.mapSize.height, 
-            this.mapSize.width, 
+            0,
+            this.mapSize.height,
+            this.mapSize.width,
             this.bottomHeight
         );
+    }
+}
+
+class OnScreenWriting extends GameObject {
+    constructor(canvas, camera, map) {
+        super();
+        this.canvas = canvas;
+        this.camera = camera;
+        this.map = map;
+
+        this.displayText = {
+            heading: { text: '', opacity: 0, fadeTimer: 0 },
+            subheading: { text: '', opacity: 0, fadeTimer: 0 },
+            paragraph: { text: '', opacity: 0, fadeTimer: 0 }
+        };
+
+        this.fadeConfig = {
+            fadeInDuration: 500,
+            displayDuration: 2000,
+            fadeOutDuration: 1000,
+            headingDelay: 0,
+            subheadingDelay: 500,
+            paragraphDelay: 1000
+        };
+
+        // Listen for text display events
+        events.on('DISPLAY_TEXT', this, (data) => {
+            this.displayText = {
+                heading: { 
+                    text: data.heading || '', 
+                    opacity: 0, 
+                    fadeTimer: -this.fadeConfig.headingDelay 
+                },
+                subheading: { 
+                    text: data.subheading || '', 
+                    opacity: 0, 
+                    fadeTimer: -this.fadeConfig.subheadingDelay 
+                },
+                paragraph: { 
+                    text: data.paragraph || '', 
+                    opacity: 0, 
+                    fadeTimer: -this.fadeConfig.paragraphDelay 
+                }
+            };
+        });
+    }
+
+    step(delta) {
+        ['heading', 'subheading', 'paragraph'].forEach(type => {
+            const element = this.displayText[type];
+            if (element.text) {
+                element.fadeTimer += delta;
+                const totalDuration = this.fadeConfig.fadeInDuration + 
+                                    this.fadeConfig.displayDuration + 
+                                    this.fadeConfig.fadeOutDuration;
+
+                if (element.fadeTimer <= 0) {
+                    element.opacity = 0;
+                } else if (element.fadeTimer <= this.fadeConfig.fadeInDuration) {
+                    element.opacity = element.fadeTimer / this.fadeConfig.fadeInDuration;
+                } else if (element.fadeTimer <= this.fadeConfig.fadeInDuration + this.fadeConfig.displayDuration) {
+                    element.opacity = 1;
+                } else if (element.fadeTimer <= totalDuration) {
+                    const fadeOutProgress = (element.fadeTimer - this.fadeConfig.fadeInDuration - this.fadeConfig.displayDuration) 
+                        / this.fadeConfig.fadeOutDuration;
+                    element.opacity = 1 - fadeOutProgress;
+                } else {
+                    element.text = '';
+                    element.opacity = 0;
+                }
+            }
+        });
+    }
+
+    drawImage(ctx, drawPosX, drawPosY) {
+        ctx.save();
+        
+        // Configure text styles
+        const styles = {
+            heading: { font: 'bold 48px Oswald', y: 128 },
+            subheading: { font: 'bold 32px Trocchi', y: 188 },
+            paragraph: { font: '24px Trocchi', y: 248 }
+        };
+
+        // Draw each text element
+        Object.entries(this.displayText).forEach(([type, element]) => {
+            if (element.text && element.opacity > 0) {
+                ctx.fillStyle = `rgba(255, 255, 255, ${element.opacity})`;
+                ctx.strokeStyle = `rgba(0, 0, 0, ${element.opacity})`;
+                ctx.font = styles[type].font;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                ctx.strokeText(element.text, 0, styles[type].y);
+                ctx.fillText(element.text, 0, styles[type].y);
+            }
+        });
+
+        ctx.restore();
     }
 }

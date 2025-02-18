@@ -1,8 +1,8 @@
 class Camera extends GameObject {
-    constructor(canvas, mapSize) {
+    constructor(canvas, map) {
         super(canvas);
         this.canvas = canvas;
-        this.mapSize = mapSize;
+        this.map = map;
         const newX = 0;
         const newY = 0;
         this.position = new Vector2(newX, newY);
@@ -22,7 +22,7 @@ class Camera extends GameObject {
         this.shiftDistance = 64; // pixels
         this.shiftCounter = this.shiftDistance;
 
-        const tileWidth = mapSize.tileSize; // Adjust tile width as needed
+        const tileWidth = this.map.mapSize.tileSize; // Adjust tile width as needed
         this.halfTile = tileWidth / 2;
         this.halfWidth = -this.halfTile + canvas.width / 2;
         this.halfHeight = -this.halfTile + canvas.height / 2;
@@ -82,8 +82,8 @@ class Camera extends GameObject {
         }
 
         // Constrain camera within the map boundaries
-        const minX = this.canvas.width - this.mapSize.width - panExtensionX;
-        const minY = this.canvas.height - this.mapSize.height - panExtensionY;
+        const minX = this.canvas.width - this.map.mapSize.width - panExtensionX;
+        const minY = this.canvas.height - this.map.mapSize.height - panExtensionY;
         const maxX = panExtensionX;
         const maxY = panExtensionY;
 
@@ -191,8 +191,8 @@ class Camera extends GameObject {
         // Constrain camera within the map boundaries
         const minX = 0;
         const minY = 0;
-        const maxX = this.mapSize.width - this.canvas.width;
-        const maxY = this.mapSize.height - this.canvas.height;
+        const maxX = this.map.mapSize.width - this.canvas.width;
+        const maxY = this.map.mapSize.height - this.canvas.height;
 
         this.position.x = Math.max(minX, Math.min(centerX, maxX));
         this.position.y = Math.max(minY, Math.min(centerY, maxY));
