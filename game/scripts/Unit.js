@@ -446,7 +446,7 @@ class Transmission {
 class Unit extends GameObject {
     constructor(x, y, size, colorClass, speed, name, canvas, camera, map, level = 1, experience = 0, health = 100) {
         super(canvas);
-        this.debug = true;
+        this.debug = false;
 
         document.addEventListener('keydown', (event) => {
             if (event.key === 'F2') {
