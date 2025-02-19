@@ -53,7 +53,7 @@ class EvasiveUnit extends GameObject {
             { x: -1, y: 0 }, // Left
         ];
 
-        const tileSize = root.mapSize.tileSize;
+        const tileSize = root.map.mapSize.tileSize;
 
         for (const direction of directions) {
             const neighborX = this.position.x + direction.x * tileSize;

@@ -91,14 +91,13 @@ class GameMap extends GameObject {
             }
         });
 
-        // Add to class properties in constructor
 
     }
     ready() {
         events.emit('DISPLAY_TEXT', {
             heading: gameWorlds[this.gameWorld].name,
-            subheading: 'Welcome',
-            paragraph: 'Use WASD to move.'
+            subheading: gameWorlds[this.gameWorld].subheading,
+            paragraph: gameWorlds[this.gameWorld].paragraph
         });
     }
     step(delta, root) {
@@ -243,6 +242,10 @@ class GameMap extends GameObject {
                 return generateSapForestWorld(this, this.lengthOfRun);
             case 'combined':
                 return generateCombinedWorld(this, this.lengthOfRun);
+            case 'underworld':
+                return generateUnderworld(this);
+            case 'ledge':
+                return generateEarthLedge(this);
             default:
                 console.warn(`Unknown world type: ${this.gameWorld}, defaulting to flat`);
                 return generateFlatWorld(this);
@@ -658,7 +661,10 @@ class GameMap extends GameObject {
             }
         });
 
-
+        if (this.editMode) {
+            this.highlightEditRange(ctx);
+            this.highlightSelectedTile(ctx);
+        }
     }
     disturbWater(x, y) {
         const tile = this.getTileAtCoordinates(x, y);
@@ -675,7 +681,6 @@ class GameMap extends GameObject {
         }
     }
 
-    // Update cycleMapType method
     cycleMapType() {
         const worldTypes = Object.keys(gameWorlds);
         const currentIndex = worldTypes.indexOf(this.gameWorld);
@@ -689,8 +694,8 @@ class GameMap extends GameObject {
         // Emit text display event instead of updating worldNameDisplay
         events.emit('DISPLAY_TEXT', {
             heading: gameWorlds[nextWorld].name,
-            subheading: 'Testing out the new world',
-            paragraph: '...'
+            subheading: gameWorlds[nextWorld].subheading,
+            paragraph: gameWorlds[nextWorld].paragraph
         });
 
         events.emit('MAP_CHANGED', this);
@@ -720,7 +725,6 @@ class GameMap extends GameObject {
 
         }
     }
-
     advanceMap() {
         const worldTypes = Object.keys(gameWorlds);
         const currentIndex = worldTypes.indexOf(this.gameWorld);

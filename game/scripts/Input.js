@@ -96,14 +96,10 @@ class Input {
             // Recenter map to active unit on numpad 0 key press
             if (event.key === '0' && event.location === KeyboardEvent.DOM_KEY_LOCATION_NUMPAD) {
                 const currentUnit = this.turnOrder[this.currentTurnIndex];
-                this.camera.position.x = Math.round(currentUnit.x - this.canvas.width / 2 + currentUnit.size / 2);
-                this.camera.position.y = Math.round(currentUnit.y - this.camera.height / 2 + currentUnit.size / 2);
+                this.camera.position.x = Math.round(currentunit.position.x - this.canvas.width / 2 + currentUnit.size / 2);
+                this.camera.position.y = Math.round(currentunit.position.y - this.camera.height / 2 + currentUnit.size / 2);
             }
 
-            if(event.key ==='F3') {
-                event.preventDefault(); // Prevent the default F3 action (view source)
-                events.emit("DEBUG_TOGGLE"); // Emit the event to toggle debug mode
-            }
 
 
             // Toggle UI visibility on F1 key press

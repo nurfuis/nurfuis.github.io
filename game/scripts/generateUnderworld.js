@@ -191,19 +191,19 @@
 
                 if (tileAbove && tileBelow && currentTile.type === 'earth' && tileAbove.type === 'air') {
 
-                    currentTile.alernateImage = randomInt(1,
+                    currentTile.variant = randomInt(1,
                         5); // Set the image of the current tile to the earth tile texture with air above
                 }
                 if (tileAbove && tileBelow && currentTile.type === 'earth' && tileBelow.type === 'air') {
 
-                    currentTile.alernateImage = randomInt(6,
+                    currentTile.variant = randomInt(6,
                         11); // Set the image of the current tile to the earth tile texture with air above
                 }
                 if (tileAbove && tileBelow && currentTile.type === 'earth' && tileAbove.type === 'earth' &&
                     tileBelow.type === 'earth') {
                     const random = Math.random(); // Generate a random number between 0 and 1
                     if (random < 0.5) {
-                        currentTile.alernateImage = randomInt(12,
+                        currentTile.variant = randomInt(12,
                             27); // Set the image of the current tile to the earth tile texture with air above
                     }
                 }
@@ -211,7 +211,7 @@
                 if (currentTile.type === 'wood') {
                     const random = Math.random(); // Generate a random number between 0 and 1
                     if (random < 0.5) { // 50% chance to set the image to the wood tile texture with air adjacent
-                        currentTile.alernateImage =
+                        currentTile.variant =
                             2; // Set the image of the current tile to the wood tile texture with air adjacent
                     }
 
@@ -223,7 +223,7 @@
                         const airRight = tileRight.type === 'air'; // Check if the tile to the right is air
 
                         if (airUp || airDown || airLeft || airRight) { // Check if any of the adjacent tiles are air
-                            currentTile.alernateImage =
+                            currentTile.variant =
                                 1; // Set the image of the current tile to the wood tile texture with air adjacent
                         }
                     }
@@ -231,7 +231,7 @@
 
                 if (currentTile.type === 'water') {
                     const tileIndex = randomInt(1, 5);
-                    currentTile.alernateImage =
+                    currentTile.variant =
                         tileIndex; // Set the image of the current tile to the water tile texture with air adjacent   
                 }
             }

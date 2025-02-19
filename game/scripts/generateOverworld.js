@@ -306,6 +306,105 @@ function generateHillsWorld(map) {
     }
     return tiles;
 }
+function generateEarthLedge(map) {
+    const rows = Math.ceil(map.mapSize.height / map.tileSize);
+    const cols = Math.ceil(map.mapSize.width / map.tileSize);
+    const tileSize = map.tileSize;
+    const tiles = [];
+
+    firstPass();
+    secondPass();
+    function firstPass() {
+        for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+                const noiseValue = perlin(x / 10, y / 10);
+
+                let newTile = tile;
+                const tileX = x * tileSize;
+                const tileY = y * tileSize;
+
+
+                if (y === 7) {
+                    newTile = stone(tileX, tileY);
+                }
+
+
+                else if (y === 6) {
+                    newTile = water(tileX, tileY);
+                }
+
+
+                else if (y === 5) {
+                    newTile = earth(tileX, tileY);
+                }
+
+                else if (y === 4) {
+                    if (x >= 3 && x <= 5) {
+
+                        newTile = earth(tileX, tileY);
+                    } else {
+                        newTile = air(tileX, tileY);
+                    }
+                }
+
+                else if (y === 3) {
+                    if (x === 3 || x === 5) {
+
+                        newTile = earth(tileX, tileY);
+                    } else {
+                        newTile = air(tileX, tileY);
+                    }
+                }
+                else if (y === 2) {
+                    if (x === 5) {
+                        newTile = earth(tileX, tileY);
+                    } else {
+                        newTile = air(tileX, tileY);
+                    }
+                }
+                else if (y === 1) {
+                    if (x === 0 || x === 1 || x === 4) {
+                        newTile = stone(tileX, tileY);
+                    } else {
+                        newTile = air(tileX, tileY);
+                    }
+                }
+                else if (y === 0) {
+                    if (x === 5) {
+                        newTile = stone(tileX, tileY);
+                    } else {
+                        newTile = air(tileX, tileY);
+                    }
+                }
+
+                else {
+                    newTile = air(tileX, tileY);
+                }
+
+
+                tiles.push(newTile);
+            }
+        }
+    }
+    // Second pass for spawn point
+    function secondPass() {
+        let worldSpawnFound = false;
+        for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+                const tileX = x * tileSize;
+                const tileY = y * tileSize;
+
+                const tile = tiles.find(t => t.x === tileX && t.y === tileY);
+                const tileAbove = tiles.find(t => t.x === tileX && t.y === tileY - tileSize);
+                const tileBelow = tiles.find(t => t.x === tileX && t.y === tileY + tileSize);
+
+
+            }
+        }
+    }
+    return tiles;
+}
+
 function generateForestWorld(map) {
     const rows = Math.ceil(map.mapSize.height / map.tileSize);
     const cols = Math.ceil(map.mapSize.width / map.tileSize);
@@ -488,7 +587,7 @@ function generateShallowWaterWorld(map) {
 
 
                 else if (y === 6) {
-                    if (x <= 2 || x >= 5) {
+                    if (x >= 5) {
                         newTile = earth(tileX, tileY);
                     } else {
                         newTile = water(tileX, tileY);
@@ -601,7 +700,7 @@ function generateSapForestWorld(map) {
                 function drawSmallTree(x, y, treeX, tile) {
 
                     if (x === treeX) {
-                        if (y === 4 || y === 3) {
+                        if (y === 5 || y === 4 || y === 3) {
                             const newTile = wood(tileX, tileY);
                             newTile.variant = 1;
                             Object.assign(tile, newTile);
@@ -621,7 +720,7 @@ function generateSapForestWorld(map) {
 
                 }
                 const random = Math.random();
-                if (tile.type === 'wood' && random < 0.5) {
+                if (tile.type === 'wood' && y === 5 ) {
                     const sap = new Sap(map.canvas, new Vector2(tile.x, tile.y));
                     map.addChild(sap);
                 }

@@ -133,8 +133,8 @@ class DarknessLayer extends GameObject {
         const spread = this.darknessDistance; // Adjust the spread of the darkness effect as needed
 
         const gradient = ctx.createRadialGradient(
-            this.player.x, this.player.y, 0,
-            this.player.x, this.player.y, spread
+            this.player.position.x, this.player.position.y, 0,
+            this.player.position.x, this.player.position.y, spread
         );
         gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
         gradient.addColorStop(0.7, 'rgba(0, 0, 0, 0.95)');
@@ -144,8 +144,8 @@ class DarknessLayer extends GameObject {
         ctx.fillRect(0, 0, this.map.mapSize.width, this.map.mapSize.height);
 
         // Draw the torchlight effect
-        let torchX = this.player.x; // X position of the torchlight center (player position)
-        let torchY = this.player.y; // Y position of the torchlight center (player position)
+        let torchX = this.player.position.x; // X position of the torchlight center (player position)
+        let torchY = this.player.position.y; // Y position of the torchlight center (player position)
 
         if (this.player.facingDirection === 'right') {
             torchX += 64; // Adjust the torchlight position based on the player's facing direction
@@ -304,25 +304,193 @@ class OnScreenWriting extends GameObject {
         
         // Configure text styles
         const styles = {
-            heading: { font: 'bold 48px Oswald', y: 128 },
-            subheading: { font: 'bold 32px Trocchi', y: 188 },
-            paragraph: { font: '24px Trocchi', y: 248 }
+            heading: { 
+                font: 'bold 48px Oswald', 
+                y: 128,
+                bgHeight: 60,
+                padding: 20
+            },
+            subheading: { 
+                font: 'bold 32px Trocchi', 
+                y: 188,
+                bgHeight: 40,
+                padding: 15
+            },
+            paragraph: { 
+                font: '24px Trocchi', 
+                y: 248,
+                bgHeight: 30,
+                padding: 10
+            }
         };
 
         // Draw each text element
         Object.entries(this.displayText).forEach(([type, element]) => {
             if (element.text && element.opacity > 0) {
-                ctx.fillStyle = `rgba(255, 255, 255, ${element.opacity})`;
-                ctx.strokeStyle = `rgba(0, 0, 0, ${element.opacity})`;
-                ctx.font = styles[type].font;
+                const style = styles[type];
+                ctx.font = style.font;
+                
+                // Measure text width for background
+                const textWidth = ctx.measureText(element.text).width;
+                const bgWidth = textWidth + (style.padding * 2);
+                
+                // Draw background
+                ctx.fillStyle = `rgba(0, 0, 0, ${element.opacity * 0.5})`;
+                ctx.fillRect(
+                    -bgWidth/2,
+                    style.y - style.bgHeight/2,
+                    bgWidth,
+                    style.bgHeight
+                );
+
+                // Draw text with outline for better visibility
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-
-                ctx.strokeText(element.text, 0, styles[type].y);
-                ctx.fillText(element.text, 0, styles[type].y);
+                
+                // Thicker outline for larger text
+                ctx.lineWidth = type === 'heading' ? 3 : 2;
+                ctx.strokeStyle = `rgba(0, 0, 0, ${element.opacity})`;
+                ctx.strokeText(element.text, 0, style.y);
+                
+                // Main text
+                ctx.fillStyle = `rgba(255, 255, 255, ${element.opacity})`;
+                ctx.fillText(element.text, 0, style.y);
+                
+                // Add subtle drop shadow
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                ctx.shadowBlur = 4;
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 2;
             }
         });
 
         ctx.restore();
+    }
+}
+
+class UnitDebugger extends GameObject {
+    constructor(canvas, unit) {
+        super();
+        this.unit = unit;
+        this.enabled = true;
+        
+        // Create debug container
+        this.debugElement = document.createElement('div');
+        this.debugElement.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 200px;
+            background: rgba(0, 0, 0, 0.85);
+            color: #ffffff;
+            font-family: 'Cascadia Code', 'Source Code Pro', 'Consolas', monospace;
+            font-size: 14px;
+            padding: 10px;
+            border-radius: 4px;
+            z-index: 1000;
+            display: none;
+            pointer-events: none;
+            width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        `;
+
+        // Create elements for each debug property
+        this.debugInfo = [
+            { label: 'Position', getValue: () => `x:${Math.round(this.unit.position.x)} y:${Math.round(this.unit.position.y)}` },
+            { label: 'Target Position', getValue: () => this.unit.targetPosition ? `x:${this.unit.targetPosition.x} y:${this.unit.targetPosition.y}` : 'none' },
+            { label: 'Current Tile', getValue: () => this.unit.currentTile?.type || 'none' },
+            { label: 'Tile Below', getValue: () => this.unit.tileBelow?.type || 'none' },
+            { label: 'Moving', getValue: () => this.unit.isMoving },
+            { label: 'Direction', getValue: () => this.unit.direction },
+            { label: 'isFalling', getValue: () => this.unit.isFalling },
+            {label: 'isFloating', getValue: () => this.unit.isFloating },
+            { label: 'Fall Damage', getValue: () => Math.round(this.unit.fallingDamage) },
+            { label: 'Facing', getValue: () => this.unit.facingDirection }
+        ];
+
+        // Create header
+        const header = document.createElement('div');
+        header.textContent = '🔧 UNIT DEBUG INFO';
+        header.style.cssText = `
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #00ff00;
+            padding: 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        `;
+        this.debugElement.appendChild(header);
+
+        // Create elements for each property
+        this.debugElements = this.debugInfo.map((info, index) => {
+            const element = document.createElement('div');
+            element.style.cssText = `
+                padding: 4px 5px;
+                margin-bottom: 2px;
+                background-color: ${index % 2 === 0 ? 'rgba(255, 255, 255, 0.05)' : 'transparent'};
+                display: flex;
+                justify-content: space-between;
+            `;
+
+            const labelSpan = document.createElement('span');
+            labelSpan.style.color = '#888888';
+            labelSpan.textContent = info.label;
+
+            const valueSpan = document.createElement('span');
+            valueSpan.style.color = '#ffffff';
+
+            element.appendChild(labelSpan);
+            element.appendChild(valueSpan);
+            this.debugElement.appendChild(element);
+            
+            return {
+                element,
+                valueSpan
+            };
+        });
+
+        // Add to document
+        document.body.appendChild(this.debugElement);
+
+        // Toggle debug display with F3
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'F3') {
+                e.preventDefault();
+                this.enabled = !this.enabled;
+                this.debugElement.style.display = this.enabled ? 'block' : 'none';
+            }
+        });
+    }
+
+    step(delta, root) {
+        if (!this.enabled) return;
+
+        // Update each debug element
+        this.debugElements.forEach((element, index) => {
+            const info = this.debugInfo[index];
+            element.valueSpan.textContent = info.getValue();
+            
+            // Update value color based on state
+            if (info.label === 'Health' || info.label === 'Energy' || info.label === 'Oxygen') {
+                const value = parseFloat(info.getValue());
+                if (value < 30) {
+                    element.valueSpan.style.color = '#ff4444';
+                } else if (value < 70) {
+                    element.valueSpan.style.color = '#ffaa44';
+                } else {
+                    element.valueSpan.style.color = '#44ff44';
+                }
+            }
+        });
+    }
+
+    // Override drawImage since we're using DOM
+    drawImage(ctx, drawPosX, drawPosY) {
+        // No canvas drawing needed
+    }
+
+    // Clean up when destroyed
+    destroy() {
+        this.debugElement.remove();
+        super.destroy();
     }
 }

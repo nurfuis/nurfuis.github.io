@@ -185,8 +185,8 @@ class Camera extends GameObject {
         ctx.translate(this.position.x, this.position.y);
     }
     centerOnUnit(unit) {
-        const centerX = unit.x - this.canvas.width / 2 + unit.size / 2;
-        const centerY = unit.y - this.canvas.height / 2 + unit.size / 2;
+        const centerX = unit.position.x - this.canvas.width / 2 + unit.size / 2;
+        const centerY = unit.position.y - this.canvas.height / 2 + unit.size / 2;
 
         // Constrain camera within the map boundaries
         const minX = 0;

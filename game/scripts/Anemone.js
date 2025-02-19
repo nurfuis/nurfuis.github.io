@@ -5,10 +5,10 @@ class Anemone extends GameObject {
         this.position = position; // Position of the anemone in the game world
         this.anemoneImage = new Image(); // Create a new Image object for the anemone image
         this.anemoneImage.src = 'images/anemone.png'; // Set the source of the anemone image
-        
+
         this.anemoneClosed = new Image();
         this.anemoneClosed.src = 'images/anemone-closed.png';
-        
+
         this.anemoneAggro = new Image();
         this.anemoneAggro.src = 'images/anemone-aggro.png';
 
@@ -21,7 +21,7 @@ class Anemone extends GameObject {
 
         // Add particle properties
         this.particleCount = 12; // Number of particles to emit
-        this.particleColor = 'rgba(255, 0, 0, 0.7)'; 
+        this.particleColor = 'rgba(255, 0, 0, 0.7)';
 
         // Quiver animation properties
         this.quiverAmount = 2;  // How many pixels to shake
@@ -38,7 +38,7 @@ class Anemone extends GameObject {
         this.isCollectionActive = false; // New flag for when key is pressed
         this.collectionTimer = 0;
         this.collectionDuration = 2000; // 2 seconds to collect once started
-        this.perfectTugWindow = {start: 0.4, end: 0.6}; // 40-60% of the duration
+        this.perfectTugWindow = { start: 0.4, end: 0.6 }; // 40-60% of the duration
         this.feedingBonus = 400;
         this.collectionTimeout = 3000; // Time allowed to start collection
         this.timeoutTimer = 0;
@@ -79,7 +79,8 @@ class Anemone extends GameObject {
             );
 
             if (distance <= 32 && !this.isBeingCollected && !data.unit.isMoving) { // If the player is within range and not already collecting, start collection mini-game
-                this.startCollection();
+                const useAutomatedInput = data.unit.useAutomatedInput; // Check if the player is using automated input
+                this.startCollection(useAutomatedInput);
             }
         });
 
@@ -142,11 +143,11 @@ class Anemone extends GameObject {
             });
         }
     }
-   
+
     step(delta, root) {
         // Update the time
         this.time += this.pulseSpeed * delta;
-        
+
         // Calculate the new size using a sine wave
         this.currentSize = this.baseSize + Math.sin(this.time) * this.pulseAmount;
 
@@ -160,7 +161,7 @@ class Anemone extends GameObject {
 
         if (this.isQuivering) {
             this.quiverTime += delta;
-            
+
             // Update position offsets using noise
             this.offsetX = (Math.random() - 0.5) * this.quiverAmount;
             this.offsetY = (Math.random() - 0.5) * this.quiverAmount;
@@ -190,6 +191,18 @@ class Anemone extends GameObject {
                     this.isCollectionActive = true;
                     this.collectionTimer = 0;
                 }
+                
+                // else if (root.player.useAutomatedInput) { // Automated input case
+                //     // delay by a random amount to simulate player reaction time
+                //     const delay = Math.random() * 500 + 500; // 500-1000ms delay
+
+                //     setTimeout(() => {
+                //         this.isCollectionActive = true;
+                //         this.collectionTimer = 0;
+                //     }, delay);
+
+
+                // }
             } else {
                 // Collection is active, update timer
                 this.collectionTimer += delta;
@@ -198,9 +211,9 @@ class Anemone extends GameObject {
                 if (root.input && root.input.keysPressed.length === 0) {
                     // Calculate progress percentage
                     const progress = this.collectionTimer / this.collectionDuration;
-                    
+
                     // Check if player released at the right time
-                    if (progress >= this.perfectTugWindow.start && 
+                    if (progress >= this.perfectTugWindow.start &&
                         progress <= this.perfectTugWindow.end) {
                         this.finishCollection(true);
                     } else {
@@ -230,8 +243,8 @@ class Anemone extends GameObject {
                 }
             } else {
                 this.snapTimer += delta;
-                
-                switch(this.snapState) {
+
+                switch (this.snapState) {
                     case 'closing':
                         this.snapProgress = Math.min(1, this.snapProgress + delta / this.snapTransition);
                         if (this.snapProgress >= 1) {
@@ -239,14 +252,14 @@ class Anemone extends GameObject {
                             this.snapProgress = 0;
                         }
                         break;
-                        
+
                     case 'closed':
                         if (this.snapTimer >= this.snapDuration) {
                             this.snapState = 'opening';
                             this.snapProgress = 0;
                         }
                         break;
-                        
+
                     case 'opening':
                         this.snapProgress = Math.min(1, this.snapProgress + delta / this.snapTransition);
                         if (this.snapProgress >= 1) {
@@ -303,7 +316,7 @@ class Anemone extends GameObject {
                     );
                     ctx.globalAlpha = 1 - this.snapProgress;
                 }
-                
+
                 ctx.drawImage(
                     this.anemoneClosed,
                     drawPosX + offsetX,
@@ -328,7 +341,7 @@ class Anemone extends GameObject {
         if (this.isBeingCollected) {
             const indicatorWidth = 32;
             const indicatorHeight = 4;
-            
+
             // Draw background bar
             ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
             ctx.fillRect(
@@ -337,7 +350,7 @@ class Anemone extends GameObject {
                 indicatorWidth,
                 indicatorHeight
             );
-            
+
             // Draw perfect zone
             ctx.fillStyle = 'rgba(0, 255, 0, 0.5)';
             ctx.fillRect(
@@ -346,7 +359,7 @@ class Anemone extends GameObject {
                 indicatorWidth * (this.perfectTugWindow.end - this.perfectTugWindow.start),
                 indicatorHeight
             );
-            
+
             // Only show progress bar if collection is active
             if (this.isCollectionActive) {
                 const progress = this.collectionTimer / this.collectionDuration;

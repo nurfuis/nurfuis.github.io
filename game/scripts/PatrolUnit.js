@@ -62,7 +62,7 @@ class PatrolUnit extends GameObject {
                     (this.position.y - data.y) ** 2
                 );
 
-                if (distance <= 56 && !this.isBeingCollected && !data.unit.isMoving) {
+                if (distance <= 96 && !this.isBeingCollected && !data.unit.isMoving) {
                     this.startCollection();
                 }
             }
@@ -115,7 +115,7 @@ class PatrolUnit extends GameObject {
             { x: -1, y: 0 }, // Left
         ];
 
-        const tileSize = root.mapSize.tileSize; // Get the tile size from the root object
+        const tileSize = root.map.mapSize.tileSize; // Get the tile size from the root object
 
         for (const direction of directions) {
             const neighborX = this.position.x + direction.x * tileSize;
