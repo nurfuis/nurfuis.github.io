@@ -602,20 +602,46 @@ class Unit extends GameObject {
         });
         this.map = map;
 
+        // Vestigial code
 
+        // this.isLoaded = false;
+        // this.loadReady = false;
+        // this.turnsLoaded = 0;
+        // this.vehicle = null;
+        // this.seatIndex = null;
+        // this.movePending = false;
+        // this.attackPending = false;
+        // this.attackReady = false;
+        // this.maxAttacks = 2;
+        // this.remainingAttacks = this.maxAttacks;
+        // this.perceptionRange = 128;
 
-        this.isLoaded = false;
-        this.loadReady = false;
-        this.turnsLoaded = 0;
-        this.vehicle = null;
-        this.seatIndex = null;
-        this.movePending = false;
-        this.attackPending = false;
-        this.attackReady = false;
-        this.maxAttacks = 2;
-        this.remainingAttacks = this.maxAttacks;
-        this.perceptionRange = 128;
+        // this.gcd = 0;
 
+        // this.scale = 12;
+        // this.radius = 16;
+
+        // this.powerSupply = new Battery(this);
+        // this.powerSupply.storedEnergy = 12000;
+        // this.powerSupply.storedCapacity = 12000;
+        // this.powerSupply.dischargeRate = 2; // Amps
+        // this.motor = new Motor();
+        // this.motor.KV = 10;
+
+        // this.transmission = new Transmission();
+        // this.transmission.gear = 1;
+
+        // this._maxSpeed = this.powerSupply.dischargeRate;
+
+        // this._mass = 120;
+
+        // this._gravity = 40;
+        // this._drag = 0.1; // friction
+
+        // this._acceleration = new Vector2(0, 0);
+        // this._velocity = new Vector2(0, 0);
+
+        // Start Unit
 
         this.name = name;
         this.level = level;
@@ -670,47 +696,19 @@ class Unit extends GameObject {
 
         this.isCollecting = false;
         this.isSinking = false;
-        this.isFalling = false;
         this.isFloating = false;
 
 
-        this.fallingDamage = 0;
 
         this.facingDirection = 'right';
         this.spriteWidth = 64;
         this.spriteHeight = 128;
 
-        this.gcd = 0;
-
-        this.scale = 12;
-        this.radius = 16;
-
-        this.powerSupply = new Battery(this);
-        this.powerSupply.storedEnergy = 12000;
-        this.powerSupply.storedCapacity = 12000;
-        this.powerSupply.dischargeRate = 2; // Amps
-        this.motor = new Motor();
-        this.motor.KV = 10;
-
-        this.transmission = new Transmission();
-        this.transmission.gear = 1;
-
-        this._maxSpeed = this.powerSupply.dischargeRate;
-
-        this._mass = 120;
-
-        this._gravity = 40;
-        this._drag = 0.1; // friction
-
-        this._acceleration = new Vector2(0, 0);
-        this._velocity = new Vector2(0, 0);
 
 
         this.useAutoInput = false;
 
         this.currentMapName = null;
-
-        this.moveState = new MoveState(this);
 
 
         this.image = new Image();
@@ -840,6 +838,7 @@ class Unit extends GameObject {
             }
         };
 
+        this.isFalling = false;
         this.fallDamage = 0;
         this.fallTowards = {
             active: false,
@@ -847,6 +846,7 @@ class Unit extends GameObject {
             endPos: null,
             progress: 0,
             duration: 500, // milliseconds
+            fallDampening: 500, // Dampening factor for falling
             height: 0, // No upward arc for falling
             onComplete: null
         }
@@ -931,7 +931,7 @@ class Unit extends GameObject {
 
         this.doVitals(delta);
 
-        this.powerSupply.update();
+        // this.powerSupply.update();
 
 
         let input = {
@@ -985,14 +985,14 @@ class Unit extends GameObject {
 
             this.facingDirection = 'left';
 
-            this.delay = 200;
-
+            if (!this.isJumping) {
+                this.delay = 200;
+            }
             return;
         }
 
         // jump
         if (this.isJumping && this.targetPosition) { // transition to jumping state
-
             if (this.jumpArc.active) {
 
                 this.updateJumpArc(delta);
@@ -1023,7 +1023,6 @@ class Unit extends GameObject {
 
         // fall
         if (this.isFalling && this.targetPosition) {
-            console.log('falling');
             if (this.fallTowards.active) {
                 this.updateFallTowards(delta);
                 return;
@@ -1031,16 +1030,6 @@ class Unit extends GameObject {
                 this.startFallTowards();
             }
         }
-
-        // break fall
-        // if (this.isFalling) {
-        //     if (!!tileBelow && tileBelow.solid) {
-        //         this.breakFall(tileBelow);
-        //         this.isFalling = false;
-        //         this.delay = 200;
-        //     }
-        // }
-
 
 
         // try floating
@@ -1059,7 +1048,6 @@ class Unit extends GameObject {
             this.tryMove(direction)
             return;
         }
-
         // try sink
         if (!tile.solid && !!tileBelow && tileBelow.type === 'water') {
             direction = 'down';
@@ -1067,7 +1055,6 @@ class Unit extends GameObject {
             this.tryMove(direction);
             return;
         }
-
         // try fall
         if (!!tile && !!tileBelow && tile.type === 'air' && tileBelow.type === 'air') {
             direction = 'down';
@@ -1075,8 +1062,7 @@ class Unit extends GameObject {
             this.tryFall(direction);
             return;
         }
-
-        // move ability
+        // try move
         this.tryMove(direction);
 
     }
@@ -1580,22 +1566,29 @@ class Unit extends GameObject {
                 if (jumping) {
                     this.isJumping = jumping;
 
-                    console.log('jumping');
+                    // TODO HERE
 
-                    const landingTile = this.gameMap.getSurfaceTileBelow(selectedTile.x, selectedTile.y);
-                    const emptyTile = this.gameMap.getEmptyTileAbove(landingTile.x, landingTile.y);
+                    // Limit downward jump to prevent jumping down more than 2 tiles
+                    
+                    // set a jump down range limit
+                    const jumpDownRange = 3;
 
+                    // add method to map to look down n tiles and return the empty if within jump down range
 
-                    this.targetPosition = new Vector2(emptyTile.x, emptyTile.y);
+                    // const landingTile = this.gameMap.getSurfaceTileBelow(selectedTile.x, selectedTile.y, );
+                    // const emptyTile = this.gameMap.getEmptyTileAbove(landingTile.x, landingTile.y);
 
+                    const jumpSpot = this.gameMap.getJumpSpot(selectedTile.x, selectedTile.y, jumpDownRange);
+
+                    console.log('Jump Spot:', jumpSpot);
+
+                    this.targetPosition = new Vector2(jumpSpot.x, jumpSpot.y);
 
                 } else {
                     this.isMoving = true;
                     this.targetPosition = new Vector2(selectedTile.x, selectedTile.y);
 
-
                 }
-
 
             } else if (selectedTile.breakable) {
 
@@ -1869,8 +1862,6 @@ class Unit extends GameObject {
         if (selectedTile.passable) {
             this.isFalling = true;
 
-            console.log('falling');
-
             const landingTile = this.gameMap.getSurfaceTileBelow(selectedTile.x, selectedTile.y);
             const emptyTile = this.gameMap.getEmptyTileAbove(landingTile.x, landingTile.y);
 
@@ -1880,65 +1871,68 @@ class Unit extends GameObject {
 
     breakFall(tileBelow) {
 
+        this.isFalling = false;
 
-        if (tileBelow.solid && this.isFalling) {
-            if (tileBelow.breakable) {
-                events.emit("PARTICLE_EMIT", {
-                    x: this.position.x + 32,
-                    y: this.position.y + 64,
-                    color: 'rgba(255, 255, 255, 0.5)',
-                    size: 4,
-                    duration: 1000,
-                    shape: 'square',
-                    count: 10,
-                });
-            } else {
-                events.emit("PARTICLE_EMIT", {
-                    x: this.position.x + 32,
-                    y: this.position.y + 32,
-                    color: 'rgba(191, 191, 191, 0.5)',
-                    size: 1,
-                    duration: 1000,
-                    shape: 'circle',
-                    count: 1,
-                });
-            }
 
-            events.emit("CAMERA_SHAKE", {
-                position: {
-                    x: this.position.x,
-                    y: this.position.y
-                },
-                targetPosition: {
-                    x: this.position.x,
-                    y: this.position.y - 32
-                }
+        if (tileBelow.breakable) {
+            events.emit("PARTICLE_EMIT", {
+                x: this.position.x + 32,
+                y: this.position.y + 64,
+                color: 'rgba(255, 255, 255, 0.5)',
+                size: 4,
+                duration: 1000,
+                shape: 'square',
+                count: 10,
             });
+        } else {
+            events.emit("PARTICLE_EMIT", {
+                x: this.position.x + 32,
+                y: this.position.y + 32,
+                color: 'rgba(191, 191, 191, 0.5)',
+                size: 1,
+                duration: 1000,
+                shape: 'circle',
+                count: 1,
+            });
+        }
 
-
-            if (tileBelow.durability > // Do damage to tile and player  
-                0
-            ) {
-                if (tileBelow.breakable) {
-                    tileBelow.durability -= 35;
-                }
-
-                if (this.fallingDamage > 0) {
-                    this.heart.takeDamage(this.fallingDamage);
-                };
-                this.fallingDamage = 0;
-
-            } else if (tileBelow.durability <= // Break tile and reset durability
-                0
-            ) {
-                tileBelow.type = 'air';
-                tileBelow.color = getComputedStyle(document.querySelector('.light-grey')).backgroundColor;
-                tileBelow.solid = false;
-                tileBelow.passable = true;
-                tileBelow.durability = 100;
-                tileBelow.breakable = false;
-                this.fallingDamage = 0; // freebies for breaking tiles
+        events.emit("CAMERA_SHAKE", {
+            position: {
+                x: this.position.x,
+                y: this.position.y
+            },
+            targetPosition: {
+                x: this.position.x,
+                y: this.position.y - 32
             }
+        });
+
+
+        console.log('break fall - tile durability:', tileBelow.durability);
+
+
+        if (tileBelow.durability > // Do damage to tile and player  
+            0
+        ) {
+            if (tileBelow.breakable) {
+                tileBelow.durability -= 35;
+            }
+            // Fall damage
+            if (this.fallingDamage > 0) {
+                this.heart.takeDamage(this.fallingDamage);
+            };
+            this.fallingDamage = 0;
+
+        } else if (tileBelow.durability <= // Break tile and reset durability
+            0
+        ) {
+            tileBelow.type = 'air';
+            tileBelow.color = getComputedStyle(document.querySelector('.light-grey')).backgroundColor;
+            tileBelow.solid = false;
+            tileBelow.passable = true;
+            tileBelow.durability = 100;
+            tileBelow.breakable = false;
+            this.fallingDamage = 0; // freebies for breaking tiles
         }
     }
 
@@ -1951,6 +1945,7 @@ class Unit extends GameObject {
                 progress: 0,
                 duration: 300, // milliseconds
                 height: 0,
+                fallDampening: 350, // increase to reduce damage
                 onComplete: () => {
                     this.isFalling = false;
                     this.targetPosition = null;
@@ -1989,10 +1984,10 @@ class Unit extends GameObject {
         this.position = new Vector2(x, y);
 
 
-
         // Calculate falling damage
         const fallDistance = Math.abs(end.y - start.y);
-        const fallDamage = fallDistance / 64; // Adjust the divisor to control damage sensitivity
+        const fallDampening = this.fallTowards.fallDampening;
+        const fallDamage = fallDistance / fallDampening; // Adjust the divisor to control damage sensitivity
         this.fallingDamage += fallDamage;
 
 

@@ -100,7 +100,7 @@ class DarknessLayer extends GameObject {
 
         this.darknessDistance = 1500;
 
-        this.debug = true; // Initialize debug mode as disabled
+        this.debug = false; // Initialize debug mode as disabled
 
         events.on("CAMERA_SHAKE", this, (data) => {
             this.hasShake = true;

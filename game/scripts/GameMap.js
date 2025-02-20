@@ -274,6 +274,35 @@ class GameMap extends GameObject {
 
         return null;
     }
+
+    getJumpSpot(x, y, range) {
+
+        const tileX = Math.floor(x / this.tileSize);
+        const tileY = Math.floor(y / this.tileSize);
+
+        let index = 0;
+        let tiles = [];
+
+        for (let i = tileY; i < this.mapSize.height / this.tileSize; i++) {
+            const tile = this.getTileAtCoordinates(tileX * this.tileSize, i * this.tileSize);
+
+            tiles.push(tile);
+
+            index++;
+
+            if (index >= range) {
+                // return the air tile above a solid tile or the last tile if no solid tile is found
+                const solidTile = tiles.find(tile => tile.solid);
+                if (solidTile) {
+                    return this.getEmptyTileAbove(solidTile.x, solidTile.y);
+                } else {
+                    return tiles[tiles.length - 1];
+                }                
+            }
+        }
+    }
+
+
     getSurfaceTileBelow(x, y) {
 
         const tileX = Math.floor(x / this.tileSize);
@@ -304,10 +333,10 @@ class GameMap extends GameObject {
 
     getTileAtCoordinates(x, y) {
 
-        const findX = Math.floor( x / this.tileSize) * this.tileSize;
-        const findY = Math.floor( y / this.tileSize) * this.tileSize;
+        const findX = Math.floor(x / this.tileSize) * this.tileSize;
+        const findY = Math.floor(y / this.tileSize) * this.tileSize;
 
-        const tile = this.tiles.find(tile => tile.x === findX && tile.y === findY );
+        const tile = this.tiles.find(tile => tile.x === findX && tile.y === findY);
 
         if (tile) {
             return tile;
@@ -739,7 +768,7 @@ class GameMap extends GameObject {
     }
 
 
-    
+
     cycleMapType() {
         const worldTypes = Object.keys(gameWorlds);
         const currentIndex = worldTypes.indexOf(this.gameWorld);
