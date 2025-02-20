@@ -100,7 +100,7 @@ class DarknessLayer extends GameObject {
 
         this.darknessDistance = 1500;
 
-        this.debug = false; // Initialize debug mode as disabled
+        this.debug = true; // Initialize debug mode as disabled
 
         events.on("CAMERA_SHAKE", this, (data) => {
             this.hasShake = true;
@@ -132,9 +132,13 @@ class DarknessLayer extends GameObject {
         }
         const spread = this.darknessDistance; // Adjust the spread of the darkness effect as needed
 
+        let drawX = this.player.position.x;
+        let drawY = this.player.position.y;
+
+
         const gradient = ctx.createRadialGradient(
-            this.player.position.x, this.player.position.y, 0,
-            this.player.position.x, this.player.position.y, spread
+            drawX, drawY, 0,
+            drawX, drawY, spread
         );
         gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
         gradient.addColorStop(0.7, 'rgba(0, 0, 0, 0.95)');
@@ -144,8 +148,8 @@ class DarknessLayer extends GameObject {
         ctx.fillRect(0, 0, this.map.mapSize.width, this.map.mapSize.height);
 
         // Draw the torchlight effect
-        let torchX = this.player.position.x; // X position of the torchlight center (player position)
-        let torchY = this.player.position.y; // Y position of the torchlight center (player position)
+        let torchX = drawX; // X position of the torchlight center (player position)
+        let torchY = drawY; // Y position of the torchlight center (player position)
 
         if (this.player.facingDirection === 'right') {
             torchX += 64; // Adjust the torchlight position based on the player's facing direction
@@ -253,20 +257,20 @@ class OnScreenWriting extends GameObject {
         // Listen for text display events
         events.on('DISPLAY_TEXT', this, (data) => {
             this.displayText = {
-                heading: { 
-                    text: data.heading || '', 
-                    opacity: 0, 
-                    fadeTimer: -this.fadeConfig.headingDelay 
+                heading: {
+                    text: data.heading || '',
+                    opacity: 0,
+                    fadeTimer: -this.fadeConfig.headingDelay
                 },
-                subheading: { 
-                    text: data.subheading || '', 
-                    opacity: 0, 
-                    fadeTimer: -this.fadeConfig.subheadingDelay 
+                subheading: {
+                    text: data.subheading || '',
+                    opacity: 0,
+                    fadeTimer: -this.fadeConfig.subheadingDelay
                 },
-                paragraph: { 
-                    text: data.paragraph || '', 
-                    opacity: 0, 
-                    fadeTimer: -this.fadeConfig.paragraphDelay 
+                paragraph: {
+                    text: data.paragraph || '',
+                    opacity: 0,
+                    fadeTimer: -this.fadeConfig.paragraphDelay
                 }
             };
         });
@@ -277,9 +281,9 @@ class OnScreenWriting extends GameObject {
             const element = this.displayText[type];
             if (element.text) {
                 element.fadeTimer += delta;
-                const totalDuration = this.fadeConfig.fadeInDuration + 
-                                    this.fadeConfig.displayDuration + 
-                                    this.fadeConfig.fadeOutDuration;
+                const totalDuration = this.fadeConfig.fadeInDuration +
+                    this.fadeConfig.displayDuration +
+                    this.fadeConfig.fadeOutDuration;
 
                 if (element.fadeTimer <= 0) {
                     element.opacity = 0;
@@ -288,7 +292,7 @@ class OnScreenWriting extends GameObject {
                 } else if (element.fadeTimer <= this.fadeConfig.fadeInDuration + this.fadeConfig.displayDuration) {
                     element.opacity = 1;
                 } else if (element.fadeTimer <= totalDuration) {
-                    const fadeOutProgress = (element.fadeTimer - this.fadeConfig.fadeInDuration - this.fadeConfig.displayDuration) 
+                    const fadeOutProgress = (element.fadeTimer - this.fadeConfig.fadeInDuration - this.fadeConfig.displayDuration)
                         / this.fadeConfig.fadeOutDuration;
                     element.opacity = 1 - fadeOutProgress;
                 } else {
@@ -301,23 +305,23 @@ class OnScreenWriting extends GameObject {
 
     drawImage(ctx, drawPosX, drawPosY) {
         ctx.save();
-        
+
         // Configure text styles
         const styles = {
-            heading: { 
-                font: 'bold 48px Oswald', 
+            heading: {
+                font: 'bold 48px Oswald',
                 y: 128,
                 bgHeight: 60,
                 padding: 20
             },
-            subheading: { 
-                font: 'bold 32px Trocchi', 
+            subheading: {
+                font: 'bold 32px Trocchi',
                 y: 188,
                 bgHeight: 40,
                 padding: 15
             },
-            paragraph: { 
-                font: '24px Trocchi', 
+            paragraph: {
+                font: '24px Trocchi',
                 y: 248,
                 bgHeight: 30,
                 padding: 10
@@ -329,16 +333,16 @@ class OnScreenWriting extends GameObject {
             if (element.text && element.opacity > 0) {
                 const style = styles[type];
                 ctx.font = style.font;
-                
+
                 // Measure text width for background
                 const textWidth = ctx.measureText(element.text).width;
                 const bgWidth = textWidth + (style.padding * 2);
-                
+
                 // Draw background
                 ctx.fillStyle = `rgba(0, 0, 0, ${element.opacity * 0.5})`;
                 ctx.fillRect(
-                    -bgWidth/2,
-                    style.y - style.bgHeight/2,
+                    -bgWidth / 2,
+                    style.y - style.bgHeight / 2,
                     bgWidth,
                     style.bgHeight
                 );
@@ -346,16 +350,16 @@ class OnScreenWriting extends GameObject {
                 // Draw text with outline for better visibility
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                
+
                 // Thicker outline for larger text
                 ctx.lineWidth = type === 'heading' ? 3 : 2;
                 ctx.strokeStyle = `rgba(0, 0, 0, ${element.opacity})`;
                 ctx.strokeText(element.text, 0, style.y);
-                
+
                 // Main text
                 ctx.fillStyle = `rgba(255, 255, 255, ${element.opacity})`;
                 ctx.fillText(element.text, 0, style.y);
-                
+
                 // Add subtle drop shadow
                 ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
                 ctx.shadowBlur = 4;
@@ -373,7 +377,7 @@ class UnitDebugger extends GameObject {
         super();
         this.unit = unit;
         this.enabled = true;
-        
+
         // Create debug container
         this.debugElement = document.createElement('div');
         this.debugElement.style.cssText = `
@@ -396,17 +400,28 @@ class UnitDebugger extends GameObject {
 
         // Create elements for each debug property
         this.debugInfo = [
+            { label: 'World:', getValue: () => this.unit.currentGameWorld },
             { label: 'Position', getValue: () => `x:${Math.round(this.unit.position.x)} y:${Math.round(this.unit.position.y)}` },
             { label: 'Target Position', getValue: () => this.unit.targetPosition ? `x:${this.unit.targetPosition.x} y:${this.unit.targetPosition.y}` : 'none' },
             { label: 'Current Tile', getValue: () => this.unit.currentTile?.type || 'none' },
             { label: 'Tile Below', getValue: () => this.unit.tileBelow?.type || 'none' },
-            { label: 'Moving', getValue: () => this.unit.isMoving },
             { label: 'Direction', getValue: () => this.unit.direction },
+            { label: 'isIdling', getValue: () => this.unit.isIdling },
+            { label: 'isFloating', getValue: () => this.unit.isFloating },
+            { label: 'isMoving', getValue: () => this.unit.isMoving },
+            { label: 'isJumping', getValue: () => this.unit.isJumping },
             { label: 'isFalling', getValue: () => this.unit.isFalling },
-            {label: 'isFloating', getValue: () => this.unit.isFloating },
             { label: 'Fall Damage', getValue: () => Math.round(this.unit.fallingDamage) },
-            { label: 'Facing', getValue: () => this.unit.facingDirection }
+            { label: 'Facing', getValue: () => this.unit.facingDirection },
+            { label: 'Recording', getValue: () => this.isReplaying ? 'REPLAY' : 'LIVE' },
+            { label: 'History Size', getValue: () => `${this.movementHistory.length} frames` },
+            {
+                label: 'Replay Time', getValue: () => this.isReplaying ?
+                    `${((Date.now() - this.replayStartTime) / 1000).toFixed(1)}s` : '-'
+            },
         ];
+
+
 
         // Create header
         const header = document.createElement('div');
@@ -441,7 +456,7 @@ class UnitDebugger extends GameObject {
             element.appendChild(labelSpan);
             element.appendChild(valueSpan);
             this.debugElement.appendChild(element);
-            
+
             return {
                 element,
                 valueSpan
@@ -459,16 +474,126 @@ class UnitDebugger extends GameObject {
                 this.debugElement.style.display = this.enabled ? 'block' : 'none';
             }
         });
+
+
+        // Add replay properties
+        this.historyDuration = 30000; // 30 seconds in ms
+        this.replaySpeed = 1; // 1 = normal speed, 2 = double speed, etc.
+        this.isReplaying = false;
+        this.replayStartTime = 0;
+        this.currentReplayIndex = 0;
+
+        // Store movement history
+        this.movementHistory = [];
+        this.lastRecordTime = Date.now();
+        this.recordInterval = 16; // Record every 16ms (roughly 60fps)
+
+        // Add replay info to debug display
+        this.currentGameWorld = null;
+
+
+
+        // Add replay controls listener
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'r' || e.key === 'R') {
+                e.preventDefault();
+                this.toggleReplay();
+            }
+        });
+
+
+
+    }
+    recordState() {
+        if (!!this.currentGameWorld) {
+            this.currentGameWorld = null;
+        }
+        const now = Date.now();
+        if (now - this.lastRecordTime >= this.recordInterval) {
+            this.lastRecordTime = now;
+
+            // Record current state
+            const state = {
+                timestamp: now,
+                position: { x: this.unit.position.x, y: this.unit.position.y },
+                direction: this.unit.direction,
+                facingDirection: this.unit.facingDirection,
+                isMoving: this.unit.isMoving,
+                isFalling: this.unit.isFalling,
+                isFloating: this.unit.isFloating,
+                fallingDamage: this.unit.fallingDamage,
+                currentTile: this.unit.currentTile?.type,
+                tileBelow: this.unit.tileBelow?.type,
+                currentGameWorld: this.unit?.currentGameWorld
+            };
+
+            this.movementHistory.push(state);
+
+            // Trim history to duration limit
+            const cutoffTime = now - this.historyDuration;
+            this.movementHistory = this.movementHistory.filter(state =>
+                state.timestamp >= cutoffTime
+            );
+        }
     }
 
+    toggleReplay() {
+        if (this.isReplaying) {
+            // Stop replay
+            this.isReplaying = false;
+            // Restore unit's current state
+            Object.assign(this.unit.position, this.currentPosition);
+        } else {
+            // Start replay
+            this.isReplaying = true;
+            this.replayStartTime = Date.now();
+            this.currentReplayIndex = 0;
+            // Store current position to restore later
+            this.currentPosition = {
+                x: this.unit.currentTile.x,
+                y: this.unit.currentTile.y
+            };
+        }
+    }
     step(delta, root) {
         if (!this.enabled) return;
+
+        if (this.isReplaying) {
+            // Handle replay playback
+            const replayTime = Date.now() - this.replayStartTime;
+            const targetIndex = Math.floor((replayTime * this.replaySpeed) / this.recordInterval);
+
+            if (targetIndex >= this.movementHistory.length) {
+                this.toggleReplay(); // End replay when finished
+            } else {
+                const state = this.movementHistory[targetIndex];
+
+
+                if (this.currentGameWorld !== state.currentGameWorld) {
+                    this.currentGameWorld = state.currentGameWorld;
+                    events.emit('CHANGE_GAME_WORLD', { gameWorld: this.currentGameWorld });
+                }
+                
+                // Apply historical state to unit
+                Object.assign(this.unit.position, state.position);
+                this.unit.direction = state.direction;
+                this.unit.facingDirection = state.facingDirection;
+                this.unit.isMoving = state.isMoving;
+                this.unit.isFalling = state.isFalling;
+                this.unit.isFloating = state.isFloating;
+                this.unit.fallingDamage = state.fallingDamage;
+            }
+        } else {
+            // Record current state
+            this.recordState();
+        }
+
 
         // Update each debug element
         this.debugElements.forEach((element, index) => {
             const info = this.debugInfo[index];
             element.valueSpan.textContent = info.getValue();
-            
+
             // Update value color based on state
             if (info.label === 'Health' || info.label === 'Energy' || info.label === 'Oxygen') {
                 const value = parseFloat(info.getValue());

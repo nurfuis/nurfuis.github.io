@@ -20,6 +20,12 @@ class Sap extends GameObject {
         this.particleCount = 12; // Number of particles to emit
         this.particleColor = 'rgba(255, 200, 100, 0.7)'; // Sappy amber color
 
+        // Add frame fade properties
+        this.frameOpacity = 1;
+        this.fadeDistance = 128; // Distance at which fade starts
+        this.minOpacity = 0;
+        this.fadeSpeed = 0.1;
+
         this.sapImage.onload = () => { // Ensure the image is loaded before drawing
             this.ready();
         };
@@ -37,6 +43,14 @@ class Sap extends GameObject {
                 (this.position.y - this.playerPosition.y) ** 2
             );
 
+            // Calculate frame opacity based on distance
+            if (distance <= this.fadeDistance) {
+                const fadeRatio = distance / this.fadeDistance;
+                this.frameOpacity = Math.max(this.minOpacity, fadeRatio);
+            } else {
+                this.frameOpacity = 1;
+            }
+
             if (distance <= 32) { // If the player is within range, emit a sap event
                 // Emit particles before destroying
                 this.emitCollectionParticles();
@@ -45,7 +59,15 @@ class Sap extends GameObject {
                 this.destroy(); // Remove the sap from the game world
             }
         });
-
+        events.on('BLOCK_BREAK', this, (data) => { // Listen for block break events
+            if (data.x === this.position.x && data.y === this.position.y) { // If the block at the sap's position is broken
+                // Emit particles before destroying
+                this.emitCollectionParticles();
+                events.emit('SAP_COLLECTED', this); // Emit the sap collected event with the sap object as data
+                this.parent.removeChild(this); // Remove the sap from the game world
+                this.destroy(); // Remove the sap from the game world
+            }
+        });
     }
 
     emitCollectionParticles() {
@@ -96,6 +118,8 @@ class Sap extends GameObject {
         );
 
         // Draw the frame overlay image on top of the sap image
+        ctx.save();
+        ctx.globalAlpha = this.frameOpacity;
         ctx.drawImage(
             this.frameOverlay,
             drawPosX,
@@ -103,5 +127,6 @@ class Sap extends GameObject {
             this.baseSize,
             this.baseSize
         );
+        ctx.restore();
     }
 }

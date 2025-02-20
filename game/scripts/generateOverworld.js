@@ -133,7 +133,10 @@ function generateCombinedWorld(map, runLength = 20) {
         generateForestWorld,
         generateFloatingIslandWorld,
         generateShallowWaterWorld,
-        generateSapForestWorld
+        generateSapForestWorld,
+        generateEarthLedge,
+        generatePoolWater,
+        generateColumnWater
     ];
 
     // Temporarily modify map size to generate sections
@@ -630,6 +633,180 @@ function generateShallowWaterWorld(map) {
     }
     return tiles;
 }
+function generatePoolWater(map) {
+    const rows = Math.ceil(map.mapSize.height / map.tileSize);
+    const cols = Math.ceil(map.mapSize.width / map.tileSize);
+
+    const tileSize = map.tileSize;
+
+    let tiles = []
+
+    firstPass();
+    secondPass();
+
+    function firstPass() {
+        for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+                const noiseValue = perlin(x / 10, y / 10);
+
+                let newTile = tile;
+                const tileX = x * tileSize;
+                const tileY = y * tileSize;
+
+
+                if (y === 7) {
+                    newTile = stone(tileX, tileY);
+                }
+
+
+                else if (y === 6) {
+                    if (x >= 5) {
+                        newTile = earth(tileX, tileY);
+                    } else {
+                        newTile = water(tileX, tileY);
+                    }
+                }
+
+
+                else if (y === 5) {
+                    if (x <= 2 || x >= 6) {
+                        newTile = earth(tileX, tileY);
+                    } else {
+                        newTile = water(tileX, tileY);
+                    }
+                }
+                else if (y === 4) {
+                    if (x === 2 || x === 6) {
+                        newTile = earth(tileX, tileY);
+                    } else {
+                        if ( x >= 3 && x <= 5) {
+                            newTile = water(tileX, tileY);
+                        } else {
+                            newTile = air(tileX, tileY);
+                        }
+                    }
+                }
+                else {
+                    newTile = air(tileX, tileY);
+                }
+
+
+                tiles.push(newTile);
+            }
+        }
+    }
+
+    function secondPass() {
+        for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+
+                const tileX = x * tileSize;
+                const tileY = y * tileSize;
+
+                let tile = tiles.find(t => t.x === tileX && t.y === tileY);
+
+                const tileAbove = tiles.find(t => t.x === tileX && t.y === tileY - tileSize);
+                const tileBelow = tiles.find(t => t.x === tileX && t.y === tileY + tileSize);
+
+            }
+        }
+    }
+    return tiles;
+}
+function generateColumnWater(map) {
+    const rows = Math.ceil(map.mapSize.height / map.tileSize);
+    const cols = Math.ceil(map.mapSize.width / map.tileSize);
+
+    const tileSize = map.tileSize;
+
+    let tiles = []
+
+    firstPass();
+    secondPass();
+
+    function firstPass() {
+        for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+                const noiseValue = perlin(x / 10, y / 10);
+
+                let newTile = tile;
+                const tileX = x * tileSize;
+                const tileY = y * tileSize;
+
+
+                if (y === 7) {
+                    newTile = stone(tileX, tileY);
+                }
+
+
+                else if (y === 6) {
+                    if (x >= 5) {
+                        newTile = earth(tileX, tileY);
+                    } else {
+                        newTile = water(tileX, tileY);
+                    }
+                }
+
+
+                else if (y === 5) {
+                    if (x <= 2 || x >= 6) {
+                        newTile = earth(tileX, tileY);
+                    } else {
+                        newTile = water(tileX, tileY);
+                    }
+                }
+                else if (y === 4) {
+                    if (x === 2 || x === 6 || x === 5 || x === 3) {
+                        newTile = earth(tileX, tileY);
+                    } else {
+                        if ( x >= 3 && x <= 5) {
+                            newTile = water(tileX, tileY);
+                        } else {
+                            newTile = air(tileX, tileY);
+                        }
+                    }
+                }
+                else if (y === 3) {
+                    if (x === 3 || x === 5) {
+                        newTile = earth(tileX, tileY);
+                    } else {
+                        if ( x >= 3 && x <= 5) {
+                            newTile = water(tileX, tileY);
+                        } else {
+                            newTile = air(tileX, tileY);
+                        }
+                    }
+                }
+
+
+                else {
+                    newTile = air(tileX, tileY);
+                }
+
+
+                tiles.push(newTile);
+            }
+        }
+    }
+
+    function secondPass() {
+        for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+
+                const tileX = x * tileSize;
+                const tileY = y * tileSize;
+
+                let tile = tiles.find(t => t.x === tileX && t.y === tileY);
+
+                const tileAbove = tiles.find(t => t.x === tileX && t.y === tileY - tileSize);
+                const tileBelow = tiles.find(t => t.x === tileX && t.y === tileY + tileSize);
+
+            }
+        }
+    }
+    return tiles;
+}
+
 
 function generateSapForestWorld(map) {
     const rows = Math.ceil(map.mapSize.height / map.tileSize);

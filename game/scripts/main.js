@@ -1,10 +1,10 @@
-const gameWorld = 'flat'; // Set the game world to 'overworld' by default
+const gameWorld = 'ledge'; // Set the game world to 'overworld' by default
 
 const gameWorlds = {
   flat: {
     type: 'flat',
     name: 'Flat Land',
-    paragraph: 'Move up, down, and side to side by pressing the WASD keys.',
+    paragraph: 'Move up, down, and side to side by pressing movement keys (Arrows or WASD).',
     width: 512,
     height: 512,
     tileSize: 64,
@@ -13,7 +13,7 @@ const gameWorlds = {
   hills: {
     type: 'hills',
     name: 'Small Hill',
-    paragraph: 'Move diagonally by pressing two of the WASD keys at the same time.',
+    paragraph: 'Move diagonally by pressing two directions at the same time.',
     width: 512,
     height: 512,
     tileSize: 64,
@@ -22,7 +22,7 @@ const gameWorlds = {
   ledge: {
     type: 'ledge',
     name: 'Small Ledge',
-    paragraph: 'Press the space key with up, left, or right to jump.',
+    paragraph: 'Press the space key to jump. Try jumping with a directional key.',
     width: 512,
     height: 512,
     tileSize: 64,
@@ -37,10 +37,28 @@ const gameWorlds = {
     tileSize: 64,
     lengthOfRun: 1
   },
+  poolWater: {
+    type: 'poolWater',
+    name: 'Pool of Water',
+    paragraph: 'A pool of water.',
+    width: 512,
+    height: 512,
+    tileSize: 64,
+    lengthOfRun: 1
+  },
+  columnWater: {
+    type: 'columnWater',
+    name: 'Column of Water',
+    paragraph: 'A column of water.',
+    width: 512,
+    height: 512,
+    tileSize: 64,
+    lengthOfRun: 1
+  },
   forest: {
     type: 'forest',
     name: 'Small Tree',
-    paragraph: 'A small tree.',
+    paragraph: 'Some blocks can be broken by moving towards them.',
     width: 512,
     height: 512,
     tileSize: 64,
@@ -50,7 +68,7 @@ const gameWorlds = {
   sapForest: {
     type: 'sapForest',
     name: 'Sap Wood',
-    paragraph: 'A forest of small trees with sappy logs.',
+    paragraph: 'Collecting sap restores some hunger.',
     width: 512 * 3,
     height: 512,
     tileSize: 64,

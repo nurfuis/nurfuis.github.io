@@ -23,7 +23,7 @@ const attackTypes = [{
     cost: 5
 }
 ];
-const mooreNeighbors = [{
+const mooreNeighborOffsets = [{
     x: -64,
     y: -64
 }, {
@@ -93,7 +93,7 @@ const extendedMooreNeighbors = [{
     y: 0
 }, {
     x: -64,
-    y:0
+    y: 0
 },
 {
     x: 0,  // center
@@ -441,7 +441,142 @@ class Transmission {
     }
 }
 
+const moveStates = {
+    idle: {
+        enter: (unit) => {
+            unit.idleTimer = 0;
+        },
+        update: (unit, delta) => {
+            unit.idleTimer += delta;
+            if (unit.idleTimer >= unit.idleDelay) {
+                unit.moveState = moveStates.lookAround;
+            }
+        },
+        exit: (unit) => {
+        },
+    },
+    lookAround: {
+        enter: (unit) => {
+            unit.lookTime = 0;
+        },
+        update: (unit, delta) => {
+            unit.lookTime += delta;
+            if (unit.lookTime >= unit.lookDuration) {
+                unit.moveState = moveStates.idle;
+            }
+        },
+        exit: (unit) => {
 
+        }
+    },
+    jumping: {
+        enter: (unit) => {
+            unit.jumpArc.active = true;
+        },
+        update: (unit, delta) => {
+            unit.updateJumpArc(delta);
+        },
+        exit: (unit) => {
+            unit.jumpArc.active = false;
+        }
+    },
+    moving: {
+        enter: (unit) => {
+            unit.isMoving = true;
+        },
+        update: (unit, delta) => {
+            unit.moveTowards();
+        },
+        exit: (unit) => {
+            unit.isMoving = false;
+        }
+    },
+    falling: {
+        enter: (unit) => {
+            unit.isFalling = true;
+        },
+        update: (unit, delta) => {
+            unit.tryMove('down');
+        },
+        exit: (unit) => {
+            unit.isFalling = false;
+        }
+    },
+    floating: {
+        enter: (unit) => {
+            unit.isFloating = true;
+        },
+        update: (unit, delta) => {
+            unit.tryMove('down');
+        },
+        exit: (unit) => {
+            unit.isFloating = false;
+        }
+    }
+};
+
+const checkFalling = (unit) => {
+    return !unit.tileBelow.solid;
+};
+
+const checkJumping = (unit) => {
+    return unit.isJumping;
+};
+
+const checkMoving = (unit) => {
+    return unit.isMoving;
+};
+
+const checkFloating = (unit) => {
+    return unit.isFloating;
+}
+
+const checkIdle = (unit) => {
+    return unit.idleTimer >= unit.idleDelay;
+};
+
+const checkLookAround = (unit) => {
+    return unit.lookTime >= unit.lookDuration;
+};
+
+const checks = {
+    checkFalling,
+    checkJumping,
+    checkMoving,
+    checkFloating,
+    checkIdle,
+    checkLookAround
+};
+
+class MoveState {
+    constructor(unit) {
+        this.unit = unit;
+        this.states = moveStates;
+        this.currentState = this.states.idle;
+        this.currentState.enter(this.unit);
+    }
+
+    update(delta) {
+        // Run current state update
+        this.currentState.update(this.unit, delta);
+
+        // Check transitions
+        for (const [check, nextState] of Object.entries(this.currentState.transitions)) {
+            if (checks[check](this.unit)) {
+                this.transitionTo(this.states[nextState]);
+                break;
+            }
+        }
+    }
+
+    transitionTo(newState) {
+        this.currentState.exit(this.unit);
+        this.currentState = newState;
+        this.currentState.enter(this.unit);
+    }
+}
+
+const { idle, lookAround, jumping, moving, falling, floating } = moveStates;
 
 class Unit extends GameObject {
     constructor(x, y, size, colorClass, speed, name, canvas, camera, map, level = 1, experience = 0, health = 100) {
@@ -535,10 +670,9 @@ class Unit extends GameObject {
 
         this.isCollecting = false;
         this.isSinking = false;
-        this.isMoving = false;
         this.isFalling = false;
         this.isFloating = false;
-        this.isJumping = false;
+
 
         this.fallingDamage = 0;
 
@@ -574,9 +708,9 @@ class Unit extends GameObject {
 
         this.useAutoInput = false;
 
-        this.momentum = 0;
-        this.upCount = 0;
-        this.maxUp = 2;
+        this.currentMapName = null;
+
+        this.moveState = new MoveState(this);
 
 
         this.image = new Image();
@@ -589,6 +723,21 @@ class Unit extends GameObject {
         this.imageDown.src = 'images/Sprite-curioustraveler3.png';
 
         events.on('MAP_CHANGED', this, (map) => {
+            this.currentGameWorld = map.gameWorld;
+
+            // cancel jump
+            this.jumpArc.active = false;
+            this.isJumping = false;
+            this.isFalling = false;
+            this.isFloating = false;
+            this.isMoving = false;
+            this.isCollecting = false;
+            this.isSinking = false;
+            this.isGravityOff = false;
+            this.fallingDamage = 0;
+            this.delay = 0;
+
+
             this.moveToSpawn();
         });
         events.on('PATROL_DEFEATED', this, (patrol) => {
@@ -691,16 +840,48 @@ class Unit extends GameObject {
             }
         };
 
-        this.idleTimer = 0;
-        this.idleDelay = 3000;
-        this.lookDirections = ['right', 'up', 'left', 'down'];
-        this.currentLookIndex = 0;
-        this.lookTime = 0;
-        this.lookDuration = 4000;
+        this.fallDamage = 0;
+        this.fallTowards = {
+            active: false,
+            startPos: null,
+            endPos: null,
+            progress: 0,
+            duration: 500, // milliseconds
+            height: 0, // No upward arc for falling
+            onComplete: null
+        }
+
         this.isIdling = false;
-        this.lastInputTime = Date.now();
+        this.idleTimer = {
+            active: false,
+            startTime: 0,
+            duration: 3000,
+            onComplete: null
+        };
+
+        this.isJumping = false;
+        this.jumpArc = {
+            active: false,
+            startPos: null,
+            endPos: null,
+            progress: 0,
+            duration: 500, // milliseconds
+            height: 192, // max height of jump arc
+            onComplete: null
+        };
+
+        this.isMoving = false;
+        this.moveTowards = {
+            active: false,
+            startPos: null,
+            endPos: null,
+            progress: 0,
+            duration: 500, // milliseconds
+            onComplete: null
+        }
     }
     ready() {
+        this.currentGameWorld = this.parent.parent.map.gameWorld;
         this.startingposition = new Vector2(this.position.x, this.position.y);
 
         const tile = this.currentTile;
@@ -742,19 +923,10 @@ class Unit extends GameObject {
 
         if (tile !== this.tile) {
             this.previousTile = this.tile;
+
             this.tile = tile;
+
             this.calculateMooreNeighbors(this.gameMap);
-        }
-
-        // UPDATE GRID MOVEMENT
-        if (this.isMoving && this.targetPosition) {
-
-            const distance = this.moveTowards();
-
-            if (tile.type === 'water') {
-                root.map.disturbWater(this.position.x, this.position.y);
-            }
-            return;
         }
 
         this.doVitals(delta);
@@ -762,12 +934,11 @@ class Unit extends GameObject {
         this.powerSupply.update();
 
 
-
         let input = {
             direction: this.getDirectionFromInput(root.input.keysPressed)
         };
 
-        let direction = 'center';
+        let direction = this.direction;
 
         if (this.useAutoInput) {
             input = root.automatedInput;
@@ -779,48 +950,117 @@ class Unit extends GameObject {
         this.lastDirection = this.direction;
         this.direction = direction;
 
-        // idle ability
-        this.updateIdleState(delta, root);
-        if (this.isIdling) {
-            return;
+        // check if idle
+        if (!this.moving && !this.isFalling && !this.isFloating && !this.isJumping && !this.isCollecting && !this.isIdling && !this.isChangingFacingDirection) {
+            this.isIdling = true;
+        } else {
+            if (direction != 'center') {
+                this.isIdling = false;
+                this.idleTimer.active = false;
+
+            }
+            // try other steps
         }
 
-        // change facing ability
+        // idle
+        if (this.isIdling && !this.targetPosition) {
+            if (this.idleTimer.active) {
+                this.updateIdleTimer(delta);
+            } else {
+                this.startIdleTimer();
+            }
+        }
+
+        // change facing 
         if (this.facingDirection != 'right' && direction === 'right') {
+
             this.facingDirection = 'right';
-            this.delay = 200;
+
+            if (!this.isJumping) {
+
+                this.delay = 200;
+            }
             return;
         } else if (this.facingDirection != 'left' && direction === 'left') {
+
             this.facingDirection = 'left';
+
             this.delay = 200;
-            return;
-        } else if (this.facingDirection != 'down' && direction === 'down') {
-            this.facingDirection = 'down';
-        } else if (this.facingDirection != 'up' && direction === 'up') {
-            this.facingDirection = 'up';
-        }
 
-        if (this.momentum > 0) {
-            this.momentum -= 1;
-            this.tryMove(this.momentumDirection);
             return;
         }
 
+        // jump
+        if (this.isJumping && this.targetPosition) { // transition to jumping state
+
+            if (this.jumpArc.active) {
+
+                this.updateJumpArc(delta);
+
+                if (tile.type === 'water') {
+                    root.map.disturbWater(this.position.x, this.position.y);
+                }
+                return;
+            } else {
+                this.startJumpArc();
+            }
+        }
+
+        // move
+        if (this.isMoving && this.targetPosition) {
+            if (this.moveTowards.active) {
+
+                this.updateMoveTowards(delta);
+
+                if (tile.type === 'water') {
+                    root.map.disturbWater(this.position.x, this.position.y);
+                }
+                return;
+            } else {
+                this.startMoveTowards();
+            }
+        }
+
+        // fall
+        if (this.isFalling && this.targetPosition) {
+            console.log('falling');
+            if (this.fallTowards.active) {
+                this.updateFallTowards(delta);
+                return;
+            } else {
+                this.startFallTowards();
+            }
+        }
+
+        // break fall
+        // if (this.isFalling) {
+        //     if (!!tileBelow && tileBelow.solid) {
+        //         this.breakFall(tileBelow);
+        //         this.isFalling = false;
+        //         this.delay = 200;
+        //     }
+        // }
+
+
+
+        // try floating
         if (this.isFloating) {
             if (!!tileBelow && tileBelow.solid) {
                 this.isFloating = false;
             }
         }
+        //  try swim
+        if (tile.type === 'water') {
+            direction = 'down';
 
-        if (this.isFalling) {
-            if (!!tileBelow && tileBelow.solid) {
-                this.breakFall(tileBelow);
-                this.isFalling = false;
-                this.momentum = 0;
-                this.delay = 200;
+            if (!!input.direction && input.direction !== 'center') {
+                direction = input.direction;
             }
+            this.tryMove(direction)
+            return;
         }
 
+        // try sink
         if (!tile.solid && !!tileBelow && tileBelow.type === 'water') {
             direction = 'down';
 
@@ -828,19 +1068,11 @@ class Unit extends GameObject {
             return;
         }
 
-        if (!tile.solid && !!tileBelow && tileBelow.type === 'air') {
+        // try fall
+        if (!!tile && !!tileBelow && tile.type === 'air' && tileBelow.type === 'air') {
             direction = 'down';
-            this.isFalling = true;
 
-            this.tryMove(direction);
-            return;
-        }
-
-
-
-        if (this.upCount > 0) {
-            this.upCount -= 1;
-            this.delay = 30;
+            this.tryFall(direction);
             return;
         }
 
@@ -852,8 +1084,10 @@ class Unit extends GameObject {
         if (!this.isAlive) return;
         if (this.isCollecting) return;
 
-        const scale = 0.75;
+        let drawX = this.position.x;
+        let drawY = this.position.y;
 
+        const scale = 0.75;
 
         let offsetX = 0;
         let offsetY = -16;
@@ -866,50 +1100,50 @@ class Unit extends GameObject {
         if (this.facingDirection === 'left') {
             ctx.drawImage(
                 this.imageLeft,
-                this.position.x + offsetX,
-                this.position.y + offsetY,
+                drawX + offsetX,
+                drawY + offsetY,
                 scaledWidth,
                 scaledHeight
             );
         } else if (this.facingDirection === 'right') {
             ctx.drawImage(
                 this.image,
-                this.position.x + offsetX,
-                this.position.y + offsetY,
+                drawX + offsetX,
+                drawY + offsetY,
                 scaledWidth,
                 scaledHeight
             );
         } else if (this.facingDirection === 'down') {
             ctx.drawImage(
                 this.imageDown,
-                this.position.x + offsetX,
-                this.position.y + offsetY,
+                drawX + offsetX,
+                drawY + offsetY,
                 scaledWidth + (32 * scale),
                 scaledHeight
             );
         } else if (this.facingDirection === 'up') {
             ctx.drawImage(
                 this.imageDown,
-                this.position.x + offsetX,
-                this.position.y + offsetY,
+                drawX + offsetX,
+                drawY + offsetY,
                 scaledWidth + (32 * scale),
                 scaledHeight
             );
         }
 
-        this.drawManaBar(ctx, this.position.x, this.position.y - 10);
+        // this.drawManaBar(ctx, drawX, drawY - 10);
 
         if (this.debug) {
             let index = 0;
             this.calculateExtendedMooreNeighbors(this.gameMap);
             this.extendedMooreNeighbors.forEach(neighbor => {
-                let text = `${neighbor.x} ${neighbor.y}`;
+                let text = `${index}`;
                 let text2 = `${neighbor.type}`;
                 let text3 = `${neighbor.passable}`;
 
                 if (index === 12) {
                     // UNIT TILE
-                    text = `${Math.floor(this.position.x)}, ${Math.floor(this.position.y)}`;
+                    text = `${Math.floor(drawX)}, ${Math.floor(drawY)}`;
                     text2 = `${this.facingDirection}, ${neighbor.type}`;
                     text3 = `${this.direction}`;
                     ctx.fillStyle = 'rgba(0, 255, 0, 0.5)';
@@ -981,44 +1215,6 @@ class Unit extends GameObject {
         ctx.restore();
     }
 
-
-    updateIdleState(delta, root) {
-        if (this.useAutoInput) return;
-        const now = Date.now();
-
-        if (root.input.keysPressed.length > 0) {
-            this.lastInputTime = now;
-            this.isIdling = false;
-            this.idleTimer = 0;
-        }
-
-        if (this.isMoving || this.isFalling || this.isSinking) {
-            this.idleTimer = 0;
-            this.isIdling = false;
-            this.lastInputTime = now;
-            return;
-        }
-
-        if (!this.isIdling) {
-            this.idleTimer += delta;
-            if (this.idleTimer >= this.idleDelay) {
-                this.isIdling = true;
-                console.log('Unit idle timer:', this.idleTimer);
-                this.lookTime = 0;
-                this.currentLookIndex = this.lookDirections.indexOf(this.facingDirection);
-            }
-        }
-
-        if (this.isIdling) {
-            this.lookTime += delta;
-            if (this.lookTime >= this.lookDuration) {
-                this.lookTime = 0;
-                this.currentLookIndex = (this.currentLookIndex + 1) % this.lookDirections.length;
-                this.facingDirection = this.lookDirections[this.currentLookIndex];
-            }
-        }
-    }
-
     getDirectionFromInput(keysPressed) {
         let direction = 'center';
         const numKeysPressed = keysPressed.length;
@@ -1088,8 +1284,6 @@ class Unit extends GameObject {
                     direction = 'up-left';
 
                 }
-
-
             }
 
         } else if (keysPressed.includes('d') && keysPressed.includes(' ') && numKeysPressed === 2) {
@@ -1210,133 +1404,167 @@ class Unit extends GameObject {
 
             direction = 'down-right';
 
-        } 
-         
+        }
+
 
         return direction;
 
     }
-    tryMove(direction) {
-        if (this.isMoving) return;
+
+    tryMove(direction, momentum = 0) {
+        if (this.isMoving || this.isJumping) return;
 
         this.targetPosition = null;
+
         let selectedTile = null;
+
+        let jumping = false;
 
         let dX = 0;
         let dY = 0;
 
         switch (direction) {
             case 'up': {
+
                 selectedTile = this.mooreNeighbors[1];
+
                 dX = 0; dY = -1;
-                this.upCount++;
+
+                jumping = true;
+
                 break;
             }
             case 'down': {
+
                 selectedTile = this.mooreNeighbors[7];
+
                 dX = 0; dY = 1;
+
                 break;
             }
             case 'left': {
+
                 selectedTile = this.mooreNeighbors[3];
+
                 dX = -1; dY = 0;
+
                 break;
             }
             case 'right': {
+
                 selectedTile = this.mooreNeighbors[5];
+
                 dX = 1; dY = 0;
+
                 break;
             }
             case 'up-left': {
+
                 selectedTile = this.mooreNeighbors[0];
 
                 dX = -1; dY = -1;
-                
-                this.upCount++;
+
+                if (!this.mooreNeighbors[3].solid && !this.mooreNeighbors[6].solid) {
+                    this.calculateExtendedMooreNeighbors(this.gameMap);
+                    selectedTile = this.extendedMooreNeighbors[10];
+                }
+
+                jumping = true;
 
                 break;
             }
             case 'up-right': {
+
                 selectedTile = this.mooreNeighbors[2];
 
                 dX = 1; dY = -1;
 
-                this.upCount++;
+                if (!this.mooreNeighbors[5].solid && !this.mooreNeighbors[8].solid) {
+                    this.calculateExtendedMooreNeighbors(this.gameMap);
+                    selectedTile = this.extendedMooreNeighbors[14];
+                }
+
+                jumping = true;
 
                 break;
             }
             case 'down-left': {
+
                 selectedTile = this.mooreNeighbors[6];
+
                 dX = -1; dY = 1;
+
+                jumping = true;
+
                 break;
             }
             case 'down-right': {
+
                 selectedTile = this.mooreNeighbors[8];
+
                 dX = 1; dY = 1;
+
+                jumping = true;
+
                 break;
             }
             case 'up-two': {
+
                 this.calculateExtendedMooreNeighbors(this.gameMap);
 
                 selectedTile = this.extendedMooreNeighbors[2];
 
                 dX = 0; dY = -2;
 
-                this.upCount += 2;
-
-                this.momentum = 1;
-                this.momentumDirection = 'up';
+                jumping = true;
 
                 break;
             }
             case 'up-two-right-one': {
 
-                selectedTile = this.tileUpTwo;
+                this.calculateExtendedMooreNeighbors(this.gameMap);
 
-                this.momentum = 1;
-                this.momentumDirection = 'right';
+                selectedTile = this.extendedMooreNeighbors[3];
 
-                dX = 0; dY = -3;
-                this.upCount += 3;
+                dX = 1; dY = -2;
 
+                jumping = true;
 
                 break;
             }
             case 'up-two-left-one': {
 
-                selectedTile = this.tileUpTwo;
-                this.momentum = 1;
-                this.momentumDirection = 'left';
+                this.calculateExtendedMooreNeighbors(this.gameMap);
 
-                dX = 0; dY = -3;
-                this.upCount += 3;
+                selectedTile = this.extendedMooreNeighbors[1];
+
+                dX = -1; dY = -2;
+
+                jumping = true;
+
                 break;
             }
             case 'up-left-two': {
+
                 this.calculateExtendedMooreNeighbors(this.gameMap);
 
                 selectedTile = this.extendedMooreNeighbors[0];
 
                 dX = -2; dY = -2;
 
-                this.upCount += 2;
-
-                this.momentum = 1;
-                this.momentumDirection = 'left';
+                jumping = true;
 
                 break;
             }
             case 'up-right-two': {
+
                 this.calculateExtendedMooreNeighbors(this.gameMap);
 
                 selectedTile = this.extendedMooreNeighbors[4];
 
                 dX = 2; dY = -2;
 
-                this.upCount += 2;
-
-                this.momentum = 1;
-                this.momentumDirection = 'right';
+                jumping = true;
 
                 break;
             }
@@ -1346,17 +1574,34 @@ class Unit extends GameObject {
         const checkLeftBorder = this.position.x <= 0;
 
         if (selectedTile) {
-            if (selectedTile.passable) {
-                this.targetPosition = new Vector2(selectedTile.x, selectedTile.y);
-                this.isMoving = true;
 
-                // Store movement direction for later use
-                this.lastMovementDirection = {
-                    x: selectedTile.x - this.position.x,
-                    y: selectedTile.y - this.position.y
-                };
+            if (selectedTile.passable) {
+
+                if (jumping) {
+                    this.isJumping = jumping;
+
+                    console.log('jumping');
+
+                    const landingTile = this.gameMap.getSurfaceTileBelow(selectedTile.x, selectedTile.y);
+                    const emptyTile = this.gameMap.getEmptyTileAbove(landingTile.x, landingTile.y);
+
+
+                    this.targetPosition = new Vector2(emptyTile.x, emptyTile.y);
+
+
+                } else {
+                    this.isMoving = true;
+                    this.targetPosition = new Vector2(selectedTile.x, selectedTile.y);
+
+
+                }
+
+
             } else if (selectedTile.breakable) {
+
                 this.tryBreakBlock(selectedTile);
+
+
             } else if (selectedTile.type === 'border') {
                 if (checkLeftBorder) {
                     // go back
@@ -1370,52 +1615,7 @@ class Unit extends GameObject {
             }
         }
     }
-    moveTowards() {
-        let distanceToTravelX = this.targetPosition.x - this.position.x;
-        let distanceToTravelY = this.targetPosition.y - this.position.y;
 
-        let distance = Math.sqrt(distanceToTravelX ** 2 + distanceToTravelY ** 2);
-
-        if (distance <= this.speed) {
-            this.position.x = this.targetPosition.x;
-            this.position.y = this.targetPosition.y;
-            this.targetPosition = null;
-            this.isMoving = false;
-
-        } else {
-            let normalizedX = distanceToTravelX / distance;
-            let normalizedY = distanceToTravelY / distance;
-
-            let adjustedSpeed = this.speed;
-
-            if (this.isSinking) {
-                adjustedSpeed *= 0.3;
-            }
-            if (this.isFloating) {
-                adjustedSpeed *= 0.4;
-            }
-            if (this.tile.type === 'water') {
-                adjustedSpeed *= 0.5;
-            }
-            if (this.isFalling) {
-                adjustedSpeed *= 2;
-            }
-
-            const newX = this.position.x + normalizedX * adjustedSpeed;
-            const newY = this.position.y + normalizedY * adjustedSpeed;
-
-            if (newX > 0) {
-                this.lastX = this.position.x;
-                this.position.x = newX;
-            }
-            if (newY > 0) {
-                this.lastY = this.position.y;
-                this.position.y = newY;
-            }
-
-        }
-        return distance;
-    }
     move(direction) {
         if (direction) {
             const torque =
@@ -1614,6 +1814,70 @@ class Unit extends GameObject {
             }
         }
     }
+
+    tryFall(direction) {
+        if (this.isFalling) return;
+
+        this.targetPosition = null;
+
+        let selectedTile = null;
+
+        let dX = 0;
+        let dY = 0;
+
+        switch (direction) {
+            case 'up':
+
+                selectedTile = this.mooreNeighbors[1];
+
+                dX = 0; dY = -1;
+
+                break;
+
+            case 'down':
+
+                selectedTile = this.mooreNeighbors[7];
+
+                dX = 0; dY = 1;
+
+                break;
+
+            case 'left':
+
+                selectedTile = this.mooreNeighbors[3];
+
+                dX = -1; dY = 0;
+
+                break;
+
+            case 'right':
+
+                selectedTile = this.mooreNeighbors[5];
+
+                dX = 1; dY = 0;
+
+                break;
+
+            default:
+                break;
+        }
+        const checkRightBorder = this.position.x + this.size >= this.mapSize.width;
+        const checkLeftBorder = this.position.x <= 0;
+        const checkTopBorder = this.position.y <= 0;
+        const checkBottomBorder = this.position.y + this.size >= this.mapSize.height;
+
+        if (selectedTile.passable) {
+            this.isFalling = true;
+
+            console.log('falling');
+
+            const landingTile = this.gameMap.getSurfaceTileBelow(selectedTile.x, selectedTile.y);
+            const emptyTile = this.gameMap.getEmptyTileAbove(landingTile.x, landingTile.y);
+
+            this.targetPosition = new Vector2(emptyTile.x, emptyTile.y);
+        }
+    }
+
     breakFall(tileBelow) {
 
 
@@ -1659,7 +1923,7 @@ class Unit extends GameObject {
                     tileBelow.durability -= 35;
                 }
 
-                if (this.fallingDamage > 1) {
+                if (this.fallingDamage > 0) {
                     this.heart.takeDamage(this.fallingDamage);
                 };
                 this.fallingDamage = 0;
@@ -1677,6 +1941,245 @@ class Unit extends GameObject {
             }
         }
     }
+
+    startFallTowards() {
+        if (!this.fallTowards.active) {
+            this.fallTowards = {
+                active: true,
+                startPos: this.position,
+                endPos: this.targetPosition,
+                progress: 0,
+                duration: 300, // milliseconds
+                height: 0,
+                onComplete: () => {
+                    this.isFalling = false;
+                    this.targetPosition = null;
+                    this.delay = 200;
+                    this.breakFall(this.tileBelow);
+                }
+            };
+        } else {
+            console.warn('Fall towards already active');
+        }
+    }
+    updateFallTowards(delta) {
+        if (!this.fallTowards.active) return;
+
+        this.fallTowards.progress += delta / this.fallTowards.duration;
+
+        if (this.fallTowards.progress >= 1) {
+            this.position = this.fallTowards.endPos;
+            this.fallTowards.active = false;
+            if (this.fallTowards.onComplete) this.fallTowards.onComplete();
+            return;
+        }
+
+        // Calculate fall position with downward acceleration
+        const t = this.fallTowards.progress;
+        const start = this.fallTowards.startPos;
+        const end = this.fallTowards.endPos;
+
+        // Horizontal linear interpolation
+        const x = start.x + (end.x - start.x) * t;
+
+        // Vertical movement with acceleration
+        const fallCurve = t * t; // Quadratic acceleration
+        const y = start.y + (end.y - start.y) * fallCurve;
+
+        this.position = new Vector2(x, y);
+
+
+
+        // Calculate falling damage
+        const fallDistance = Math.abs(end.y - start.y);
+        const fallDamage = fallDistance / 64; // Adjust the divisor to control damage sensitivity
+        this.fallingDamage += fallDamage;
+
+
+        // Emit falling particles
+        if (t % 0.1 < 0.016) {
+            events.emit("PARTICLE_EMIT", {
+                x: this.position.x + 32,
+                y: this.position.y + 64,
+                color: 'rgba(128, 128, 128, 0.3)',
+                size: 2,
+                duration: 300,
+                shape: 'circle',
+                count: 1,
+                velocity: {
+                    x: (Math.random() - 0.5) * 2,
+                    y: Math.random() * 2
+                }
+            });
+        }
+    }
+
+
+    lookAround() {
+
+        if (this.useAutoInput) return;
+
+        const lookDirections = ['up', 'down', 'left', 'right'];
+        const randomIndex = Math.floor(Math.random() * lookDirections.length);
+        const randomDirection = lookDirections[randomIndex];
+
+        this.facingDirection = randomDirection;
+
+    }
+
+    startIdleTimer() {
+        if (!this.idleTimer.active) {
+            this.idleTimer = {
+                active: true,
+                progress: 0,
+                duration: 3000,
+                onComplete: () => {
+                    this.isIdling = false;
+                    this.idleTimer.active = false;
+                    this.lookAround();
+                }
+            };
+        } else {
+            console.warn('Idle timer already active');
+        }
+    }
+    updateIdleTimer(delta) {
+        if (!this.idleTimer.active) return;
+
+        this.idleTimer.progress += delta;
+
+        if (this.idleTimer.progress >= this.idleTimer.duration) {
+            this.idleTimer.active = false;
+            if (this.idleTimer.onComplete) this.idleTimer.onComplete();
+            return;
+        }
+    }
+
+    startMoveTowards() {
+        if (!this.moveTowards.active) {
+            this.moveTowards = {
+                active: true,
+                startPos: this.position,
+                endPos: this.targetPosition,
+                progress: 0,
+                duration: 200,
+                onComplete: () => {
+                    this.isMoving = false;
+                    this.targetPosition = null;
+                    this.delay = 0;
+                }
+            };
+        } else {
+            console.warn('Move towards already active');
+        }
+    }
+    updateMoveTowards(delta) {
+        if (!this.moveTowards.active) return;
+
+        let duration = this.moveTowards.duration;
+
+
+        if (this.isFloating) {
+            duration *= 1.4;
+        }
+        if (this.tile.type === 'water') {
+            duration *= 1.5;
+        }
+        if (this.isFalling) {
+            duration *= .3;
+        }
+
+        this.moveTowards.progress += delta / duration;
+
+        if (this.moveTowards.progress >= 1) {
+
+            this.position = this.moveTowards.endPos;
+
+            this.moveTowards.active = false;
+
+            if (this.moveTowards.onComplete) this.moveTowards.onComplete();
+
+            return;
+        }
+
+        const t = this.moveTowards.progress;
+        const start = this.moveTowards.startPos;
+        const end = this.moveTowards.endPos;
+
+        const x = start.x + (end.x - start.x) * t;
+        const y = start.y + (end.y - start.y) * t;
+
+        this.position = new Vector2(x, y);
+    }
+
+
+    startJumpArc() {
+        if (!this.jumpArc.active) {
+            this.jumpArc = {
+                active: true,
+                startPos: this.position,
+                endPos: this.targetPosition,
+                progress: 0,
+                duration: 500,
+                height: this.spriteHeight / 2,
+                onComplete: () => {
+                    this.isJumping = false;
+                    this.targetPosition = null;
+                    this.isMoving = false;
+                    this.delay = 200;
+                }
+            };
+        } else {
+            console.warn('Jump arc already active');
+        }
+    }
+    updateJumpArc(delta) {
+        // check
+        if (!this.jumpArc.active) return;
+
+        this.jumpArc.progress += delta / this.jumpArc.duration;
+
+        if (this.jumpArc.progress >= 1) {
+            // Finish jump
+            this.position = this.jumpArc.endPos;
+            this.jumpArc.active = false;
+            if (this.jumpArc.onComplete) this.jumpArc.onComplete();
+            return;
+        }
+
+        // Calculate arc position
+        const t = this.jumpArc.progress;
+        const start = this.jumpArc.startPos;
+        const end = this.jumpArc.endPos;
+
+        // Horizontal linear interpolation
+        const x = start.x + (end.x - start.x) * t;
+
+        // Vertical quadratic curve for arc
+        const arcHeight = this.jumpArc.height * (4 * t * (1 - t));
+        const y = start.y + (end.y - start.y) * t - arcHeight;
+
+        this.position = new Vector2(x, y);
+
+        // Emit particles during jump
+        if (t % 0.1 < 0.016) { // Emit every ~100ms
+            events.emit("PARTICLE_EMIT", {
+                x: this.position.x + 32,
+                y: this.position.y + 64,
+                color: 'rgba(255, 255, 255, 0.3)',
+                size: 2,
+                duration: 300,
+                shape: 'square',
+                count: 1,
+                velocity: {
+                    x: (Math.random() - 0.5) * 2,
+                    y: Math.random() * 1
+                }
+            });
+        }
+    }
+
+
 
 
     calculateExtendedMooreNeighbors(map) {
@@ -1700,13 +2203,17 @@ class Unit extends GameObject {
             }
         });
     }
+
     calculateMooreNeighbors(map) {
+
         this.mooreNeighbors = [];
 
-        mooreNeighbors.forEach(neighbor => {
+        mooreNeighborOffsets.forEach(neighbor => {
             const neighborX = this.position.x + neighbor.x;
             const neighborY = this.position.y + neighbor.y;
+
             const neighborTile = map.getTileAtCoordinates(neighborX, neighborY);
+
             if (neighborTile) {
                 this.mooreNeighbors.push(neighborTile);
             } else {
@@ -1721,8 +2228,7 @@ class Unit extends GameObject {
 
 
     moveToSpawn() {
-        this.position.x = this.startingposition.x;
-        this.position.y = this.startingposition.y;
+        this.position = new Vector2(this.startingposition.x, this.startingposition.y);
 
         this.lastX = null;
         this.lastY = null;
@@ -1820,6 +2326,7 @@ class Unit extends GameObject {
 
 
     tryEmitPosition() {
+
         if (this.lastX === this.position.x && this.lastY === this.position.y) {
             return;
         }
@@ -1879,12 +2386,17 @@ class Unit extends GameObject {
 
 
     breakBlock(target) {
+        this.delay = 350;
+
+        events.emit('BLOCK_BREAK', target);
+
         target.type = 'air';
         target.color = getComputedStyle(document.querySelector('.light-grey')).backgroundColor;
         target.solid = false;
         target.passable = true;
         target.durability = 100;
         target.breakable = false;
+
     }
     attackBlock(target) {
         const randomNumber = Math.random();
@@ -2109,6 +2621,7 @@ class Unit extends GameObject {
     get mapSize() {
         return this.parent.parent.map.mapSize;
     }
+
     get currentTile() {
         return this.parent.parent.map.getTileAtCoordinates(this.position.x, this.position.y);
     }
