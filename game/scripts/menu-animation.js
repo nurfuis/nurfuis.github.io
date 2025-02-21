@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cellSize = 32;
     const cols = Math.floor(menuCanvas.width / cellSize);
     const rows = Math.floor(menuCanvas.height / cellSize);
-    let grid = new Array(cols).fill(null).map(() => new Array(rows).fill(0));
+    let grid = new Array(cols).fill(null).world(() => new Array(rows).fill(0));
 
     // Track cursor position
     let cursorX = -1;
@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateGrid() {
-        const next = grid.map(arr => [...arr]);
+        const next = grid.world(arr => [...arr]);
 
         for (let i = 0; i < cols; i++) {
             for (let j = 0; j < rows; j++) {

@@ -119,10 +119,10 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
-function generateCombinedWorld(map, runLength = 20) {
-    // Store original map dimensions for a single section
-    const sectionWidth = map.mapSize.width / runLength;
-    const originalWidth = map.mapSize.width;
+function generateCombinedWorld(world, runLength = 20) {
+    // Store original world dimensions for a single section
+    const sectionWidth = world.width / runLength;
+    const originalWidth = world.width;
     console.log('Combined world width: ' + originalWidth);
     console.log('Section width: ' + sectionWidth);
 
@@ -139,8 +139,8 @@ function generateCombinedWorld(map, runLength = 20) {
         generateColumnWater
     ];
 
-    // Temporarily modify map size to generate sections
-    map.mapSize.width = sectionWidth;
+    // Temporarily modify world size to generate sections
+    world.width = sectionWidth;
 
     // Generate all sections
     const combinedTiles = [];
@@ -149,10 +149,10 @@ function generateCombinedWorld(map, runLength = 20) {
     for (let i = 0; i < runLength; i++) {
         // Randomly select a section generator
         const randomGenerator = sectionGenerators[Math.floor(Math.random() * sectionGenerators.length)];
-        const sectionTiles = randomGenerator(map);
+        const sectionTiles = randomGenerator(world);
 
         // Offset tiles for this section
-        const offsetTiles = sectionTiles.map(tile => ({
+        const offsetTiles = sectionTiles.world(tile => ({
             ...tile,
             x: tile.x + (sectionWidth * i),
             worldSpawnPoint: false // Reset spawn point
@@ -161,17 +161,17 @@ function generateCombinedWorld(map, runLength = 20) {
         combinedTiles.push(...offsetTiles);
     }
 
-    // Restore original map size
-    map.mapSize.width = originalWidth;
+    // Restore original world size
+    world.width = originalWidth;
 
     return combinedTiles;
 }
 
-function generateFlatWorld(map) {
-    const rows = Math.ceil(map.mapSize.height / map.tileSize);
-    const cols = Math.ceil(map.mapSize.width / map.tileSize);
+function generateFlatWorld(world) {
+    const rows = Math.ceil(world.height / world.tileSize);
+    const cols = Math.ceil(world.width / world.tileSize);
 
-    const tileSize = map.tileSize;
+    const tileSize = world.tileSize;
 
     let tiles = []
 
@@ -232,10 +232,49 @@ function generateFlatWorld(map) {
     return tiles;
 
 }
-function generateHillsWorld(map) {
-    const rows = Math.ceil(map.mapSize.height / map.tileSize);
-    const cols = Math.ceil(map.mapSize.width / map.tileSize);
-    const tileSize = map.tileSize;
+
+function makeSuperFlat(world) {
+    const rows = Math.ceil(world.height / world.tileSize);
+    const cols = Math.ceil(world.width / world.tileSize);
+
+    const tileSize = world.tileSize;
+
+    let tiles = []
+
+    firstPass();
+
+    function firstPass() {
+        for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+
+                let newTile = tile;
+
+                const tileX = x * tileSize;
+                const tileY = y * tileSize;
+
+
+                if (y === 14) {
+                    newTile = stone(tileX, tileY);
+                }
+
+                else {
+                    newTile = air(tileX, tileY);
+                }
+
+
+                tiles.push(newTile);
+            }
+        }
+    }
+
+    return tiles;
+
+}
+
+function generateHillsWorld(world) {
+    const rows = Math.ceil(world.height / world.tileSize);
+    const cols = Math.ceil(world.width / world.tileSize);
+    const tileSize = world.tileSize;
     const tiles = [];
 
     firstPass();
@@ -309,10 +348,10 @@ function generateHillsWorld(map) {
     }
     return tiles;
 }
-function generateEarthLedge(map) {
-    const rows = Math.ceil(map.mapSize.height / map.tileSize);
-    const cols = Math.ceil(map.mapSize.width / map.tileSize);
-    const tileSize = map.tileSize;
+function generateEarthLedge(world) {
+    const rows = Math.ceil(world.height / world.tileSize);
+    const cols = Math.ceil(world.width / world.tileSize);
+    const tileSize = world.tileSize;
     const tiles = [];
 
     firstPass();
@@ -408,11 +447,11 @@ function generateEarthLedge(map) {
     return tiles;
 }
 
-function generateForestWorld(map) {
-    const rows = Math.ceil(map.mapSize.height / map.tileSize);
-    const cols = Math.ceil(map.mapSize.width / map.tileSize);
+function generateForestWorld(world) {
+    const rows = Math.ceil(world.height / world.tileSize);
+    const cols = Math.ceil(world.width / world.tileSize);
 
-    const tileSize = map.tileSize;
+    const tileSize = world.tileSize;
 
     let tiles = []
 
@@ -494,11 +533,11 @@ function generateForestWorld(map) {
     return tiles;
 
 }
-function generateFloatingIslandWorld(map) {
-    const rows = Math.ceil(map.mapSize.height / map.tileSize);
-    const cols = Math.ceil(map.mapSize.width / map.tileSize);
+function generateFloatingIslandWorld(world) {
+    const rows = Math.ceil(world.height / world.tileSize);
+    const cols = Math.ceil(world.width / world.tileSize);
 
-    const tileSize = map.tileSize;
+    const tileSize = world.tileSize;
 
     let tiles = []
 
@@ -563,11 +602,11 @@ function generateFloatingIslandWorld(map) {
     }
     return tiles;
 }
-function generateShallowWaterWorld(map) {
-    const rows = Math.ceil(map.mapSize.height / map.tileSize);
-    const cols = Math.ceil(map.mapSize.width / map.tileSize);
+function generateShallowWaterWorld(world) {
+    const rows = Math.ceil(world.height / world.tileSize);
+    const cols = Math.ceil(world.width / world.tileSize);
 
-    const tileSize = map.tileSize;
+    const tileSize = world.tileSize;
 
     let tiles = []
 
@@ -633,11 +672,11 @@ function generateShallowWaterWorld(map) {
     }
     return tiles;
 }
-function generatePoolWater(map) {
-    const rows = Math.ceil(map.mapSize.height / map.tileSize);
-    const cols = Math.ceil(map.mapSize.width / map.tileSize);
+function generatePoolWater(world) {
+    const rows = Math.ceil(world.height / world.tileSize);
+    const cols = Math.ceil(world.width / world.tileSize);
 
-    const tileSize = map.tileSize;
+    const tileSize = world.tileSize;
 
     let tiles = []
 
@@ -679,7 +718,7 @@ function generatePoolWater(map) {
                     if (x === 2 || x === 6) {
                         newTile = earth(tileX, tileY);
                     } else {
-                        if ( x >= 3 && x <= 5) {
+                        if (x >= 3 && x <= 5) {
                             newTile = water(tileX, tileY);
                         } else {
                             newTile = air(tileX, tileY);
@@ -713,11 +752,11 @@ function generatePoolWater(map) {
     }
     return tiles;
 }
-function generateColumnWater(map) {
-    const rows = Math.ceil(map.mapSize.height / map.tileSize);
-    const cols = Math.ceil(map.mapSize.width / map.tileSize);
+function generateColumnWater(world) {
+    const rows = Math.ceil(world.height / world.tileSize);
+    const cols = Math.ceil(world.width / world.tileSize);
 
-    const tileSize = map.tileSize;
+    const tileSize = world.tileSize;
 
     let tiles = []
 
@@ -759,7 +798,7 @@ function generateColumnWater(map) {
                     if (x === 2 || x === 6 || x === 5 || x === 3) {
                         newTile = earth(tileX, tileY);
                     } else {
-                        if ( x >= 3 && x <= 5) {
+                        if (x >= 3 && x <= 5) {
                             newTile = water(tileX, tileY);
                         } else {
                             newTile = air(tileX, tileY);
@@ -770,7 +809,7 @@ function generateColumnWater(map) {
                     if (x === 3 || x === 5) {
                         newTile = earth(tileX, tileY);
                     } else {
-                        if ( x >= 3 && x <= 5) {
+                        if (x >= 3 && x <= 5) {
                             newTile = water(tileX, tileY);
                         } else {
                             newTile = air(tileX, tileY);
@@ -808,11 +847,11 @@ function generateColumnWater(map) {
 }
 
 
-function generateSapForestWorld(map) {
-    const rows = Math.ceil(map.mapSize.height / map.tileSize);
-    const cols = Math.ceil(map.mapSize.width / map.tileSize);
+function generateSapForestWorld(world) {
+    const rows = Math.ceil(world.height / world.tileSize);
+    const cols = Math.ceil(world.width / world.tileSize);
 
-    const tileSize = map.tileSize;
+    const tileSize = world.tileSize;
 
     let tiles = []
 
@@ -872,7 +911,7 @@ function generateSapForestWorld(map) {
 
                 trees.forEach(tree => {
                     drawSmallTree(x, y, tree, tile);
-                });    
+                });
 
                 function drawSmallTree(x, y, treeX, tile) {
 
@@ -884,7 +923,7 @@ function generateSapForestWorld(map) {
 
                         }
                     }
-                    if (x === treeX || x === treeX -1 || x === treeX + 1) {
+                    if (x === treeX || x === treeX - 1 || x === treeX + 1) {
                         if (y === 2 || y === 1) {
                             Object.assign(tile, foliage(tileX, tileY));
                         }
@@ -897,9 +936,9 @@ function generateSapForestWorld(map) {
 
                 }
                 const random = Math.random();
-                if (tile.type === 'wood' && y === 5 ) {
-                    const sap = new Sap(map.canvas, new Vector2(tile.x, tile.y));
-                    map.addChild(sap);
+                if (tile.type === 'wood' && y === 5) {
+                    const sap = new Sap(world.canvas, new Vector2(tile.x, tile.y));
+                    world.addChild(sap);
                 }
 
 
@@ -910,4 +949,5 @@ function generateSapForestWorld(map) {
     return tiles;
 
 }
+
 

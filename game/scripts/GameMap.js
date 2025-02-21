@@ -1,22 +1,14 @@
-const rarityRates = [0.01, 0.05, 0.1, 0.2, 0.3]; // Rarity rates for each rarity level
-const rarityLabels = ['legendary', 'epic', 'rare', 'uncommon', 'common']; // Rarity labels for each rarity level
-
-
-
-
 class GameMap extends GameObject {
-    constructor(canvas, mapSize, gameWorld) {
+    constructor(canvas, world) {
         super(canvas);
         this.x = 0;
         this.y = 0;
+
         this.canvas = canvas;
 
-        this.mapSize = mapSize;
-        this.tileSize = mapSize.tileSize;
+        this.initializeGameWorld(world);
 
-        this.gameWorld = gameWorld;
-
-        this.tiles = this.generateTiles();
+        this.tiles = this.generateTiles(world);
 
 
         this.editMode = false;
@@ -78,13 +70,19 @@ class GameMap extends GameObject {
             this.toggleEditMode();
         });
         events.on('CHANGE_GAME_WORLD', this, (data) => {
-            console.log('Changing game world to ' + data.gameWorld);
-            this.gameWorld = data.gameWorld;
-            this.setMapSize(data.gameWorld);
-            this.tiles = this.generateTiles(data.gameWorld);
+            console.log('Changing game world to ' + data.world);
+
+            // this.world = data.world;
+            // this.setMapSize(data.world);
+
+            this.initializeGameWorld(data.world);
+
+            this.tiles = this.generateTiles(data.world);
         });
+
+
         // Add water disturbance tracking
-        this.disturbedWaterTiles = new Map(); // Map of {tileKey: animationFrame}
+        this.disturbedWaterTiles = new Map(); // world of {tileKey: animationFrame}
         this.disturbanceDuration = 1500; // How long the disturbance lasts (ms)
         this.animationSpeed = 200; // Time between animation frames (ms)
 
@@ -98,13 +96,27 @@ class GameMap extends GameObject {
 
 
     }
+
+    initializeGameWorld(world) {
+        const worldData = gameWorlds[world];
+
+        if (!worldData) {
+            throw new Error(`Game world "${worldName}" not found!`); // Throw an error
+        }
+
+        Object.assign(this, worldData);
+
+        console.log(this);
+    }
+
     ready() {
         events.emit('DISPLAY_TEXT', {
-            heading: gameWorlds[this.gameWorld].name,
-            subheading: gameWorlds[this.gameWorld].subheading,
-            paragraph: gameWorlds[this.gameWorld].paragraph
+            heading: this.name,
+            subheading: this.subheading,
+            paragraph: this.paragraph
         });
     }
+
     step(delta, root) {
         const input = root.input;
 
@@ -120,7 +132,7 @@ class GameMap extends GameObject {
 
             // Handle arrow key presses
             if (keysPressed.length > 0 && !!this.selectedTile) {
-                this.delay = 200; // Delay in milliseconds (e.g., 200ms = 0.25 seconds)
+                this.delay = constants.KEY_DELAY; // Delay in milliseconds (e.g., 200ms = 0.25 seconds)
                 let newX = this.selectedTile.x;
                 let newY = this.selectedTile.y;
 
@@ -139,15 +151,15 @@ class GameMap extends GameObject {
                     (newY - this.playerPosition.y) ** 2
                 );
 
-                // Check if the new position is within the edit range and map boundaries
+                // Check if the new position is within the edit range and world boundaries
                 if (distance <= editRange &&
-                    newX >= 0 && newX < this.mapSize.width &&
-                    newY >= 0 && newY < this.mapSize.height) {
+                    newX >= 0 && newX < this.width &&
+                    newY >= 0 && newY < this.height) {
                     this.useArrowKeys = true;
                     this.selectedTile = this.getTileAtCoordinates(newX, newY);
                 } else {
                     this.useArrowKeys = false;
-                    return; // Return early if the updated position is outside the edit range or map boundaries
+                    return; // Return early if the updated position is outside the edit range or world boundaries
                 }
             }
 
@@ -211,29 +223,17 @@ class GameMap extends GameObject {
 
 
     }
+
     toggleEditMode() {
         this.editMode = !this.editMode;
         this.selectedTile = this.getTileAtCoordinates(this.playerPosition.x, this.playerPosition.y);
     }
-    setMapSize(worldType) {
-        let world = gameWorlds[worldType];
-        if (!world) {
-            console.warn(`Unknown world type: ${worldType}, defaulting to flat`);
-            world = gameWorlds.flat;
-        }
 
-        this.mapSize = {
-            width: world.width,
-            height: world.height,
-            tileSize: world.tileSize
-        };
-        this.lengthOfRun = world.lengthOfRun;
-    }
-    generateTiles() {
+    generateTiles(world) {
         this.children.forEach(child => {
             this.removeChild(child);
         });
-        switch (this.gameWorld) {
+        switch (world) {
             case 'flat':
                 return generateFlatWorld(this);
             case 'hills':
@@ -254,13 +254,14 @@ class GameMap extends GameObject {
                 return generatePoolWater(this);
             case 'columnWater':
                 return generateColumnWater(this);
+            case 'superFlat':
+                return makeSuperFlat(this);
             default:
-                console.warn(`Unknown world type: ${this.gameWorld}, defaulting to flat`);
+                console.warn(`Unknown world type: ${this.world}, defaulting to flat`);
                 return generateFlatWorld(this);
         }
     }
 
-    // Add a method to get the next solid tile below a given position
     getEmptyTileAbove(x, y) {
         const tileX = Math.floor(x / this.tileSize);
         const tileY = Math.floor(y / this.tileSize);
@@ -275,7 +276,7 @@ class GameMap extends GameObject {
         return null;
     }
 
-    getJumpSpot(x, y, range) {
+    getJumpTarget(x, y, range) {
 
         const tileX = Math.floor(x / this.tileSize);
         const tileY = Math.floor(y / this.tileSize);
@@ -283,7 +284,7 @@ class GameMap extends GameObject {
         let index = 0;
         let tiles = [];
 
-        for (let i = tileY; i < this.mapSize.height / this.tileSize; i++) {
+        for (let i = tileY; i < this.height / this.tileSize; i++) {
             const tile = this.getTileAtCoordinates(tileX * this.tileSize, i * this.tileSize);
 
             tiles.push(tile);
@@ -297,19 +298,64 @@ class GameMap extends GameObject {
                     return this.getEmptyTileAbove(solidTile.x, solidTile.y);
                 } else {
                     return tiles[tiles.length - 1];
-                }                
+                }
             }
         }
     }
 
+    getFallTarget(x, y) {
 
-    getSurfaceTileBelow(x, y) {
+        let index = 0;
+        let tiles = [];
+
+        const tileY = Math.floor(y / this.tileSize);
+
+        tiles.push(tile);
+
+        index++;
+
+        for (let i = tileY; i < this.height / this.tileSize; i++) {
+
+            const solidTile = tiles.find(tile => tile.solid);
+
+            if (solidTile) {
+                return this.getEmptyTileAbove(solidTile.x, solidTile.y);
+            } else {
+                return tiles[tiles.length - 1];
+            }
+        }
+
+        return null;
+
+    }
+
+    getWaterTileBelow(x, y) {
+        const tileX = Math.floor(x / this.tileSize);
+        const tileY = Math.floor(y / this.tileSize);
+
+        for (let i = tileY; i < this.height / this.tileSize; i++) {
+            const tile = this.getTileAtCoordinates(tileX * this.tileSize, i * this.tileSize);
+            if (tile.type === 'water') {
+                return tile;
+            }
+        }
+
+        return null;
+    }
+
+    getSolidTileBelow(x, y) {
 
         const tileX = Math.floor(x / this.tileSize);
         const tileY = Math.floor(y / this.tileSize);
 
-        for (let i = tileY; i < this.mapSize.height / this.tileSize; i++) {
+        let tiles = [];
+
+        for (let i = tileY; i < this.height / this.tileSize; i++) {
             const tile = this.getTileAtCoordinates(tileX * this.tileSize, i * this.tileSize);
+
+            tiles.push(tile);
+
+
             if (tile.solid) {
                 return tile;
             }
@@ -320,7 +366,6 @@ class GameMap extends GameObject {
 
     }
 
-
     getTileBelow(x, y) {
         const tileX = Math.floor(x / this.tileSize);
         const tileY = Math.floor(y / this.tileSize);
@@ -329,7 +374,6 @@ class GameMap extends GameObject {
         return tile;
 
     }
-
 
     getTileAtCoordinates(x, y) {
 
@@ -349,6 +393,7 @@ class GameMap extends GameObject {
             };
         }
     }
+
     getTileAt(x, y) {
         return this.getTileAtCoordinates(x, y);
     }
@@ -357,6 +402,7 @@ class GameMap extends GameObject {
         ctx.fillStyle = color;
         ctx.fillRect(x, y, size, size);
     }
+
     updateTileVisibility(tile) {
         const maxDurability = 100; // Assuming 100 is the maximum durability
         const sizeFactor = Math.min(tile.durability, maxDurability) / maxDurability;
@@ -372,9 +418,10 @@ class GameMap extends GameObject {
             offsetY
         };
     }
+
     highlightEditRange(ctx) {
         const tilesInRange = [];
-        const tileSize = this.mapSize.tileSize;
+        const tileSize = this.tileSize;
         const editRange = tileSize * 2; // Adjust the range as needed
 
         for (let dx = -editRange; dx <= editRange; dx += tileSize) {
@@ -384,8 +431,8 @@ class GameMap extends GameObject {
                 const distance = Math.sqrt(dx ** 2 + dy ** 2);
 
                 if (distance <= editRange &&
-                    targetX >= 0 && targetX < this.mapSize.width &&
-                    targetY >= 0 && targetY < this.mapSize.height) {
+                    targetX >= 0 && targetX < this.width &&
+                    targetY >= 0 && targetY < this.height) {
                     tilesInRange.push({
                         x: targetX,
                         y: targetY
@@ -399,12 +446,14 @@ class GameMap extends GameObject {
             ctx.fillRect(tile.x, tile.y, tileSize, tileSize);
         });
     }
+
     highlightSelectedTile(ctx) {
         if (this.selectedTile) {
             ctx.fillStyle = 'rgba(0, 0, 255, 0.3)'; // Semi-transparent green for selected tile
             ctx.fillRect(this.selectedTile.x, this.selectedTile.y, this.tileSize, this.tileSize);
         }
     }
+
     drawImage(ctx, offsetX, offsetY) {
         const canvasWidth = this.canvas.width;
         const canvasHeight = this.canvas.height;
@@ -435,8 +484,8 @@ class GameMap extends GameObject {
             let tileImage;
             let sourceX = 0;
             let sourceY = 0;
-            let sourceSizeW = 64; // Size of the source tile in the tile sheet
-            let sourceSizeH = 64; // Size of the source tile in the tile sheet
+            let sourceSizeW = this.tileSize; // Size of the source tile in the tile sheet
+            let sourceSizeH = this.tileSize; // Size of the source tile in the tile sheet
 
             switch (tile.type) {
                 case 'wood':
@@ -752,6 +801,7 @@ class GameMap extends GameObject {
             this.highlightSelectedTile(ctx);
         }
     }
+
     disturbWater(x, y) {
         const tile = this.getTileAtCoordinates(x, y);
         if (tile && tile.type === 'water') {
@@ -767,74 +817,79 @@ class GameMap extends GameObject {
         }
     }
 
-
-
     cycleMapType() {
         const worldTypes = Object.keys(gameWorlds);
-        const currentIndex = worldTypes.indexOf(this.gameWorld);
+
+        const currentIndex = worldTypes.indexOf(this.type);
+
         const nextIndex = (currentIndex + 1) % worldTypes.length;
+
         const nextWorld = worldTypes[nextIndex];
 
-        this.gameWorld = nextWorld;
-        this.setMapSize(nextWorld);
-        this.tiles = this.generateTiles();
+        this.initializeGameWorld(nextWorld);
 
-        // Emit text display event instead of updating worldNameDisplay
+        this.tiles = this.generateTiles(nextWorld);
+
         events.emit('DISPLAY_TEXT', {
-            heading: gameWorlds[nextWorld].name,
-            subheading: gameWorlds[nextWorld].subheading,
-            paragraph: gameWorlds[nextWorld].paragraph
+            heading: this.name,
+            subheading: this.subheading,
+            paragraph: this.paragraph
         });
 
         events.emit('MAP_CHANGED', this);
-        console.log(`Map type changed to: ${nextWorld} (${this.mapSize.width}x${this.mapSize.height})`);
+        console.log(`world type changed to: ${nextWorld} (${this.width}x${this.height})`);
     }
+
     retreatMap() {
         const worldTypes = Object.keys(gameWorlds);
-        const currentIndex = worldTypes.indexOf(this.gameWorld);
+
+        const currentIndex = worldTypes.indexOf(this.type);
 
         if (currentIndex > 0) {
             const prevWorld = worldTypes[currentIndex - 1];
-            this.gameWorld = prevWorld;
 
-            this.setMapSize(prevWorld);
-            this.tiles = this.generateTiles();
+
+            this.initializeGameWorld(prevWorld);
+
+            this.tiles = this.generateTiles(prevWorld);
 
             // Set up world name display
             events.emit('DISPLAY_TEXT', {
-                heading: gameWorlds[prevWorld].name,
-                subheading: 'Maybe you should go back',
-                paragraph: ''
+                heading: this.name,
+                subheading: this.subheading,
+                paragraph: this.paragraph
             });
 
-            events.emit('MAP_CHANGED', this); // Emit the map changed event with the new map type as data
+            events.emit('MAP_CHANGED', this); // Emit the world changed event with the new world type as data
 
-            console.log(`Map type changed to: ${prevWorld} (${this.mapSize.width}x${this.mapSize.height})`);
+            console.log(`world type changed to: ${prevWorld} (${this.width}x${this.height})`);
 
         }
     }
+
     advanceMap() {
         const worldTypes = Object.keys(gameWorlds);
-        const currentIndex = worldTypes.indexOf(this.gameWorld);
+
+        const currentIndex = worldTypes.indexOf(this.type);
 
         if (currentIndex < worldTypes.length - 1) {
             const nextWorld = worldTypes[currentIndex + 1];
 
-            this.gameWorld = nextWorld;
-            this.setMapSize(nextWorld);
 
-            this.tiles = this.generateTiles();
+            this.initializeGameWorld(nextWorld);
+
+            this.tiles = this.generateTiles(nextWorld);
 
             // Set up world name display
             events.emit('DISPLAY_TEXT', {
-                heading: gameWorlds[nextWorld].name,
+                heading: this.name,
                 subheading: '',
-                paragraph: gameWorlds[nextWorld].paragraph
+                paragraph: this.paragraph
             });
 
-            events.emit('MAP_CHANGED', this); // Emit the map changed event with the new map type as data
+            events.emit('MAP_CHANGED', this); // Emit the world changed event with the new world type as data
 
-            console.log(`Map type changed to: ${nextWorld} (${this.mapSize.width}x${this.mapSize.height})`);
+            console.log(`world type changed to: ${nextWorld} (${this.width}x${this.height})`);
 
         }
     }

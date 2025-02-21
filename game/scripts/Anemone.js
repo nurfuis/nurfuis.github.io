@@ -47,10 +47,10 @@ class Anemone extends GameObject {
         this.gasSpawnChance = 0; // Start with no chance to spawn
         this.gasCheckRadius = 2; // Check 2 tiles in each direction
         this.gasClouds = new Set(); // Track active gas cloud positions
-        this.gasCloudDuration = 5000; // Gas clouds last 5 seconds
+        this.gasCloudDuration = constants.GAS_CLOUD_DURATION; // Gas clouds last 5 seconds
         this.gasSpawnCooldown = 3000; // Check every 3 seconds
         this.lastGasSpawnCheck = 0;
-        this.playerNearbyRadius = 640; // 10 tiles (64 * 10)
+        this.playerNearbyRadius = constants.SIMULATION_RANGE; 
         this.isPlayerNearby = false;
 
         // Add teeth snap properties

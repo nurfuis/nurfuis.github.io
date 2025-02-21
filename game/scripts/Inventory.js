@@ -18,7 +18,7 @@ class Inventory {
         inventory.innerHTML = '';
 
         // Create promises for all image loads
-        const imageLoadPromises = this.items.map(item => {
+        const imageLoadPromises = this.items.world(item => {
             const image = item.getImage();
             if (!image) return Promise.resolve(); // Resolve immediately if no image
 

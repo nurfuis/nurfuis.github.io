@@ -66,7 +66,6 @@ class GameObject {
     }
 }
 
-
 class Team extends GameObject {
     constructor(colorClass, teamName) {
         super();
@@ -87,157 +86,116 @@ class Team extends GameObject {
     }
 }
 
-
 class DarknessLayer extends GameObject {
-    constructor(canvas, player, map) {
+    constructor(canvas, player, world) {
         super(canvas);
         this.player = player;
         this.canvas = canvas;
-        this.map = map;
+        this.world = world;
+        this.darknessLevel = 0; // Start at neutral
+        this.maxLevel = 10; // Maximum darkness/lightness level
+        this.opacityStep = 0.1; // Amount to change per keypress
+        this.debug = false;
 
-        this.torchRadius = 150; // Initial torch radius
-        this.torchFlicker = 0; // Flicker effect
+        // Add keyboard listeners
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'NumpadAdd') {
+                this.darknessLevel = Math.min(this.maxLevel, this.darknessLevel + 1);
+                console.log('Darkness Level:', this.darknessLevel);
+            } else if (e.code === 'NumpadSubtract') {
+                this.darknessLevel = Math.max(-this.maxLevel, this.darknessLevel - 1);
+                console.log('Darkness Level:', this.darknessLevel);
+            }
+        });
+    }
 
-        this.darknessDistance = 1500;
+    draw(ctx) {
+        if (this.debug) return;
 
-        this.debug = false; // Initialize debug mode as disabled
+        if (this.darknessLevel !== 0) {
+            const opacity = Math.abs(this.darknessLevel * this.opacityStep);
+            if (this.darknessLevel < 0) {
+                // Darken
+                ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`;
+            } else {
+                // Lighten
+                ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+            }
+            
+            ctx.fillRect(
+                0, 
+                0, 
+                this.canvas.width, 
+                this.canvas.height
+            );
+        }
+    }
+}
 
+class LightLayer extends GameObject {
+    constructor(canvas, unit, world) {
+        super(canvas);
+        this.unit = unit;
+        this.canvas = canvas;
+        this.world = world;
+        
+        this.torchRadius = 150;
+        this.torchFlicker = 0;
+        this.hasShake = false;
+        this.shakeDuration = 0;
+        
         events.on("CAMERA_SHAKE", this, (data) => {
             this.hasShake = true;
             this.shakeDuration = 200;
         });
     }
 
-    step(delta, root) {
-        if (this.debug) {
-            return; // Skip updating if debug mode is enabled
-        }
+    update(delta) {
         let flicker = 0.001;
         if (this.hasShake) {
-            flicker = 0.01; // Increase flicker speed during shake
-            this.shakeDuration -= delta; // Decrease shake duration over time
+            flicker = 0.01;
+            this.shakeDuration -= delta;
             if (this.shakeDuration <= 0) {
-                this.hasShake = false; // Stop shaking after duration ends
+                this.hasShake = false;
             }
-
         }
-        // Update torch radius to create a flicker effect
-        this.torchFlicker += delta * flicker; // Adjust the speed of flicker
-        this.torchRadius = 150 + Math.sin(this.torchFlicker) * 10 + Math.random() * 5; // Adjust the range of flicker
+        this.torchFlicker += delta * flicker;
+        this.torchRadius = 150 + Math.sin(this.torchFlicker) * 10 + Math.random() * 5;
     }
 
-    draw(ctx, x, y) {
-        if (this.debug) {
-            return; // Skip drawing if debug mode is enabled
+    draw(ctx) {
+        let torchX = this.unit.position.x;
+        let torchY = this.unit.position.y;
+
+        if (this.unit.facingDirection === 'right') {
+            torchX += this.unit.size;
         }
-        const spread = this.darknessDistance; // Adjust the spread of the darkness effect as needed
 
-        let drawX = this.player.position.x;
-        let drawY = this.player.position.y;
-
-
-        const gradient = ctx.createRadialGradient(
-            drawX, drawY, 0,
-            drawX, drawY, spread
-        );
-        gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
-        gradient.addColorStop(0.7, 'rgba(0, 0, 0, 0.95)');
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 1)');
-
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, this.map.mapSize.width, this.map.mapSize.height);
-
-        // Draw the torchlight effect
-        let torchX = drawX; // X position of the torchlight center (player position)
-        let torchY = drawY; // Y position of the torchlight center (player position)
-
-        if (this.player.facingDirection === 'right') {
-            torchX += 64; // Adjust the torchlight position based on the player's facing direction
-        }
         if (this.hasShake) {
-            const randomX = Math.random() * 10 - 5; // Random shake offset in X direction
-            const randomY = Math.random() * 10 - 5; // Random shake offset in Y direction
-            torchX += randomX; // Apply shake offset to the torchlight position
-            torchY += randomY; // Apply shake offset to the torchlight position
-
+            const randomX = Math.random() * 10 - 5;
+            const randomY = Math.random() * 10 - 5;
+            torchX += randomX;
+            torchY += randomY;
         }
+
         const torchGradient = ctx.createRadialGradient(
             torchX, torchY, 0,
             torchX, torchY, this.torchRadius
         );
-        torchGradient.addColorStop(0, 'rgba(255, 140, 0, 0.4)'); // Warm glow color
+        torchGradient.addColorStop(0, 'rgba(255, 140, 0, 0.2)');
         torchGradient.addColorStop(1, 'rgba(255, 140, 0, 0)');
 
         ctx.fillStyle = torchGradient;
-        ctx.fillRect(0, 0, this.map.mapSize.width, this.map.mapSize.height);
-    }
-}
-
-class VignetteLayer extends GameObject {
-    constructor(canvas, mapSize) {
-        super(canvas);
-        this.canvas = canvas;
-        this.mapSize = mapSize;
-
-        // Add extra padding for shake effects
-        this.padding = 64;
-
-        // Calculate panel sizes based on max pan distance (half canvas)
-        this.leftWidth = Math.ceil(canvas.width / 2) + this.padding;
-        this.rightWidth = Math.ceil(canvas.width / 2) + this.padding;
-        this.topHeight = Math.ceil(canvas.height / 2) + this.padding;
-        this.bottomHeight = Math.ceil(canvas.height / 2) + this.padding;
-
-        this.debug = false; // Initialize debug mode as disabled
-    }
-
-    draw(ctx) {
-        if (this.debug) {
-            return; // Skip drawing if debug mode is enabled
-        }
-
-        ctx.fillStyle = '#000000';
-
-        // Left panel
-        ctx.fillRect(
-            -this.leftWidth,
-            -this.topHeight,
-            this.leftWidth,
-            this.mapSize.height + this.topHeight + this.bottomHeight
-        );
-
-        // Right panel
-        ctx.fillRect(
-            this.mapSize.width,
-            -this.topHeight,
-            this.rightWidth,
-            this.mapSize.height + this.topHeight + this.bottomHeight
-        );
-
-        // Top panel
-        ctx.fillRect(
-            0,
-            -this.topHeight,
-            this.mapSize.width,
-            this.topHeight
-        );
-
-        // Bottom panel
-        ctx.fillRect(
-            0,
-            this.mapSize.height,
-            this.mapSize.width,
-            this.bottomHeight
-        );
+        ctx.fillRect(-this.canvas.width / 2, 0, this.world.width, this.canvas.height);
     }
 }
 
 class OnScreenWriting extends GameObject {
-    constructor(canvas, camera, map) {
+    constructor(canvas, camera, world) {
         super();
         this.canvas = canvas;
         this.camera = camera;
-        this.map = map;
+        this.world = world;
 
         this.displayText = {
             heading: { text: '', opacity: 0, fadeTimer: 0 },
@@ -276,7 +234,7 @@ class OnScreenWriting extends GameObject {
         });
     }
 
-    step(delta) {
+    update(delta) {
         ['heading', 'subheading', 'paragraph'].forEach(type => {
             const element = this.displayText[type];
             if (element.text) {
@@ -306,23 +264,29 @@ class OnScreenWriting extends GameObject {
     drawImage(ctx, drawPosX, drawPosY) {
         ctx.save();
 
+        // Translate to center of viewport
+        ctx.translate(
+            this.canvas.width / 2,
+            this.canvas.height / 4  // Position text in upper third of screen
+        );
+
         // Configure text styles
         const styles = {
             heading: {
                 font: 'bold 48px Oswald',
-                y: 128,
+                y: 0, // Adjusted relative to translated position
                 bgHeight: 60,
                 padding: 20
             },
             subheading: {
                 font: 'bold 32px Trocchi',
-                y: 188,
+                y: 60, // Space below heading
                 bgHeight: 40,
                 padding: 15
             },
             paragraph: {
                 font: '24px Trocchi',
-                y: 248,
+                y: 120, // Space below subheading
                 bgHeight: 30,
                 padding: 10
             }
@@ -406,13 +370,13 @@ class UnitDebugger extends GameObject {
             { label: 'Current Tile', getValue: () => this.unit.currentTile?.type || 'none' },
             { label: 'Tile Below', getValue: () => this.unit.tileBelow?.type || 'none' },
             { label: 'Direction', getValue: () => this.unit.direction },
+            { label: 'Facing', getValue: () => this.unit.facingDirection },
             { label: 'isIdling', getValue: () => this.unit.isIdling },
-            { label: 'isFloating', getValue: () => this.unit.isFloating },
             { label: 'isMoving', getValue: () => this.unit.isMoving },
             { label: 'isJumping', getValue: () => this.unit.isJumping },
             { label: 'isFalling', getValue: () => this.unit.isFalling },
             { label: 'Fall Damage', getValue: () => Math.round(this.unit.fallingDamage) },
-            { label: 'Facing', getValue: () => this.unit.facingDirection },
+            { label: 'isFloating', getValue: () => this.unit.isFloating },
             { label: 'Recording', getValue: () => this.isReplaying ? 'REPLAY' : 'LIVE' },
             { label: 'History Size', getValue: () => `${this.movementHistory.length} frames` },
             {
@@ -571,7 +535,7 @@ class UnitDebugger extends GameObject {
 
                 if (this.currentGameWorld !== state.currentGameWorld) {
                     this.currentGameWorld = state.currentGameWorld;
-                    events.emit('CHANGE_GAME_WORLD', { gameWorld: this.currentGameWorld });
+                    events.emit('CHANGE_GAME_WORLD', { world: this.currentGameWorld });
                 }
                 
                 // Apply historical state to unit
@@ -617,5 +581,69 @@ class UnitDebugger extends GameObject {
     destroy() {
         this.debugElement.remove();
         super.destroy();
+    }
+}
+
+class BackgroundLayer extends GameObject {
+    constructor(canvas, camera, scrollSpeed = 0.5) {
+        super();
+        this.canvas = canvas;
+        this.camera = camera;
+        this.scrollSpeed = scrollSpeed;
+        
+        // Image loading
+        this.image = new Image();
+        this.isImageLoaded = false;
+        this.image.onload = () => {
+            this.isImageLoaded = true;
+            
+            // Calculate scale and dimensions after image loads
+            this.scale = Math.max(
+                this.canvas.width / this.image.width,
+                this.canvas.height / this.image.height
+            );
+            
+            // Calculate dimensions to cover viewport
+            this.width = this.image.width * this.scale;
+            this.height = this.image.height * this.scale;
+        };
+        this.image.src = 'images/bg-2.png';
+        
+        // Initial position
+        this.position = new Vector2(0, 0);
+        this.offset = new Vector2(0, 0);
+    }
+
+    update(delta) {
+        if (!this.isImageLoaded) return;
+        
+        // Update parallax offset based on camera position
+        this.offset.x = -this.camera.position.x * this.scrollSpeed;
+        this.offset.y = -this.camera.position.y * this.scrollSpeed;
+        
+        // Wrap offset to prevent image tearing
+        this.offset.x = this.offset.x % this.width;
+        this.offset.y = this.offset.y % this.height;
+    }
+
+    drawImage(ctx) {
+        if (!this.isImageLoaded) return;
+        
+        ctx.save();
+        
+        // Draw main image and wrapped copies for seamless scrolling
+        for (let x = -1; x <= 1; x++) {
+            for (let y = -1; y <= 1; y++) {
+                ctx.drawImage(
+                    this.image,
+                    this.offset.x + (x * this.width),
+                    this.offset.y + (y * this.height),
+                    this.width,
+                    this.height
+                );
+            }
+        }
+        
+        ctx.restore();
     }
 }

@@ -1,7 +1,7 @@
-    function generateUnderworld(map) {
+    function generateUnderworld(world) {
         const tiles = [];
-        const rows = Math.ceil(map.mapSize.height / map.tileSize);
-        const cols = Math.ceil(map.mapSize.width / map.tileSize);
+        const rows = Math.ceil(world.height / world.tileSize);
+        const cols = Math.ceil(world.width / world.tileSize);
 
         // First pass: Generate all tiles
         for (let y = 0; y < rows; y++) {
@@ -39,8 +39,8 @@
                 }
 
                 const color = getComputedStyle(document.querySelector(`.${colorClass}`)).backgroundColor;
-                const drawX = x * map.tileSize;
-                const drawY = y * map.tileSize;
+                const drawX = x * world.tileSize;
+                const drawY = y * world.tileSize;
 
                 tiles.push({
                     x: drawX,
@@ -85,11 +85,11 @@
 
                     const random = Math.random();
                     if (random < 0.05) { // 15% chance to spawn a seed
-                        const seed = new Seed(map.canvas, new Vector2(
+                        const seed = new Seed(world.canvas, new Vector2(
                             currentTile.x,
-                            currentTile.y - map.tileSize
+                            currentTile.y - world.tileSize
                         ));
-                        map.addChild(seed);
+                        world.addChild(seed);
                     }
 
                 }
@@ -98,8 +98,8 @@
                 if (currentTile.type === 'earth' && tileAbove.type === 'earth') {
                     const random = Math.random();
                     if (random < 0.05) { // 15% chance to spawn a seed
-                        const acorn = new Acorn(map.canvas, new Vector2(currentTile.x, currentTile.y - map.tileSize));
-                        map.addChild(acorn);
+                        const acorn = new Acorn(world.canvas, new Vector2(currentTile.x, currentTile.y - world.tileSize));
+                        world.addChild(acorn);
                     }
                 }
 
@@ -118,21 +118,21 @@
                                     itemCount].rarity);
                             item.position = new Vector2(currentTile.x, currentTile
                                 .y); // Set the position of the item to the current tile's position
-                            map.addChild(item); // Add the item to the map's children array
+                            world.addChild(item); // Add the item to the world's children array
                             itemCount++; // Increment the item count to move to the next item in the gameItems array
                         }
                     }
 
                     if (currentTile.type === 'air' && tileAbove.type === 'air' && tileBelow.type === 'air') {
                         if (random < 0.05) { // 5% chance to spawn a feyLight
-                            const feyLight = new FeyLight(map.canvas, new Vector2(currentTile.x, currentTile.y));
-                            map.addChild(feyLight);
+                            const feyLight = new FeyLight(world.canvas, new Vector2(currentTile.x, currentTile.y));
+                            world.addChild(feyLight);
                         }
                     }
 
                     if (currentTile.type === 'water' && tileBelow.type == 'wood' && random > 0.1 && random < 0.15) {
-                        const anemone = new Anemone(map.canvas, new Vector2(currentTile.x, currentTile.y));
-                        map.addChild(anemone);
+                        const anemone = new Anemone(world.canvas, new Vector2(currentTile.x, currentTile.y));
+                        world.addChild(anemone);
                     }
                 }
 
@@ -142,8 +142,8 @@
                         tileAbove.type === 'air' && tileBelow.type === 'air') {
                         const random = Math.random(); // Generate a random number between 0 and 1
                         if (random < 0.05) {
-                            const patrol = new PatrolUnit(map.canvas, new Vector2(currentTile.x, currentTile.y));
-                            map.addChild(patrol);
+                            const patrol = new PatrolUnit(world.canvas, new Vector2(currentTile.x, currentTile.y));
+                            world.addChild(patrol);
                         }
                     }
                 }
@@ -153,23 +153,23 @@
 
 
                 if (currentTile.type === 'wood' && random < 0.05) {
-                    const sap = new Sap(map.canvas, new Vector2(currentTile.x, currentTile.y));
-                    map.addChild(sap);
+                    const sap = new Sap(world.canvas, new Vector2(currentTile.x, currentTile.y));
+                    world.addChild(sap);
                 }
                 if (random > 0.05 && random < 0.1 && currentTile.type === 'wood') { 
-                    const obstacle = new EvasiveUnit(map.canvas, new Vector2(currentTile.x, currentTile.y), new Vector2(map.tileSize, map.tileSize), 'obstacle');
-                    map.addChild(obstacle);
+                    const obstacle = new EvasiveUnit(world.canvas, new Vector2(currentTile.x, currentTile.y), new Vector2(world.tileSize, world.tileSize), 'obstacle');
+                    world.addChild(obstacle);
                 }
 
                 if (currentTile.type === 'water' && random < 0.05) {
-                    const air = new AirBubble(map.canvas, new Vector2(currentTile.x, currentTile.y));
-                    map.addChild(air);
+                    const air = new AirBubble(world.canvas, new Vector2(currentTile.x, currentTile.y));
+                    world.addChild(air);
                 }
 
 
                 if (currentTile.type === 'water' && random > 0.05 && random < 0.1) {
-                    const luminaSphere = new LuminaSphere(map.canvas, new Vector2(currentTile.x, currentTile.y));
-                    map.addChild(luminaSphere);
+                    const luminaSphere = new LuminaSphere(world.canvas, new Vector2(currentTile.x, currentTile.y));
+                    world.addChild(luminaSphere);
                 }
 
 
@@ -236,6 +236,6 @@
                 }
             }
         }
-        events.emit('MAP_GENERATED', tiles); // Emit the map generated event with the tiles array as data
+        events.emit('MAP_GENERATED', tiles); // Emit the world generated event with the tiles array as data
         return tiles;
     }

@@ -26,7 +26,7 @@ class AirBubble extends GameObject {
                 (this.position.y - this.playerPosition.y) ** 2
             );
 
-            if (distance <= 64) { // If the player is within range, emit a airBubble event
+            if (distance <= constants.ITEM_COLLECT_RANGE) { // If the player is within range, emit a airBubble event
                 events.emit('AIR_COLLECTED', this); // Emit the airBubble collected event with the airBubble object as data
                 this.parent.removeChild(this); // Remove the airBubble from the game world  
                 this.destroy(); // Remove the airBubble from the game world

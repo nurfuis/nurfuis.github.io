@@ -93,7 +93,7 @@ class Input {
 
             }
 
-            // Recenter map to active unit on numpad 0 key press
+            // Recenter world to active unit on numpad 0 key press
             if (event.key === '0' && event.location === KeyboardEvent.DOM_KEY_LOCATION_NUMPAD) {
                 const currentUnit = this.turnOrder[this.currentTurnIndex];
                 this.camera.position.x = Math.round(currentunit.position.x - this.canvas.width / 2 + currentUnit.size / 2);

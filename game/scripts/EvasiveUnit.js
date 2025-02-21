@@ -53,12 +53,12 @@ class EvasiveUnit extends GameObject {
             { x: -1, y: 0 }, // Left
         ];
 
-        const tileSize = root.map.mapSize.tileSize;
+        const tileSize = root.world.tileSize;
 
         for (const direction of directions) {
             const neighborX = this.position.x + direction.x * tileSize;
             const neighborY = this.position.y + direction.y * tileSize;
-            const neighborTile = root.map.getTileAtCoordinates(neighborX, neighborY);
+            const neighborTile = root.world.getTileAtCoordinates(neighborX, neighborY);
 
             if (neighborTile && neighborTile.type === this.initialTile.type) {
                 neighbors.push(neighborTile);

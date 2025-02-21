@@ -170,7 +170,7 @@ class Seed extends GameObject {
                 const checkX = this.position.x + (dx * tileSize);
                 const checkY = this.position.y + (dy * tileSize);
 
-                const tile = root.map.getTileAtCoordinates(checkX, checkY);
+                const tile = root.world.getTileAtCoordinates(checkX, checkY);
                 if (tile && tile.type === 'air' && tile.passable) {
                     possiblePositions.push({ x: checkX, y: checkY });
                 }

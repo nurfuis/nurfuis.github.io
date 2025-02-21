@@ -18,7 +18,7 @@ let direction = 'center';
             const distance = this.moveTowards();
 
             if (tile.type === 'water') {
-                root.map.disturbWater(this.position.x, this.position.y);
+                root.world.disturbWater(this.position.x, this.position.y);
             }
             return;
         }

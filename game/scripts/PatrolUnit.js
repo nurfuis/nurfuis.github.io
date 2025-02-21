@@ -69,7 +69,7 @@ class PatrolUnit extends GameObject {
         });
     }
     ready() {
-        this.initialTile = this.parent.getTileAtCoordinates(this.position.x, this.position.y); // Get the tile type of the unit's current position from the map object in the root object
+        this.initialTile = this.parent.getTileAtCoordinates(this.position.x, this.position.y); // Get the tile type of the unit's current position from the world object in the root object
 
     }
     moveTowards(unit, destinationPosition, speed) {
@@ -115,14 +115,14 @@ class PatrolUnit extends GameObject {
             { x: -1, y: 0 }, // Left
         ];
 
-        const tileSize = root.map.mapSize.tileSize; // Get the tile size from the root object
+        const tileSize = root.world.tileSize; // Get the tile size from the root object
 
         for (const direction of directions) {
             const neighborX = this.position.x + direction.x * tileSize;
             const neighborY = this.position.y + direction.y * tileSize;
 
-            const neighborTile = root.map.getTileAtCoordinates(neighborX, neighborY); // Get the neighbor tile from the map object in the root object
-            const neighborTileType = neighborTile?.type; // Get the tile type of the neighbor tile from the map object in the root object
+            const neighborTile = root.world.getTileAtCoordinates(neighborX, neighborY); // Get the neighbor tile from the world object in the root object
+            const neighborTileType = neighborTile?.type; // Get the tile type of the neighbor tile from the world object in the root object
 
             const match = neighborTileType == this.initialTile.type; // Log the tile type of the neighbor tile to the console for debugging purposes
 

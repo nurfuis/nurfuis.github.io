@@ -93,7 +93,8 @@ class GameItem extends GameObject {
         this.source = image;
         this.value = value;
         this.position = new Vector2(0, 0);
-        this.size = 64;
+        this.size = constants.ITEM_SIZE;
+
         this.rarity = rarity; // Add rarity property to the item object
         
         events.on('PLAYER_POSITION', this, (data) => { // Listen for player position updates
@@ -105,7 +106,7 @@ class GameItem extends GameObject {
                 (this.position.y - this.playerPosition.y) ** 2
             );
 
-            if (distance <= 64) { // If the player is within range, emit a sap event
+            if (distance <= constants.ITEM_COLLECT_RANGE) { // If the player is within range, emit a sap event
                 events.emit('ITEM_COLLECTED', this); // Emit the sap collected event with the sap object as data
                 this.destroy(); // Remove the sap from the game world
 
