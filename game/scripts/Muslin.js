@@ -99,4 +99,6 @@ class Muslin {
         ctx.drawImage(this.offscreenCanvas, 0, 0);
         ctx.globalAlpha = 1;
     }
+
+
 }

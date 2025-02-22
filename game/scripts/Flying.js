@@ -181,7 +181,7 @@ class Flying extends GameObject {
         this.spriteHeight = 128;
         this.frameX = 0;  // Column in sprite sheet
         this.frameY = 0;  // Row in sprite sheet (0=down, 1=up, 2=right, 3=left)
-        
+
         // Add patrol and following properties
         this.followDistance = 256; // Pixels to maintain from player
         this.followHeight = 64; // New property for hovering height
@@ -192,7 +192,7 @@ class Flying extends GameObject {
         this.lastPlayerMoveTime = Date.now();
         this.idleThreshold = 2500; // Time before starting patrol
         this.isPatrolling = false;
-        
+
         // Add smooth movement properties
         this.targetPosition = new Vector2(0, 0);
         this.moveSpeed = 0.1;
@@ -242,11 +242,11 @@ class Flying extends GameObject {
         this.isSearching = true;
         this.searchProgress = 0;
         this.currentSearchRow = 0;
-        
+
         // Alternate initial direction
         this.searchDirection = -this.lastSearchDirection;
         this.lastSearchDirection = this.searchDirection;
-        
+
         // Random offset from player position
         const angle = Math.random() * Math.PI * 2;
         const distance = Math.random() * 100; // Random distance up to 100 pixels
@@ -256,7 +256,7 @@ class Flying extends GameObject {
 
     updateFacingDirection() {
         let dx, dy;
-        
+
         if (this.isEdgeHovering) {
             // Always face player during edge hover
             this.facingDirection = this.edgeHoverSide === 'right' ? 'left' : 'right';
@@ -267,11 +267,11 @@ class Flying extends GameObject {
             // For patrol, use rate of change of position
             dx = this.targetPosition.x - this.position.x;
             dy = this.targetPosition.y - this.position.y;
-            
+
             // Use sin/cos of patrol angle with 90-degree offset (PI/2)
-            const sinAngle = Math.sin(this.patrolAngle + Math.PI/2);
-            const cosAngle = Math.cos(this.patrolAngle + Math.PI/2);
-            
+            const sinAngle = Math.sin(this.patrolAngle + Math.PI / 2);
+            const cosAngle = Math.cos(this.patrolAngle + Math.PI / 2);
+
             // Determine direction based on position in the circle
             if (Math.abs(sinAngle) > Math.abs(cosAngle)) {
                 // Vertical movement is dominant
@@ -284,7 +284,7 @@ class Flying extends GameObject {
             // Regular following behavior
             dx = this.playerPosition.x - this.position.x;
             dy = this.playerPosition.y - this.position.y;
-            
+
             // Determine primary direction based on larger delta
             if (Math.abs(dx) > Math.abs(dy)) {
                 this.facingDirection = dx > 0 ? 'right' : 'left';
@@ -292,9 +292,9 @@ class Flying extends GameObject {
                 this.facingDirection = dy > 0 ? 'down' : 'up';
             }
         }
-    
+
         // Update frameY based on direction
-        switch(this.facingDirection) {
+        switch (this.facingDirection) {
             case 'down':
                 this.frameY = 2;
                 break;
@@ -319,13 +319,13 @@ class Flying extends GameObject {
             const dX = this.unit.position.x - this.position.x;
             const dY = this.unit.position.y - this.position.y;
             const distance = Math.sqrt(dX * dX + dY * dY);
-            
+
             // Only swoop if within reasonable range
             const maxSwoopDistance = 400; // Maximum distance to initiate swoop
             if (distance <= maxSwoopDistance) {
                 const angle = Math.atan2(dY, dX);
                 const swoopSpeed = 20;
-                
+
                 // Limit movement based on distance
                 const speedMultiplier = Math.min(1, distance / maxSwoopDistance);
                 this._velocity.x = Math.cos(angle) * swoopSpeed * speedMultiplier;
@@ -357,9 +357,9 @@ class Flying extends GameObject {
                 }
 
                 // Calculate edge hover position
-                const xOffset = this.edgeHoverSide === 'right' ? 
+                const xOffset = this.edgeHoverSide === 'right' ?
                     this.edgeHoverDistance : -this.edgeHoverDistance;
-                
+
                 this.targetPosition.x = this.playerPosition.x + xOffset;
                 this.targetPosition.y = this.playerPosition.y - this.edgeHoverHeight;
 
@@ -393,15 +393,15 @@ class Flying extends GameObject {
                 );
 
                 // Center search pattern on player plus offset
-                this.targetPosition.x = this.playerPosition.x + this.searchOffset.x + 
-                    (this.searchProgress * this.searchWidth - this.searchWidth/2);
-                
+                this.targetPosition.x = this.playerPosition.x + this.searchOffset.x +
+                    (this.searchProgress * this.searchWidth - this.searchWidth / 2);
+
                 // Limit vertical position to map bounds
                 this.targetPosition.y = Math.max(
                     64, // Minimum height from ground
                     Math.min(
                         maxHeight,
-                        this.playerPosition.y + this.searchOffset.y - 
+                        this.playerPosition.y + this.searchOffset.y -
                         this.searchStartHeight - rowOffset
                     )
                 );
@@ -464,7 +464,7 @@ class Flying extends GameObject {
         // Debug visualization
         if (this.debug) {
             ctx.save();
-            
+
             // Draw patrol/follow circle
             ctx.strokeStyle = this.isPatrolling ? 'rgba(0, 255, 0, 0.3)' : 'rgba(255, 0, 0, 0.3)';
             ctx.beginPath();
@@ -495,7 +495,7 @@ class Flying extends GameObject {
                 120,
                 50
             );
-            
+
             ctx.font = '12px Consolas';
             ctx.textAlign = 'center';
             ctx.fillStyle = 'white';
@@ -515,7 +515,7 @@ class Flying extends GameObject {
             ctx.strokeStyle = 'yellow';
             ctx.beginPath();
             ctx.moveTo(this.position.x, this.position.y);
-            switch(this.facingDirection) {
+            switch (this.facingDirection) {
                 case 'up':
                     ctx.lineTo(this.position.x, this.position.y - arrowLength);
                     break;
@@ -556,6 +556,204 @@ class Flying extends GameObject {
 
         // Update power systems
         this.powerSupply.update();
+    }
+    move(direction) {
+        if (direction) {
+            const torque =
+                (this.motor.KV *
+                    this.powerSupply.voltage *
+                    this.transmission.gearBox[this.transmission.gear].motor) /
+                (this.totalMass *
+                    this.transmission.gearBox[this.transmission.gear].drive);
+
+
+            switch (direction) {
+                case "left":
+                    if (Math.abs(this._acceleration.x) < this._maxSpeed) {
+                        this._acceleration.x -= torque;
+                        // this.body.animations.play("walkLeft");
+                    }
+                    break;
+                case "right":
+                    if (Math.abs(this._acceleration.x) < this._maxSpeed) {
+                        this._acceleration.x += torque;
+                        // this.body.animations.play("walkRight");
+                    }
+                    break;
+                case "up":
+                    if (Math.abs(this._acceleration.y) < this._maxSpeed) {
+                        this._acceleration.y -= torque;
+                        // this.body.animations.play("walkUp");
+                    }
+                    break;
+                case "down":
+                    if (Math.abs(this._acceleration.y) < this._maxSpeed) {
+                        this._acceleration.y += torque;
+                        // this.body.animations.play("walkDown");
+                    }
+                    break;
+                case "up-left":
+                    if (Math.abs(this._acceleration.x) < this._maxSpeed / 2 &&
+                        Math.abs(this._acceleration.y) < this._maxSpeed / 2
+                    ) {
+                        this._acceleration.x -= torque / Math.sqrt(2);
+                        this._acceleration.y -= torque / Math.sqrt(2);
+                        // this.body.animations.play("walkLeft");
+                    }
+                    break;
+                case "up-right":
+                    if (Math.abs(this._acceleration.x) < this._maxSpeed / 2 &&
+                        Math.abs(this._acceleration.y) < this._maxSpeed / 2
+                    ) {
+                        this._acceleration.x += torque / Math.sqrt(2);
+                        this._acceleration.y -= torque / Math.sqrt(2);
+                        // this.body.animations.play("walkRight");
+                    }
+                    break;
+                case "down-left":
+                    if (Math.abs(this._acceleration.x) < this._maxSpeed &&
+                        Math.abs(this._acceleration.y) < this._maxSpeed / 2
+                    ) {
+                        this._acceleration.x -= torque / Math.sqrt(2);
+                        this._acceleration.y += torque / Math.sqrt(2);
+                        // this.body.animations.play("walkLeft");
+                    }
+                    break;
+                case "down-right":
+                    if (Math.abs(this._acceleration.x) < this._maxSpeed &&
+                        Math.abs(this._acceleration.y) < this._maxSpeed / 2
+                    ) {
+                        this._acceleration.x += torque / Math.sqrt(2);
+                        this._acceleration.y += torque / Math.sqrt(2);
+                        // this.body.animations.play("walkRight");
+                    }
+                case "center":
+                    // NO DIRECTION - APPLY FRICTION & GRAVITY
+                    // Reset acceleration to 0 on key release (no input)
+                    const aX = this._acceleration.x;
+                    const aY = this._acceleration.y;
+
+                    // x friction
+                    if (aX < 0) {
+                        this._acceleration.x = aX + this._drag;
+                    } else if (aX > 0) {
+                        this._acceleration.x = aX - this._drag;
+                    }
+
+                    if ((aX < 1 && aX > 0) || (aX > -1 && aX < 0)) {
+                        this._acceleration.x = 0;
+                    }
+
+                    // y friction
+                    if (aY < 0) {
+                        this._acceleration.y = aY + this._drag;
+                    } else if (aY > 0) {
+                        this._acceleration.y = aY - this._drag;
+                    }
+
+                    if ((aY < 1 && aY > 0) || (aY > -1 && aY < 0)) {
+                        this._acceleration.y = 0;
+                    }
+
+                    // gravity
+
+                    // accelerate the unit downwards
+
+
+                    break;
+            }
+        }
+
+        const sag = this.powerSupply.dropoff[this.powerSupply.storedCharge];
+
+        const forceX = this._acceleration.x * this.totalMass * sag;
+        const forceY = this._acceleration.y * this.totalMass * sag;
+
+        const vX = forceX / this._mass;
+        const vY = forceY / this._mass;
+
+        if (vX < 0 || vX > 0) {
+            this._velocity.x = vX * 1 - this._gravity;
+        } else if ((vX < 1 && vX > 0) || (vX > -1 && vX < 0)) {
+            this._velocity.x = 0;
+        }
+
+        if (vY < 0 || vY > 0) {
+            this._velocity.y = vY * 1 - this._gravity;
+        } else if ((vY < 1 && vY > 0) || (vY > -1 && vY < 0)) {
+            this._velocity.y = 0;
+        }
+
+        let nextX = this.position.x;
+        let nextY = this.position.y;
+
+        switch (this.direction) {
+            case "left":
+                nextX += vX;
+                break;
+            case "right":
+                nextX += vX;
+                break;
+            case "up":
+                nextY += vY;
+                break;
+            case "down":
+                nextY += vY;
+                break;
+            case "up-left":
+                nextX += vX;
+                nextY += vY;
+                break;
+            case "up-right":
+                nextX += vX;
+                nextY += vY;
+                break;
+            case "down-left":
+                nextX += vX;
+                nextY += vY;
+                break;
+            case "down-right":
+                nextX += vX;
+                nextY += vY;
+                break;
+            default:
+                break;
+        }
+
+        const nextPosition = new Vector2(nextX, nextY);
+        const result = this.canMoveTo(nextPosition.x, nextPosition.y);
+
+
+        if (
+            !!result &&
+            result.passable) {
+
+            this.position = nextPosition;
+        } else {
+            this._velocity = new Vector2(0, 0);
+            this._acceleration = new Vector2(0, 0);
+
+            switch (this.facingDirection) {
+                case "left":
+                    // this.body.animations.play("standLeft");
+                    break;
+
+                case "right":
+                    // this.body.animations.play("standRight");
+                    break;
+
+                case "up":
+                    // this.body.animations.play("standUp");
+                    break;
+
+                case "down":
+                    // this.body.animations.play("standDown");
+                    break;
+
+                default:
+                    break;
+            }
+        }
     }
 }
 

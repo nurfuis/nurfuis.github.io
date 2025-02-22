@@ -1,141 +1,3 @@
-function updateUnitStats(unit) {
-    const activeUnitName = document.getElementById('active-unit-name');
-    const unitLevel = document.getElementById('unit-level');
-    const unitExperience = document.getElementById('unit-experience');
-    activeUnitName.innerText = unit.name;
-    unitLevel.innerText = `Level: ${unit.level}`;
-    unitExperience.innerText = `Experience: ${unit.experience}`;
-
-}
-
-function toggleUIVisibility(hide) {
-    const zIndex = hide ? '-1' : '1';
-    const turnOrderList = document.querySelector('.turn-order');
-    const legend = document.querySelector('.legend');
-    const unitStats = document.querySelector('.unit-stats');
-    const healthBarContainer = document.querySelector('.health-bar');
-    const actionBar = document.querySelector('.action-bar');
-    const oxygenBar = document.querySelector('.oxygen-bar');
-    const stomachBar = document.querySelector('.stomach-bar');
-    const scoreBoard = document.querySelector('.scoreboard');
-
-
-    turnOrderList.style.zIndex = zIndex;
-    legend.style.zIndex = zIndex;
-    unitStats.style.zIndex = zIndex;
-    healthBarContainer.style.zIndex = zIndex;
-    actionBar.style.zIndex = zIndex;
-    oxygenBar.style.zIndex = zIndex;
-    stomachBar.style.zIndex = zIndex;
-    scoreBoard.style.zIndex = zIndex;
-
-}
-
-function toggleActionBarButtons(movePending, attackPending) {
-    const actionBarButtons = document.querySelectorAll('.action-bar button');
-    actionBarButtons.forEach(button => {
-        if (movePending && button.id !== 'move-button') {
-            button.disabled = true;
-        } else if (attackPending && button.id !== 'attack-button') {
-            button.disabled = true;
-        } else {
-            button.disabled = false;
-        }
-    });
-
-    const loadMenu = document.getElementById('load-menu');
-    loadMenu.style.display = 'none';
-}
-
-function populateAttackMenu(unit) {
-    const attackMenu = document.getElementById('attack-menu');
-    attackMenu.innerHTML = ''; // Clear previous buttons
-    unit.attacks.forEach(attack => {
-        const button = document.createElement('button');
-        button.textContent = attack.name;
-        button.addEventListener('click', () => {
-            console.log(unit.name, 'selected attack:', attack.name);
-            unit.selectedAttack = attack;
-            unit.attackReady = true;
-            attackMenu.style.display = 'none'; // Hide the menu after selection
-        });
-        attackMenu.appendChild(button);
-    });
-}
-
-function aoeAttack(x, y, radius, gameObjects) {
-    const targets = [];
-    for (const obj of gameObjects) {
-        const distance = Math.sqrt((obj.x - x) ** 2 + (obj.y - y) ** 2);
-        if (distance <= radius) {
-            targets.push(obj);
-        }
-    }
-    return targets;
-}
-
-let selectedVehicle = null; // Track the selected vehicle
-
-let vehicleControlsMenu = document.getElementById('vehicle-controls-menu'); // Get the vehicle controls menu
-
-function showLoadMenu(unit, vehicle) {
-    console.log(unit.name, 'is near', vehicle.name);
-
-    const loadMenu = document.getElementById('load-menu');
-    loadMenu.innerHTML = ''; // Clear previous buttons
-
-    for (let i = 0; i < vehicle.capacity; i++) {
-        if (!vehicle.occupiedSeats[i]) {
-            const button = document.createElement('button');
-            button.textContent = `Seat ${i + 1}`;
-            button.addEventListener('click', () => {
-                if (vehicle.loadUnit(unit, i)) {
-                    console.log(unit.name, 'loaded into seat', i + 1);
-                    loadMenu.style.display = 'none';
-                    selectedVehicle = null;
-
-                    showVehicleControls(vehicle, unit);
-
-                    // If the unit is the driver, show the vehicle controls
-                    if (i === 0) {
-                        //
-                    }
-                } else {
-                    console.log('Failed to load unit into seat', i + 1);
-                }
-            });
-            loadMenu.appendChild(button);
-        }
-    }
-
-    loadMenu.style.display = 'flex';
-    selectedVehicle = vehicle;
-}
-
-function showVehicleControls(vehicle, unit) {
-    vehicleControlsMenu.innerHTML = ''; // Clear previous buttons
-
-    // Add unload button only if the unit has been loaded for 1 or more turns
-    if (unit.turnsLoaded >= 1) {
-        const unloadButton = document.createElement('button');
-        unloadButton.textContent = 'Unload';
-        unloadButton.addEventListener('click', () => {
-            // Find the first occupied seat
-            const seatIndex = vehicle.occupiedSeats.findIndex(seat => seat !== null);
-            if (seatIndex !== -1) {
-                const unit = vehicle.occupiedSeats[seatIndex];
-                if (vehicle.unloadUnit(seatIndex)) {
-                    console.log(unit.name, 'unloaded from vehicle');
-                    vehicleControlsMenu.style.display = 'none';
-                }
-            }
-        });
-        vehicleControlsMenu.appendChild(unloadButton);
-    }
-
-    vehicleControlsMenu.style.display = 'flex';
-}
-
 class AutomatedInput {
     constructor(directions = [
         { direction: "left", weight: 2 },
@@ -190,5 +52,82 @@ class AutomatedInput {
 
         // Fallback to center
         this.currentDirection = 'center';
+    }
+}
+
+class MenuDraggable {
+    static makeDraggable(element, headerElement, initialPosition = { right: '20px', top: '20px' }) {
+        let isDragging = false;
+        let currentX;
+        let currentY;
+        let initialX;
+        let initialY;
+        let xOffset = 0;
+        let yOffset = 0;
+
+        // Set initial position
+        if (initialPosition.right) {
+            element.style.right = initialPosition.right;
+            element.style.left = 'auto';
+            // Calculate initial X offset from right
+            const rect = element.getBoundingClientRect();
+            xOffset = window.innerWidth - rect.right;
+        } else {
+            element.style.left = initialPosition.left || '20px';
+        }
+        element.style.top = initialPosition.top;
+
+        headerElement.style.cursor = 'grab';
+
+        headerElement.addEventListener('mousedown', dragStart);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', dragEnd);
+
+        function dragStart(e) {
+            if (e.target === headerElement || headerElement.contains(e.target)) {
+                const rect = element.getBoundingClientRect();
+                xOffset = e.clientX - rect.left;
+                yOffset = e.clientY - rect.top;
+                initialX = rect.left;
+                initialY = rect.top;
+                isDragging = true;
+                headerElement.style.cursor = 'grabbing';
+            }
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+
+            e.preventDefault();
+            
+            // Calculate new position
+            let newX = e.clientX - xOffset;
+            let newY = e.clientY - yOffset;
+
+            // Get window and element boundaries
+            const rect = element.getBoundingClientRect();
+            const maxX = window.innerWidth - rect.width;
+            const maxY = window.innerHeight - rect.height;
+
+            // Constrain to window bounds with padding
+            const padding = 10;
+            newX = Math.min(Math.max(padding, newX), maxX - padding);
+            newY = Math.min(Math.max(padding, newY), maxY - padding);
+
+            setTranslate(newX, newY, element);
+        }
+
+        function dragEnd() {
+            if (!isDragging) return;
+            isDragging = false;
+            headerElement.style.cursor = 'grab';
+        }
+
+        function setTranslate(xPos, yPos, el) {
+            // Reset right position when dragging
+            el.style.right = 'auto';
+            el.style.left = `${xPos}px`;
+            el.style.top = `${yPos}px`;
+        }
     }
 }

@@ -55,268 +55,9 @@ const mooreNeighborOffsets = [{
 }
 ];
 // TODO when change to 32 fix this
-const extendedMooreNeighbors = [{
-    x: -2, // row 1
-    y: -2
-}, {
-    x: -1,
-    y: -2
-}, {
-    x: 0,
-    y: -2
-},
-{
-    x: 1,
-    y: -2
-}, {
-    x: 2,
-    y: -2
-}, {
-    x: -2, // row 2
-    y: -1
-},
-{
-    x: -1,
-    y: -1
-}, {
-    x: 0,
-    y: -1
-}, {
-    x: 1,
-    y: -1
-},
-{
-    x: 2,
-    y: -1
-}, {
-    x: -2, // row 3
-    y: 0
-}, {
-    x: -1,
-    y: 0
-},
-{
-    x: 0, // center
-    y: 0
-}, {
-    x: 1,
-    y: 0
-}, {
-    x: 2,
-    y: 0
-},
-{
-    x: -2, // row 4
-    y: 1
-}, {
-    x: -1,
-    y: 1
-}, {
-    x: 0,
-    y: 1
-},
-{
-    x: 1,
-    y: 1
-}, {
-    x: 2,
-    y: 1
-}, {
-    x: -2, // row 5
-    y: 2
-},
-{
-    x: -1,
-    y: 2
-}, {
-    x: 0,
-    y: 2
-}, {
-    x: 1,
-    y: 2
-},
-{
-    x: 2,
-    y: 2
-}
-];
-const vonNuemanNeighbors = [{
-    x: -1,
-    y: 0
-}, {
-    x: 1,
-    y: 0
-},
-{
-    x: 0,
-    y: -1
-}, {
-    x: 0,
-    y: 1
-}
-];
-
-class Lungs {
-    constructor(unit) {
-        this.unit = unit;
-        this.oxygen = 100;
-        this.maxOxygen = 100;
-    }
-    updateOxygenBar() {
-        const oxygenBar = document.getElementById('oxygen');
-        const oxygenPercentage = (this.oxygen / this.maxOxygen) * 100;
-        oxygenBar.style.width = `${oxygenPercentage}%`;
-    }
-    takeBreath(amount) {
-        this.oxygen -= amount;
-        if (this.oxygen < 0) {
-            this.oxygen = 0;
-        } else if (this.oxygen > this.maxOxygen) {
-            this.oxygen = this.maxOxygen;
-        } else {
-            this.updateOxygenBar(this.oxygen, this.maxOxygen);
-        }
-    }
-    restoreBreath(amount) {
-        this.oxygen += amount;
-        if (this.oxygen > this.maxOxygen) {
-            this.oxygen = this.maxOxygen;
-        } else {
-            this.updateOxygenBar(this.oxygen, this.maxOxygen);
-        }
-    }
-    emitWaterBubbles() {
-        if (this.unit.particleCooldowns.water.current > 0) {
-            return;
-        }
-
-        const oxygenRatio = this.oxygen / this.maxOxygen;
-        const baseBurstCount = this.unit.particleCooldowns.water.burstCount;
-        const actualBurstCount = Math.ceil(baseBurstCount * (1 + (1 - oxygenRatio) * 3));
-
-        for (let i = 0; i < actualBurstCount; i++) {
-            setTimeout(() => {
-                events.emit("PARTICLE_EMIT", {
-                    x: this.unit.position.x + 32 + (Math.random() - 0.5) * 16,
-                    y: this.unit.position.y + 8 + (Math.random() - 0.5) * 16,
-                    color: 'rgba(0, 0, 255, 0.5)',
-                    size: 4 + (1 - oxygenRatio) * 2,
-                    duration: 1000,
-                    shape: 'circle',
-                    count: 1,
-                });
-            }, i * this.unit.particleCooldowns.water.burstDelay);
-        }
 
 
-        const cooldownMultiplier = 0.5 + oxygenRatio * 0.5;
-        this.unit.particleCooldowns.water.current = this.unit.particleCooldowns.water.max * cooldownMultiplier;
-    }
-    step(delta) {
-        if (this.unit.isAlive) {
-            if (this.unit.tile.type === 'water') {
-                this.takeBreath(1);
-                this.emitWaterBubbles();
 
-            } else if (this.unit.tile.type === 'air') {
-                if (this.oxygen < this.maxOxygen) {
-                    this.oxygen += 0.1;
-                } else if (this.oxygen > this.maxOxygen) {
-                    this.oxygen = this.maxOxygen;
-
-                }
-            }
-            this.updateOxygenBar(this.oxygen, this.maxOxygen);
-        }
-    }
-}
-class Heart {
-    constructor(unit) {
-        this.unit = unit;
-        this.health = 100;
-        this.maxHealth = 100;
-        this.beatInterval = 1000;
-        this.lastBeatTime = 0;
-    }
-    updateHealthBar() {
-        const healthBar = document.getElementById('health');
-        const healthPercentage = (this.health / this.maxHealth) * 100;
-        healthBar.style.width = Math.floor(healthPercentage) + '%';
-        healthBar.innerText = Math.floor(healthPercentage) + '%';
-    }
-    takeDamage(amount) {
-
-        this.health -= amount;
-
-        if (this.health > 0) {
-
-            events.emit("PARTICLE_EMIT", {
-                x: this.unit.position.x + 32,
-                y: this.unit.position.y + 32,
-                color: 'rgba(255, 0, 0, 1)',
-                size: 3 + Math.random() * 2,
-                duration: 2000,
-                shape: 'circle',
-                count: amount,
-            });
-        } else
-            if (this.health < 0) {
-                this.health = 0;
-            } else {
-                this.updateHealthBar(this.health, this.maxHealth);
-            }
-    }
-    heal(amount) {
-        this.health += amount;
-
-        if (this.health > this.maxHealth) {
-            this.health = this.maxHealth;
-            this.updateHealthBar(this.health, this.maxHealth);
-
-        } else {
-            this.updateHealthBar(this.health, this.maxHealth);
-        }
-    }
-    step(delta) {
-        // ...
-    }
-}
-class Stomach {
-
-    constructor(unit) {
-        this.unit = unit;
-        this.energy = 10000;
-        this.maxEnergy = 10000;
-    }
-
-    updateEnergyBar() {
-        const energyBar = document.getElementById('stomach');
-        const energyPercentage = (this.energy / this.maxEnergy) * 100;
-        energyBar.style.width = `${energyPercentage}%`;
-    }
-    consumeEnergy(amount) {
-        this.energy -= amount;
-
-        if (this.energy < 0) {
-            this.energy = 0;
-
-        } else {
-            this.updateEnergyBar(this.energy, this.maxEnergy);
-        }
-    }
-    restoreEnergy(amount) {
-        this.energy += amount;
-
-        if (this.energy > this.maxEnergy) {
-            this.energy = this.maxEnergy;
-        } else {
-            this.updateEnergyBar(this.energy, this.maxEnergy);
-        }
-    }
-    step(delta) {
-        // ...
-    }
-}
 
 
 
@@ -354,14 +95,14 @@ class Unit extends GameObject {
         this.speed = speed;
 
         this.direction = 'center';
+
         this.lastDirection = 'center';
 
         this.facingDirection = 'right';
-        this.maxDistance = world.tileSize * 2;
-        this.targetPosition = null;
 
-        this.initialX = x;
-        this.initialY = y;
+        this.maxDistance = world.tileSize * 2;
+
+        this.targetPosition = null;
 
         this.position = new Vector2(x, y);
 
@@ -609,17 +350,16 @@ class Unit extends GameObject {
     }
 
     step(delta, root) {
+        // TRANSMIT SIGNALS
+
+        this.tryEmitPosition();
+
 
         // UPDATE PARTICLE COOLDOWNS
 
         Object.values(this.particleCooldowns).forEach(cooldown => {
             cooldown.current = Math.max(0, cooldown.current - delta);
         });
-
-        // TRANSMIT SIGNALS
-
-        this.tryEmitPosition();
-
 
         // OBSERVE ENVIRONMENT
 
@@ -640,7 +380,7 @@ class Unit extends GameObject {
 
         // CHECK VITALS
 
-        this.doVitals(delta);
+        this.handleOrganFunctions(delta);
 
 
         // FIND DIRECTION
@@ -793,6 +533,7 @@ class Unit extends GameObject {
         // try move
         this.tryMove(direction);
 
+        
     }
 
     draw(ctx) {
@@ -845,8 +586,6 @@ class Unit extends GameObject {
                 scaledHeight
             );
         }
-
-        // this.drawManaBar(ctx, drawX, drawY - 10);
 
         if (this.debug) {
             let index = 0;
@@ -1127,7 +866,7 @@ class Unit extends GameObject {
 
     }
 
-    tryMove(direction, momentum = 0) {
+    tryMove(direction) {
         if (this.isMoving || this.isJumping) return;
 
         this.targetPosition = null;
@@ -1324,7 +1063,7 @@ class Unit extends GameObject {
 
             } else if (selectedTile.breakable) {
 
-                this.tryBreakBlock(selectedTile);
+                this.tryBreakTile(selectedTile);
 
 
             } else if (selectedTile.type === 'border') {
@@ -1570,7 +1309,7 @@ class Unit extends GameObject {
             0
         ) {
             tileBelow.type = 'air';
-            tileBelow.color = getComputedStyle(document.querySelector('.light-grey')).backgroundColor;
+            tileBelow.color = 'red';
             tileBelow.solid = false;
             tileBelow.passable = true;
             tileBelow.durability = 100;
@@ -1941,8 +1680,6 @@ class Unit extends GameObject {
 
         this.facingDirection = 'right';
 
-        this.isGravityOff = false;
-
         this.previousTile = null;
 
         this.tile = this.currentTile;
@@ -1962,9 +1699,6 @@ class Unit extends GameObject {
         this.position.x = x;
         this.position.y = y;
 
-        this.initialX = x;
-        this.initialY = y;
-
         this.startingposition = new Vector2(x, y);
 
         this.calculateMooreNeighbors(this.world);
@@ -1981,10 +1715,15 @@ class Unit extends GameObject {
     handleDeath() {
         if (!this.isAlive) return;
         this.isAlive = false;
+
         this.isFalling = false;
+
         this.isMoving = false;
+
         this.isJumping = false;
+
         this.isIdling = false;
+
         this.isCollecting = false;
 
         this.targetPosition = null;
@@ -2047,15 +1786,6 @@ class Unit extends GameObject {
         });
     }
 
-    canMoveTo(x, y) {
-        const world = this.parent.parent.world;
-        const tile = world.getTileAtCoordinates(x, y);
-        if (!tile) return false;
-
-        return tile;
-
-    }
-
     showDustParticles() {
         if (this.particleCooldowns.dust.current > 0) {
             return;
@@ -2090,13 +1820,13 @@ class Unit extends GameObject {
         this.particleCooldowns.dust.current = this.particleCooldowns.dust.max;
     }
 
-    breakBlock(target) {
+    breakTile(target) {
         this.delay = constants.BREAK_BLOCK_DELAY;
 
         events.emit('BLOCK_BREAK', target);
 
         target.type = 'air';
-        target.color = getComputedStyle(document.querySelector('.light-grey')).backgroundColor;
+        target.color = 'red';
         target.solid = false;
         target.passable = true;
         target.durability = 100;
@@ -2104,7 +1834,7 @@ class Unit extends GameObject {
 
     }
 
-    attackBlock(target) {
+    attackTile(target) {
         const randomNumber = Math.random();
 
         target.durability -= randomNumber * 2;
@@ -2123,341 +1853,20 @@ class Unit extends GameObject {
         this.stomach.consumeEnergy(1);
     }
 
-    tryBreakBlock(target) {
+    tryBreakTile(target) {
         if (target.durability > 0 && target.breakable && this.stomach.energy > 0) {
-            this.attackBlock(target);
+            this.attackTile(target);
         } else if (target.durability <= 0) {
-            this.breakBlock(target);
+            this.breakTile(target);
         } else if (target.durability > 0 && !target.breakable) {
             this.showDustParticles();
         }
     }
 
-    doVitals(delta) {
-        // update organs and check for death     
+    handleOrganFunctions(delta) {
         this.lungs.step(delta);
-        this.heart.step(delta);
         this.stomach.step(delta);
-
-        // out of breath
-        if (this.lungs.oxygen <= 0) {
-            this.heart.takeDamage(1);
-        }
-        // starving to death
-        if (this.stomach.energy <= 0) {
-            this.heart.takeDamage(1);
-        }
-        // death by heart failure or starvation
-        if (this.heart.health <= 0) {
-            // deplete all organs before death
-            this.lungs.takeBreath(this.lungs.maxOxygen);
-            this.stomach.consumeEnergy(this.stomach.maxEnergy);
-            this.heart.takeDamage(this.heart.maxHealth);
-
-            if (this.isAlive) {
-                this.handleDeath();
-            }
-        }
-    }
-
-    highlightMoveRange(ctx) {
-        const tilesInRange = [];
-        const tileSize = this.parent.parent.world.tileSize;
-        for (let dx = -this.maxDistance; dx <= this.maxDistance; dx += tileSize) {
-            for (let dy = -this.maxDistance; dy <= this.maxDistance; dy += tileSize) {
-                const targetX = this.initialX + dx;
-                const targetY = this.initialY + dy;
-                const distance = Math.sqrt(dx ** 2 + dy ** 2);
-
-                if (distance <= this.maxDistance &&
-                    targetX >= 0 && targetX < this.world.width &&
-                    targetY >= 0 && targetY < this.world.height) {
-                    tilesInRange.push({
-                        x: targetX,
-                        y: targetY
-                    });
-                }
-            }
-        }
-
-        ctx.fillStyle = 'rgba(255, 238, 0, 0.5)';
-        tilesInRange.forEach(tile => {
-            ctx.fillRect(tile.x, tile.y, tileSize, tileSize);
-        });
-    }
-
-    highlightAttackRange(ctx) {
-        const tilesInRange = [];
-        const tileSize = this.parent.parent.world.tileSize;
-        const attackRange = this.selectedAttack ? this.selectedAttack.range : 0;
-
-        for (let dx = -attackRange; dx <= attackRange; dx += tileSize) {
-            for (let dy = -attackRange; dy <= attackRange; dy += tileSize) {
-                const targetX = this.position.x + dx;
-                const targetY = this.position.y + dy;
-                const distance = Math.sqrt(dx ** 2 + dy ** 2);
-
-                if (distance <= attackRange &&
-                    targetX >= 0 && targetX < this.world.width &&
-                    targetY >= 0 && targetY < this.world.height) {
-                    tilesInRange.push({
-                        x: targetX,
-                        y: targetY
-                    });
-                }
-            }
-        }
-
-        ctx.fillStyle = 'rgba(255, 0, 0, 0.7)';
-        tilesInRange.forEach(tile => {
-            ctx.fillRect(tile.x, tile.y, tileSize, tileSize);
-        });
-    }
-
-    drawManaBar(ctx, posX, posY) {
-        const width = this.spriteWidth; // Assuming 'this.width' represents the total width for the bar
-        const height = 4;
-        let fillColor = "blue";
-        const emptyColor = "gray";
-        const percentFull = Math.min(
-            this.powerSupply.storedEnergy / this.powerSupply.storedCapacity,
-            1
-        ); // Clamp percentage between 0 and 1
-        switch (this.powerSupply.storedCharge) {
-            case "discharged":
-                fillColor = "gray";
-                break;
-            case "critical":
-                fillColor = "red";
-                break;
-            case "low":
-                fillColor = "orange";
-                break;
-            case "bulk":
-                fillColor = "purple";
-                break;
-            case "absorb":
-                fillColor = "blue";
-                break;
-            case "float":
-                fillColor = "gold";
-                break;
-            default:
-                break;
-        }
-        // Draw the empty bar outline
-        ctx.beginPath();
-        ctx.rect(posX, posY, width, height);
-        ctx.strokeStyle = emptyColor;
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        ctx.closePath();
-
-        // Draw the filled portion of the bar
-        ctx.beginPath();
-        ctx.rect(posX, posY, width * percentFull, height); // Fill based on percentage
-        ctx.fillStyle = fillColor;
-        ctx.fill();
-        ctx.closePath();
-    }
-
-    move(direction) {
-        if (direction) {
-            const torque =
-                (this.motor.KV *
-                    this.powerSupply.voltage *
-                    this.transmission.gearBox[this.transmission.gear].motor) /
-                (this.totalMass *
-                    this.transmission.gearBox[this.transmission.gear].drive);
-
-
-            switch (direction) {
-                case "left":
-                    if (Math.abs(this._acceleration.x) < this._maxSpeed) {
-                        this._acceleration.x -= torque;
-                        // this.body.animations.play("walkLeft");
-                    }
-                    break;
-                case "right":
-                    if (Math.abs(this._acceleration.x) < this._maxSpeed) {
-                        this._acceleration.x += torque;
-                        // this.body.animations.play("walkRight");
-                    }
-                    break;
-                case "up":
-                    if (Math.abs(this._acceleration.y) < this._maxSpeed) {
-                        this._acceleration.y -= torque;
-                        // this.body.animations.play("walkUp");
-                    }
-                    break;
-                case "down":
-                    if (Math.abs(this._acceleration.y) < this._maxSpeed) {
-                        this._acceleration.y += torque;
-                        // this.body.animations.play("walkDown");
-                    }
-                    break;
-                case "up-left":
-                    if (Math.abs(this._acceleration.x) < this._maxSpeed / 2 &&
-                        Math.abs(this._acceleration.y) < this._maxSpeed / 2
-                    ) {
-                        this._acceleration.x -= torque / Math.sqrt(2);
-                        this._acceleration.y -= torque / Math.sqrt(2);
-                        // this.body.animations.play("walkLeft");
-                    }
-                    break;
-                case "up-right":
-                    if (Math.abs(this._acceleration.x) < this._maxSpeed / 2 &&
-                        Math.abs(this._acceleration.y) < this._maxSpeed / 2
-                    ) {
-                        this._acceleration.x += torque / Math.sqrt(2);
-                        this._acceleration.y -= torque / Math.sqrt(2);
-                        // this.body.animations.play("walkRight");
-                    }
-                    break;
-                case "down-left":
-                    if (Math.abs(this._acceleration.x) < this._maxSpeed &&
-                        Math.abs(this._acceleration.y) < this._maxSpeed / 2
-                    ) {
-                        this._acceleration.x -= torque / Math.sqrt(2);
-                        this._acceleration.y += torque / Math.sqrt(2);
-                        // this.body.animations.play("walkLeft");
-                    }
-                    break;
-                case "down-right":
-                    if (Math.abs(this._acceleration.x) < this._maxSpeed &&
-                        Math.abs(this._acceleration.y) < this._maxSpeed / 2
-                    ) {
-                        this._acceleration.x += torque / Math.sqrt(2);
-                        this._acceleration.y += torque / Math.sqrt(2);
-                        // this.body.animations.play("walkRight");
-                    }
-                case "center":
-                    // NO DIRECTION - APPLY FRICTION & GRAVITY
-                    // Reset acceleration to 0 on key release (no input)
-                    const aX = this._acceleration.x;
-                    const aY = this._acceleration.y;
-
-                    // x friction
-                    if (aX < 0) {
-                        this._acceleration.x = aX + this._drag;
-                    } else if (aX > 0) {
-                        this._acceleration.x = aX - this._drag;
-                    }
-
-                    if ((aX < 1 && aX > 0) || (aX > -1 && aX < 0)) {
-                        this._acceleration.x = 0;
-                    }
-
-                    // y friction
-                    if (aY < 0) {
-                        this._acceleration.y = aY + this._drag;
-                    } else if (aY > 0) {
-                        this._acceleration.y = aY - this._drag;
-                    }
-
-                    if ((aY < 1 && aY > 0) || (aY > -1 && aY < 0)) {
-                        this._acceleration.y = 0;
-                    }
-
-                    // gravity
-
-                    // accelerate the unit downwards
-
-
-                    break;
-            }
-        }
-
-        const sag = this.powerSupply.dropoff[this.powerSupply.storedCharge];
-
-        const forceX = this._acceleration.x * this.totalMass * sag;
-        const forceY = this._acceleration.y * this.totalMass * sag;
-
-        const vX = forceX / this._mass;
-        const vY = forceY / this._mass;
-
-        if (vX < 0 || vX > 0) {
-            this._velocity.x = vX * 1 - this._gravity;
-        } else if ((vX < 1 && vX > 0) || (vX > -1 && vX < 0)) {
-            this._velocity.x = 0;
-        }
-
-        if (vY < 0 || vY > 0) {
-            this._velocity.y = vY * 1 - this._gravity;
-        } else if ((vY < 1 && vY > 0) || (vY > -1 && vY < 0)) {
-            this._velocity.y = 0;
-        }
-
-        let nextX = this.position.x;
-        let nextY = this.position.y;
-
-        switch (this.direction) {
-            case "left":
-                nextX += vX;
-                break;
-            case "right":
-                nextX += vX;
-                break;
-            case "up":
-                nextY += vY;
-                break;
-            case "down":
-                nextY += vY;
-                break;
-            case "up-left":
-                nextX += vX;
-                nextY += vY;
-                break;
-            case "up-right":
-                nextX += vX;
-                nextY += vY;
-                break;
-            case "down-left":
-                nextX += vX;
-                nextY += vY;
-                break;
-            case "down-right":
-                nextX += vX;
-                nextY += vY;
-                break;
-            default:
-                break;
-        }
-
-        const nextPosition = new Vector2(nextX, nextY);
-        const result = this.canMoveTo(nextPosition.x, nextPosition.y);
-
-
-        if (
-            !!result &&
-            result.passable) {
-
-            this.position = nextPosition;
-        } else {
-            this._velocity = new Vector2(0, 0);
-            this._acceleration = new Vector2(0, 0);
-
-            switch (this.facingDirection) {
-                case "left":
-                    // this.body.animations.play("standLeft");
-                    break;
-
-                case "right":
-                    // this.body.animations.play("standRight");
-                    break;
-
-                case "up":
-                    // this.body.animations.play("standUp");
-                    break;
-
-                case "down":
-                    // this.body.animations.play("standDown");
-                    break;
-
-                default:
-                    break;
-            }
-        }
+        this.heart.step(delta);
     }
 
     set position(position) {
@@ -2517,5 +1926,158 @@ class Unit extends GameObject {
         // plus encumberance
         // return this._mass + this?.inventory?.items?.length * this.scale ** 2;
         return this._mass;
+    }
+}
+
+class Team extends GameObject {
+    constructor(colorClass, teamName) {
+        super();
+        this.colorClass = colorClass;
+        this.teamName = teamName;
+        events.on("UNIT_DEATH", this, (data) => {
+            if (data.teamName === this.teamName) {
+                console.log(this.teamName, 'unit died:', data);
+                console.log(this.teamName, 'units left:', this.children.length);
+            }
+        });
+    }
+    step(delta, root) {
+        // ...
+    }
+    addUnit(unit) {
+        this.addChild(unit);
+    }
+}
+
+class UnitDebugger extends GameObject {
+    constructor(canvas, unit) {
+        super();
+        this.unit = unit;
+        this.isVisible = false;
+        this.isCollapsed = false;
+
+        // Create debug container
+        this.debugElement = document.createElement('div');
+        this.debugElement.id = 'unit-debugger';
+        this.debugElement.className = 'unit-debugger hidden';
+
+        // Create header first
+        const header = this.createHeader();
+
+        MenuDraggable.makeDraggable(this.debugElement, header, { left: '20px', top: '20px' });
+
+
+        // Create content container for collapsible section
+        this.contentElement = document.createElement('div');
+        this.contentElement.className = 'unit-debugger-content';
+        this.debugElement.appendChild(this.contentElement);
+
+        // Create debug info elements
+        this.setupDebugInfo();
+
+        // Add to document
+        document.body.appendChild(this.debugElement);
+
+        // Toggle debug display with F3
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'F3') {
+                e.preventDefault();
+                this.toggle();
+            }
+        });
+    }
+
+    setupDebugInfo() {
+        // Debug info configuration
+        this.debugInfo = [
+            { label: 'Position', getValue: () => `X: ${this.unit.position.x.toFixed(2)}, Y: ${this.unit.position.y.toFixed(2)}` },
+            { label: 'Direction', getValue: () => this.unit.direction },
+            { label: 'Facing', getValue: () => this.unit.facingDirection },
+            { label: 'Moving', getValue: () => this.unit.isMoving ? 'Yes' : 'No' },
+            { label: 'Falling', getValue: () => this.unit.isFalling ? 'Yes' : 'No' },
+            { label: 'Floating', getValue: () => this.unit.isFloating ? 'Yes' : 'No' },
+            { label: 'Fall Damage', getValue: () => this.unit.fallingDamage?.toFixed(2) || '0' },
+            { label: 'Current Tile', getValue: () => this.unit.currentTile?.type || 'None' },
+            { label: 'Tile Below', getValue: () => this.unit.tileBelow?.type || 'None' }
+        ];
+
+        // Create debug elements
+        this.debugElements = this.debugInfo.map(info => {
+            const row = document.createElement('div');
+            row.className = 'unit-debugger-row';
+
+            const label = document.createElement('span');
+            label.className = 'unit-debugger-label';
+            label.textContent = info.label;
+
+            const value = document.createElement('span');
+            value.className = 'unit-debugger-value';
+
+            row.appendChild(label);
+            row.appendChild(value);
+            this.contentElement.appendChild(row);
+
+            return { row, valueSpan: value };
+        });
+    }
+
+    createHeader() {
+        const header = document.createElement('div');
+        header.className = 'unit-debugger-header';
+
+
+        const title = document.createElement('h3');
+        title.textContent = '🔧 UNIT DEBUG INFO';
+
+        const collapseBtn = document.createElement('button');
+        collapseBtn.className = 'collapse-btn';
+        collapseBtn.textContent = '▼';
+
+        header.appendChild(title);
+        header.appendChild(collapseBtn);
+
+        header.onclick = () => {
+            this.isCollapsed = !this.isCollapsed;
+            this.contentElement.classList.toggle('collapsed');
+            this.debugElement.classList.toggle('collapsed');
+            collapseBtn.textContent = this.isCollapsed ? '▶' : '▼';
+        };
+
+        this.debugElement.appendChild(header);
+
+        return header;
+    }
+
+    toggle() {
+        this.isVisible = !this.isVisible;
+        this.debugElement.classList.toggle('hidden');
+    }
+
+    step(delta, root) {
+        if (!this.isVisible) return;
+
+        // Update each debug element
+        this.debugElements.forEach((element, index) => {
+            const info = this.debugInfo[index];
+            element.valueSpan.textContent = info.getValue();
+
+            // Update value color based on state
+            if (info.label === 'Health' || info.label === 'Energy' || info.label === 'Oxygen') {
+                const value = parseFloat(info.getValue());
+                element.valueSpan.style.color = value < 30 ? '#ff4444' :
+                    value < 70 ? '#ffaa44' : '#44ff44';
+            }
+        });
+    }
+
+    // Override drawImage since we're using DOM
+    drawImage(ctx, drawPosX, drawPosY) {
+        // No canvas drawing needed
+    }
+
+    // Clean up when destroyed
+    destroy() {
+        this.debugElement.remove();
+        super.destroy();
     }
 }

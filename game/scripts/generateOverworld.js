@@ -83,10 +83,6 @@ const wood = (x, y) => generateTile(x, y, 3);
 const stone = (x, y) => generateTile(x, y, 4);
 const foliage = (x, y) => generateTile(x, y, 5);
 
-function randomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
 function generateTile(x, y, index) {
     const type = terrainTypes[index];
     const color = terrainColors[type];
@@ -112,12 +108,6 @@ function generateTile(x, y, index) {
         variant
     };
 }
-
-document.addEventListener('keydown', (event) => {
-    if (event.key === 'ArrowUp') {
-        const index = randomInt(0, terrainTypes.length - 1);
-    }
-});
 
 function generateCombinedWorld(world, runLength = 20) {
     // Store original world dimensions for a single section
@@ -166,7 +156,6 @@ function generateCombinedWorld(world, runLength = 20) {
 
     return combinedTiles;
 }
-
 function generateFlatWorld(world) {
     const rows = Math.ceil(world.height / world.tileSize);
     const cols = Math.ceil(world.width / world.tileSize);
@@ -232,7 +221,6 @@ function generateFlatWorld(world) {
     return tiles;
 
 }
-
 function makeSuperFlat(world) {
     const rows = Math.ceil(world.height / world.tileSize);
     const cols = Math.ceil(world.width / world.tileSize);
@@ -253,7 +241,7 @@ function makeSuperFlat(world) {
                 const tileY = y * tileSize;
 
 
-                if (y === 14) {
+                if (y === 15) {
                     newTile = stone(tileX, tileY);
                 }
 
@@ -270,7 +258,6 @@ function makeSuperFlat(world) {
     return tiles;
 
 }
-
 function generateHillsWorld(world) {
     const rows = Math.ceil(world.height / world.tileSize);
     const cols = Math.ceil(world.width / world.tileSize);
@@ -446,7 +433,6 @@ function generateEarthLedge(world) {
     }
     return tiles;
 }
-
 function generateForestWorld(world) {
     const rows = Math.ceil(world.height / world.tileSize);
     const cols = Math.ceil(world.width / world.tileSize);
@@ -845,8 +831,6 @@ function generateColumnWater(world) {
     }
     return tiles;
 }
-
-
 function generateSapForestWorld(world) {
     const rows = Math.ceil(world.height / world.tileSize);
     const cols = Math.ceil(world.width / world.tileSize);

@@ -105,7 +105,7 @@
                 0
             ) {
                 tileBelow.type = 'air';
-                tileBelow.color = getComputedStyle(document.querySelector('.light-grey')).backgroundColor;
+                tileBelow.color = 'red';
                 tileBelow.solid = false;
                 tileBelow.passable = true;
                 tileBelow.durability = 100;

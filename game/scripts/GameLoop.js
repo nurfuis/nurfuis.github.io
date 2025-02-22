@@ -17,7 +17,46 @@ class GameLoop {
 
     this.debug = false;
 
-    enablePause(this);
+    events.on('WORLD_EDIT_MODE', this, (data) => {
+      this.isEditing = data.isEditing;
+    });
+
+    events.on('TOGGLE_GAME_LOOP', this, (data) => {
+      if (data.isRunning) {
+        this.start();
+        this.isPaused = false;
+      } else {
+        this.stop();
+        this.isPaused = true;
+      }
+    });
+
+    // Add new event listener for redraw requests
+    events.on('REQUEST_REDRAW', this, () => {
+      if (this.isPaused) {
+        this.render();
+      }
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        this.stop();
+        this.isPaused = true;
+        document.title = "Escape to unpause";
+        document.querySelector('.game-interface').style.filter = "blur(5px)";
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+
+      if (event.key === "Escape") {
+        if (!this.isEditing) {
+          this.start();
+        }
+        document.title = "Fey Unit";
+        document.querySelector('.game-interface').style.filter = "none";
+      }
+    });
   }
 
   mainLoop = (timestamp) => {
@@ -62,37 +101,6 @@ class GameLoop {
     this.isRunning = false;
   }
 }
-function enablePause(gameLoop) {
-  document.addEventListener("keydown", (e) => {
-    if (e.code === "Escape") {
-      if (gameLoop.isPaused) {
-        unpause();
-      } else {
-        gameLoop.stop();
-        gameLoop.isPaused = true;
-      }
-    }
-  });
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      gameLoop.stop();
-      gameLoop.isPaused = true;
-      document.title = "Abstract Images";
-      document.querySelector('.game-interface').style.filter = "blur(5px)";
-      document.getElementById("pause-screen").style.display = "block";    
-    }
-  });
-  document.addEventListener("mousedown", (e) => {
-    if (gameLoop.isPaused) {
-      unpause();
-    }
-  });
-  function unpause() {
-    gameLoop.start();
-    document.title = "Fey Unit";
-    document.querySelector('.game-interface').style.filter = "none";
-    document.getElementById("pause-screen").style.display = "none";
 
 
-  }
-}
+

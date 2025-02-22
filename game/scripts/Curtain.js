@@ -36,7 +36,7 @@ class Curtain {
         this.color = '#000000';
 
         // Default to world view
-        this.setPreset('tight');
+        this.setPreset('world');
 
         // Add preset cycling properties
         this.presets = ['world', 'wide', 'open', 'sides', 'open', 'top-bottom', 'closed', 'tight' ];
@@ -223,5 +223,9 @@ class Curtain {
 
         // Bottom panel
         ctx.fillRect(0, this.bottomPanel.y, this.canvas.width, this.bottomPanel.height);
+    }
+
+    get currentPreset() {
+        return this.presets[this.currentPresetIndex];
     }
 }

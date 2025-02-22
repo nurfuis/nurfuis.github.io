@@ -38,7 +38,7 @@
                     breakable = false; // Air is not breakable
                 }
 
-                const color = getComputedStyle(document.querySelector(`.${colorClass}`)).backgroundColor;
+                const color = 'red';
                 const drawX = x * world.tileSize;
                 const drawY = y * world.tileSize;
 
