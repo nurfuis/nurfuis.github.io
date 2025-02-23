@@ -76,7 +76,7 @@ class Resources {
     static getImage(key) {
         const image = this.images.get(key);
         if (!image) {
-            console.error(`Image not found: ${key}`);
+            console.warn(`Image not found: ${key}`);
             return null;
         }
         return image;
@@ -85,7 +85,7 @@ class Resources {
     static getTileSheet(type) {
         const sheet = this.tileSheets.get(type);
         if (!sheet) {
-            console.error(`Tilesheet not found: ${type}`);
+            console.warn(`Tilesheet not found: ${type}`);
             return null;
         }
         return sheet;
@@ -94,7 +94,7 @@ class Resources {
     static getTileVariant(type, variant) {
         const sheet = this.tileSheets.get(type);
         if (!sheet) {
-            console.error(`Tilesheet not found: ${type}`);
+            console.warn(`Tilesheet not found: ${type}`);
             return null;
         }
         return sheet.variants[variant] || null;

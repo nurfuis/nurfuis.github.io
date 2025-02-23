@@ -6,7 +6,7 @@ class Console extends ToolPane {
             icon: '⌨️',
             position: { top: '20px', left: '360px' },
             hotkey: 'F1',
-            visible: true
+            visible: PanelStateManager.getVisibilityState('game-console')
         });
         
         this.game = game;

@@ -1,26 +1,55 @@
 class Game {
-    constructor(canvas, gameObjects) {
+    async init(worldEdit) {
+        await TileSheetConfig.initialize();
+        this.tilePalette = new TilePalette(worldEdit);
+        this.tilePalette.isVisible = PanelStateManager.getVisibilityState('tile-palette');
+    }
+    constructor(canvas, main) {
+
         this.canvas = canvas;
-        this.world = gameObjects.world;
-        this.player = gameObjects.player;
-        this.camera = gameObjects.camera;
+        this.world = main.world;
+        this.player = main.player;
+        this.camera = main.camera;
         
         this.autoSaveInterval = 30000; // Save every 30 seconds
         this.lastAutoSave = Date.now();
         
+        // Initialize UI indicator
+        this.uiIndicator = new UI();
+
         // Initialize with fresh state if debug flag is set
         if (window.DEBUG?.BYPASS_SAVE) {
             console.log('Debug mode: Bypassing saved game state');
             this.initializeCleanState();
         } else {
             this.loadGameState();
+            this.uiIndicator.showAutoLoadIndicator();
+
         }
         
         // Set up auto-save and save-on-exit
         this.setupAutoSave();
 
+
         // Initialize console
         this.console = new Console(this);
+        console.isVisible = PanelStateManager.getVisibilityState('game-console');
+
+        const worldEdit = new WorldEditMenu(canvas, main);
+        this.worldEdit = worldEdit;
+        worldEdit.isVisible = PanelStateManager.getVisibilityState('world-edit');
+        
+
+        const stageManager = new StageManager(canvas, {
+          muslin: main.muslin,
+          curtain: main.curtain,
+          darkness: main.darkness,
+          background: main.farBackground
+        });
+        this.devMenu = stageManager;
+        stageManager.isVisible = PanelStateManager.getVisibilityState('stage-manager');
+      
+        this.init(worldEdit);
 
     }
 
@@ -44,9 +73,12 @@ class Game {
         window.addEventListener('beforeunload', () => {
             this.saveGameState();
         });
+
     }
 
     saveGameState() {
+        this.uiIndicator.showAutoSaveIndicator();
+
         const gameState = {
             timestamp: Date.now(),
             world: {

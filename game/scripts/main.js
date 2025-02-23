@@ -23,20 +23,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const ctx = canvas.getContext('2d');
 
-
   const main = new GameObject();
   main.canvas = canvas;
-
 
   const newWorld = new GameMap(canvas, world);
   main.world = newWorld;
   main.addChild(newWorld);
 
-
   const camera = new Camera(canvas, newWorld);
   main.camera = camera;
   main.addChild(camera)
-
 
   const player = new Unit(
     newWorld.tileSize * constants.PLAYER_SPAWN.x,
@@ -50,13 +46,11 @@ document.addEventListener('DOMContentLoaded', () => {
   main.player = player;
   player.teamName = constants.PLAYER_TEAM;
 
-
   const playerTeam = new Team('player-color', teamName = 'Player Team');
   main.playerTeam = playerTeam;
   main.playerTeam.playerOne = player;
   main.playerTeam.addChild(player);
   main.addChild(main.playerTeam);
-
 
   const dragon = new Flying(player);
   main.addChild(dragon);
@@ -83,19 +77,15 @@ document.addEventListener('DOMContentLoaded', () => {
   ], 150);
   main.automatedInput = automatedInput;
 
-
   const particleSystem = new ParticleSystem(canvas, camera, newWorld);
   main.particleSystem = particleSystem;
   main.addChild(particleSystem);
 
-
   const muslin = new Muslin(canvas, camera, newWorld);
   main.muslin = muslin;
 
-
   const farBackground = new BackgroundLayer(canvas, camera);
   main.farBackground = farBackground;
-
 
   const sceneLighting = new LightLayer(canvas, player, newWorld);
   main.sceneLighting = sceneLighting;
@@ -103,34 +93,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const darkness = new DarknessLayer(canvas, player, newWorld);
   main.darkness = darkness;
 
-
   const curtain = new Curtain(canvas, camera, newWorld);
   main.curtain = curtain;
-
 
   const onScreenWriting = new OnScreenWriting(canvas, camera, newWorld);
   main.onScreenWriting = onScreenWriting;
 
-
-  const worldEdit = new WorldEditMenu(canvas, main);
-  main.worldEditMenu = worldEdit;
-
-  const spriteSheetViewer = new SpriteSheetViewer(canvas, main);
-  main.spriteSheetViewer = spriteSheetViewer;
-
-
-  const stageManager = new StageManager(canvas, {
-    muslin: muslin,
-    curtain: curtain,
-    darkness: darkness,
-    background: farBackground
-  });
-  main.devMenu = stageManager;
-
-
   const game = new Game(canvas, main);
   main.game = game;
-
 
   const update = (delta) => {
 
@@ -158,9 +128,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     sceneLighting.draw(ctx);
 
-    worldEdit.drawGrid(ctx);
-    worldEdit.drawHoverTile(ctx);
-    worldEdit.drawTileStats(ctx);
+    game.worldEdit.drawGrid(ctx);
+    game.worldEdit.drawHoverTile(ctx);
+    game.worldEdit.drawTileStats(ctx);
 
     ctx.restore();
 
@@ -170,7 +140,6 @@ document.addEventListener('DOMContentLoaded', () => {
     onScreenWriting.draw(ctx);
 
   };
-
 
   const gameLoop = new GameLoop(update, draw);
   main.gameLoop = gameLoop;

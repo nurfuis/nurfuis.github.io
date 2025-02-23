@@ -1,14 +1,14 @@
-class WorldEditMenu {
+class WorldEditMenu extends ToolPane {
     async initialize() {
-        await TileSheetConfig.initialize();
-        this.tilePalette = new TilePalette(this);
         this.loadMapState();
     }
 
     constructor(canvas, game) {
+        super();
         this.canvas = canvas;
         this.game = game;
-        this.isVisible = true;
+        this.id = 'world-edit';
+        this.isVisible = PanelStateManager.getVisibilityState(this.id);
         this.isEditing = false;
         this.selectedTile = null;
         this.selectedVariant = 0;
@@ -17,7 +17,6 @@ class WorldEditMenu {
         this.showTileStats = false;
         this.isDrawing = false;
         this.isErasing = false;
-
 
         // Initialize menu container
         this.debugElement = this.createMenuContainer();
@@ -531,6 +530,23 @@ class WorldEditMenu {
         events.on('TILE_SELECTED', () => {
             this.updateCursor();
         });
+
+        // Add T key toggle for edit state when menu is visible
+        document.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 't' && this.isVisible) {
+                e.preventDefault();
+                const toggleEdit = this.controls.editor.settings.toggleEdit;
+                const newValue = !toggleEdit.getValue();
+                toggleEdit.setValue(newValue);
+                
+                // Update any UI elements
+                const toggleButton = this.menuElement.querySelector('.world-edit-toggle');
+                if (toggleButton) {
+                    toggleButton.textContent = newValue ? 'ON' : 'OFF';
+                    toggleButton.classList.toggle('active', newValue);
+                }
+            }
+        });
     }
 
     paintTile(e) {
@@ -540,7 +556,8 @@ class WorldEditMenu {
             this.selectedTile, 
             this.hoverTile.x, 
             this.hoverTile.y, 
-            this.selectedVariant
+            this.selectedVariant,
+            this.selectedRotation || 0
         );
 
         this.game.world.setTile(this.hoverTile.x, this.hoverTile.y, tile);
@@ -562,6 +579,8 @@ class WorldEditMenu {
     toggle() {
         this.isVisible = !this.isVisible;
         this.menuElement.classList.toggle('hidden');
+        PanelStateManager.setVisibilityState(this.id, this.isVisible);
+
     }
 
     drawGrid(ctx) {
@@ -669,334 +688,5 @@ class WorldEditMenu {
             // Default edit mode cursor
             this.canvas.style.cursor = this.selectedTile ? 'cell' : 'default';
         }
-    }
-}
-
-class TilePalette {
-    constructor(parent) {
-        this.parent = parent;
-        this.selectedTiles = new Array(10).fill(null);
-        this.currentSlot = 0;
-        this.isVisible = true;
-        this.isCollapsed = false;
-        
-        // Create selector panel first
-        this.selectorPanel = this.createTileSelector();
-        
-        // Create and append header
-        const header = this.createHeader();
-        this.selectorPanel.insertBefore(header, this.selectorPanel.firstChild);
-
-        MenuDraggable.makeDraggable(this.selectorPanel, header, {bottom: '20px', left: '20px' });
-
-        this.createActionBar();
-        this.bindHotkeys();
-        
-        const lastSlot = localStorage.getItem('lastSelectedSlot');
-        if (lastSlot) {
-            this.selectSlot(parseInt(lastSlot));
-        }
-    }
-
-    createHeader() {
-        const header = document.createElement('div');
-        header.className = 'tile-palette-header';
-        header.style.cursor = 'grab';
-
-        const title = document.createElement('h3');
-        title.textContent = '🎨 TILE PALETTE (F4)';
-
-        // Add collapse button
-        const collapseBtn = document.createElement('button');
-        collapseBtn.className = 'collapse-btn';
-        collapseBtn.textContent = '▼';
-        collapseBtn.onclick = (e) => {
-            e.stopPropagation();
-            this.toggleCollapse();
-        };
-
-        header.appendChild(title);
-        header.appendChild(collapseBtn);
-
-        return header;
-    }
-
-    toggleCollapse() {
-        this.isCollapsed = !this.isCollapsed;
-        const content = this.selectorPanel.querySelector('.tile-selector-content');
-        content.style.display = this.isCollapsed ? 'none' : 'block';
-        
-        const collapseBtn = this.selectorPanel.querySelector('.collapse-btn');
-        collapseBtn.textContent = this.isCollapsed ? '▶' : '▼';
-    }
-
-    toggleVisibility() {
-        this.isVisible = !this.isVisible;
-        this.selectorPanel.style.display = this.isVisible ? 'block' : 'none';
-        this.actionBar.style.display = this.isVisible ? 'block' : 'none';
-    }
-
-    bindHotkeys() {
-        document.addEventListener('keydown', (e) => {
-            // Number keys 1-0
-            if (e.key >= '1' && e.key <= '9' || e.key === '0') {
-                const index = e.key === '0' ? 9 : parseInt(e.key) - 1;
-                this.selectSlot(index);
-            }
-            
-            if (e.key === 'F4') {
-                e.preventDefault();
-                this.toggleVisibility();
-            }
-        });
-    }
-
-    createTileSelector() {
-        // Create tile selector panel
-        this.selectorPanel = document.createElement('div');
-        this.selectorPanel.className = 'tile-selector-panel';
-
-        // Create content container for collapsible elements
-        const content = document.createElement('div');
-        content.className = 'tile-selector-content';
-
-        // Create type tabs
-        const tabContainer = document.createElement('div');
-        tabContainer.className = 'tile-type-tabs';
-        Object.keys(TileSheetConfig.sheets).forEach(type => {
-            const tab = this.createTypeTab(type);
-            tabContainer.appendChild(tab);
-        });
-
-        // Create tile viewer
-        this.tileViewer = document.createElement('div');
-        this.tileViewer.className = 'tile-viewer';
-        const viewerCanvas = document.createElement('canvas');
-        viewerCanvas.width = viewerCanvas.height = 96;
-        this.tileViewer.appendChild(viewerCanvas);
-
-        // Create variant grid
-        this.variantGrid = document.createElement('div');
-        this.variantGrid.className = 'variant-grid';
-
-        // Add all elements to content container
-        content.appendChild(tabContainer);
-        content.appendChild(this.tileViewer);
-        content.appendChild(this.variantGrid);
-
-        this.selectorPanel.appendChild(content);
-        document.body.appendChild(this.selectorPanel);
-
-        return this.selectorPanel;
-    }
-
-    createActionBar() {
-        this.actionBar = document.createElement('div');
-        this.actionBar.className = 'tile-palette-toolbar';
-
-        const slots = document.createElement('div');
-        slots.className = 'action-bar';
-        
-        for (let i = 0; i < 10; i++) {
-            const slot = this.createActionSlot(i);
-            slots.appendChild(slot);
-        }
-
-        const tips = document.createElement('div');
-        tips.innerHTML = `
-            <div>Shift + Click to pan</div>
-            <div>1-0 keys to select slots</div>
-            <div>Right-click to remove tile</div>
-        `;
-
-        this.actionBar.appendChild(slots);
-        // this.actionBar.appendChild(tips);
-        document.body.appendChild(this.actionBar);
-    }
-
-    createActionSlot(index) {
-        const slot = document.createElement('div');
-        slot.className = 'action-slot';
-        slot.dataset.index = index;
-        
-        // Add key hint
-        const keyNumber = (index + 1) % 10;
-        const keyHint = document.createElement('span');
-        keyHint.className = 'key-hint';
-        keyHint.textContent = keyNumber;
-        slot.appendChild(keyHint);
-
-        // Add click handler
-        slot.onclick = () => this.selectSlot(index);
-        
-        // Add right-click handler to clear slot
-        slot.oncontextmenu = (e) => {
-            e.preventDefault();
-            this.selectedTiles[index] = null;
-            this.updateSlot(slot, null);
-            this.saveState();
-        };
-
-        return slot;
-    }
-
-    selectSlot(index) {
-        // Remove selected class from all slots
-        this.actionBar.querySelectorAll('.action-slot').forEach(slot => 
-            slot.classList.remove('selected')
-        );
-        
-        // Add selected class to clicked slot
-        const slot = this.actionBar.querySelector(`[data-index="${index}"]`);
-        slot.classList.add('selected');
-        
-        this.currentSlot = index;
-        const tileData = this.selectedTiles[index];
-        
-        if (tileData) {
-            this.parent.selectedTile = tileData.type;
-            this.parent.selectedVariant = tileData.variant;
-        } else {
-            this.parent.selectedTile = null;
-            this.parent.selectedVariant = 0;
-        }
-
-        localStorage.setItem('lastSelectedSlot', index);
-    }
-
-    updateSlot(slot, data) {
-        // Clear existing content except key hint
-        const keyHint = slot.querySelector('.key-hint');
-        slot.innerHTML = '';
-        slot.appendChild(keyHint);
-        
-        if (data) {
-            const preview = document.createElement('canvas');
-            preview.width = preview.height = 32;
-            const ctx = preview.getContext('2d');
-            
-            const variant = TileSheetConfig.sheets[data.type].variants[data.variant];
-            const img = new Image();
-            img.onload = () => {
-                ctx.imageSmoothingEnabled = false;
-                ctx.drawImage(img,
-                    variant.x, variant.y, variant.w, variant.h,
-                    0, 0, 32, 32
-                );
-            };
-            img.src = TileSheetConfig.sheets[data.type].src;
-            
-            slot.appendChild(preview);
-        }
-    }
-
-    saveState() {
-        localStorage.setItem('paletteState', JSON.stringify(this.selectedTiles));
-    }
-
-    loadState() {
-        const state = localStorage.getItem('paletteState');
-        if (state) {
-            this.selectedTiles = JSON.parse(state);
-            this.actionBar.querySelectorAll('.action-slot').forEach((slot, index) => {
-                this.updateSlot(slot, this.selectedTiles[index]);
-            });
-        }
-    }
-
-    createTypeTab(type) {
-        const tab = document.createElement('button');
-        tab.className = 'tile-type-tab';
-        tab.dataset.type = type;
-        tab.textContent = type.charAt(0).toUpperCase() + type.slice(1);
-        
-        tab.onclick = () => {
-            // Remove active class from all tabs
-            this.selectorPanel.querySelectorAll('.tile-type-tab').forEach(t => 
-                t.classList.remove('active')
-            );
-            tab.classList.add('active');
-            this.showVariants(type);
-            this.updateViewer(type, 0); // Show first variant in viewer
-        };
-        
-        return tab;
-    }
-
-    showVariants(type) {
-        // Clear existing variants
-        this.variantGrid.innerHTML = '';
-        
-        const sheet = TileSheetConfig.sheets[type];
-        if (!sheet) return;
-
-        sheet.variants.forEach((variant, index) => {
-            const variantTile = document.createElement('div');
-            variantTile.className = 'variant-tile';
-            
-            const canvas = document.createElement('canvas');
-            canvas.width = canvas.height = 32;
-            const ctx = canvas.getContext('2d');
-            
-            const img = new Image();
-            img.onload = () => {
-                ctx.imageSmoothingEnabled = false;
-                ctx.drawImage(img,
-                    variant.x, variant.y, variant.w, variant.h,
-                    0, 0, 32, 32
-                );
-            };
-            img.src = sheet.src;
-            
-            variantTile.appendChild(canvas);
-            variantTile.onclick = () => {
-                this.selectVariant(type, index);
-                this.highlightVariant(variantTile);
-            };
-            
-            this.variantGrid.appendChild(variantTile);
-        });
-    }
-
-    selectVariant(type, variantIndex) {
-        this.parent.selectedTile = type;
-        this.parent.selectedVariant = variantIndex;
-        this.updateViewer(type, variantIndex);
-        
-        // If we have a current slot selected, update it
-        if (this.currentSlot !== null) {
-            this.selectedTiles[this.currentSlot] = { type, variant: variantIndex };
-            const slot = this.actionBar.querySelector(`[data-index="${this.currentSlot}"]`);
-            this.updateSlot(slot, this.selectedTiles[this.currentSlot]);
-            this.saveState();
-        }
-    }
-
-    updateViewer(type, variantIndex) {
-        const viewerCtx = this.tileViewer.querySelector('canvas').getContext('2d');
-        viewerCtx.clearRect(0, 0, 96, 96);
-        
-        const sheet = TileSheetConfig.sheets[type];
-        if (!sheet) return;
-        
-        const variant = sheet.variants[variantIndex];
-
-        
-        const img = new Image();
-        img.onload = () => {
-            viewerCtx.imageSmoothingEnabled = false;
-            viewerCtx.drawImage(img,
-                variant.x, variant.y, variant.w, variant.h,
-                0, 0, 96, 96
-            );
-        };
-        img.src = sheet.src;
-    }
-
-    highlightVariant(selectedTile) {
-        this.variantGrid.querySelectorAll('.variant-tile').forEach(tile => 
-            tile.classList.remove('selected')
-        );
-        selectedTile.classList.add('selected');
     }
 }

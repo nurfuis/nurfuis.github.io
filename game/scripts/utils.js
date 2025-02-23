@@ -4,11 +4,11 @@ function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-
-
 function resizeCanvas(canvas) {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+
+    events.emit('WINDOW_RESIZED', { width: window.innerWidth , height: window.innerHeight})
 }
 
 function fade(t) {

@@ -5,7 +5,7 @@ class ToolPane {
             title: 'Tool Pane',
             icon: '🔧',
             position: { right: '20px', top: '20px' },
-            visible: true,
+            visible: PanelStateManager.getVisibilityState(options.id), // Load saved state
             collapsed: false,
             hotkey: null,
             className: 'tool-pane'
@@ -305,8 +305,8 @@ class ToolPane {
 
     toggle() {
         this.isVisible = !this.isVisible;
-        this.element.classList.toggle('hidden');
-        events.emit(`${this.options.id}_TOGGLED`, { visible: this.isVisible });
+        this.element.classList.toggle('hidden', !this.isVisible);
+        PanelStateManager.setVisibilityState(this.options.id, this.isVisible);
     }
 
     toggleCollapse() {
@@ -318,5 +318,16 @@ class ToolPane {
 
     destroy() {
         this.element.remove();
+    }
+}
+
+class PanelStateManager {
+    static getVisibilityState(panelId) {
+        const state = localStorage.getItem(`panel_${panelId}_visible`);
+        return state === null ? false : state === 'true';
+    }
+
+    static setVisibilityState(panelId, isVisible) {
+        localStorage.setItem(`panel_${panelId}_visible`, isVisible);
     }
 }

@@ -87,8 +87,10 @@
 .fort-color {
     background-color: green;
 }
+
 .vehicle-color {
-    background-color: rgba(139, 69, 19, 0.75); /* Brown */
+    background-color: rgba(139, 69, 19, 0.75);
+    /* Brown */
     border: 1px solid brown;
 }
 
@@ -117,6 +119,7 @@ canvas#gameCanvas {
     z-index: 0;
     /* Ensure canvas is behind other elements */
 }
+
 .scoreboard {
     position: fixed;
     top: 20px;
@@ -151,6 +154,7 @@ canvas#gameCanvas {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     padding-right: 15px;
 }
+
 .splash-screen {
     position: absolute;
     top: 0;
@@ -275,7 +279,7 @@ p {
     /* Slightly more opaque on hover */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
     /* More pronounced shadow on hover */
-    
+
 }
 
 .menu button:active {
@@ -346,12 +350,13 @@ p {
         border-radius: 4px;
     }
 
-   
+
     .health-bar {
         margin: 10px;
         height: 20px;
         border-radius: 5px;
-        width: 128px;;
+        width: 128px;
+        ;
         position: absolute;
         bottom: 300px;
         /* Position the health bar directly above the unit stats */
@@ -422,7 +427,8 @@ p {
         margin: 10px;
         height: 20px;
         border-radius: 5px;
-        width: 128px;;
+        width: 128px;
+        ;
         position: absolute;
         bottom: 200px;
         /* Position the stomach bar directly above the unit stats */
@@ -459,6 +465,7 @@ p {
 .hidden {
     display: none;
 }
+
 #inventory-menu {
     display: none;
     justify-content: center;
@@ -472,8 +479,10 @@ p {
     border-radius: 10px;
     z-index: 10;
 }
+
 .inventory-item {
-    background-color: #4CAF50; /* Green */
+    background-color: #4CAF50;
+    /* Green */
     border: none;
     color: white;
     padding: 2px 2px;
@@ -487,11 +496,13 @@ p {
     width: 56px;
     height: 56px;
 }
+
 .inventory-item img {
     width: 48px;
     height: 48px;
     object-fit: cover;
 }
+
 .tooltip {
     display: none;
     position: absolute;
@@ -575,7 +586,9 @@ p {
 }
 
 
-.heart-icon, .stomach-icon, .lungs-icon {
+.heart-icon,
+.stomach-icon,
+.lungs-icon {
     width: 96px;
     height: 96px;
     margin-right: 5px;
@@ -583,7 +596,9 @@ p {
     pointer-events: none;
 }
 
-.health-details, .energy-details, .oxygen-details {
+.health-details,
+.energy-details,
+.oxygen-details {
     transition: opacity 0.3s ease;
 }
 
@@ -592,19 +607,114 @@ p {
     bottom: 20px;
     right: 20px;
     background: rgba(0, 0, 0, 0.7);
-    color: white;
+    color: rgba(255, 255, 255, 0.85);
     padding: 8px 16px;
     border-radius: 4px;
     font-size: 14px;
-    animation: fadeInOut 2s ease-in-out;
     pointer-events: none;
+    z-index: 1000;
+    transform: translateX(120%);
+    opacity: 0;
+    animation: slideInOut 2s ease-in-out forwards;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.auto-save-indicator::before {
+    content: '💾';
+    animation: spin 1s linear infinite;
+}
+
+.auto-load-indicator {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    color: rgba(255, 255, 255, 0.85);
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    pointer-events: none;
+    z-index: 1000;
+    transform: translateX(120%);
+    opacity: 0;
+    animation: slideInOut 2s ease-in-out forwards;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.auto-load-indicator::before {
+    content: '📂';
+    animation: bounce 1s ease infinite;
+}
+
+@keyframes slideInOut {
+    0% {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+    15% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    85% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-3px);
+    }
+}
+
+@keyframes slideOut {
+    0% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    200% {
+        opacity: 0;
+        transform: translateX(100%);
+    }
 }
 
 @keyframes fadeInOut {
-    0% { opacity: 0; }
-    20% { opacity: 1; }
-    80% { opacity: 1; }
-    100% { opacity: 0; }
+    0% {
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    80% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
 }
 
 /* Scrollbar Styles */
@@ -757,5 +867,3 @@ p {
     flex: 1;
     font-size: 14px;
 }
-
-

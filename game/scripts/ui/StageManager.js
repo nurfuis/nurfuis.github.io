@@ -2,7 +2,7 @@ class StageManager {
     constructor(canvas, game) {
         this.canvas = canvas;
         this.game = game;
-        this.isVisible = true;
+        this.isVisible = PanelStateManager.getVisibilityState('stage-manager');
         this.sections = new Map(); // Store section references
         this.controls = new Map(); // Store control references
 

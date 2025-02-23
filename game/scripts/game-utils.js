@@ -133,14 +133,29 @@ class MenuDraggable {
 }
 
 class UI {
+    constructor() {
+    }
+
     showAutoSaveIndicator() {
         const indicator = document.createElement('div');
         indicator.className = 'auto-save-indicator';
-        indicator.textContent = '💾 Auto-saving...';
+        indicator.textContent = 'Auto-saving...';
         document.body.appendChild(indicator);
         
         setTimeout(() => {
             indicator.remove();
         }, 2000);
     }
+
+    showAutoLoadIndicator() {
+        const indicator = document.createElement('div');
+        indicator.className = 'auto-load-indicator';
+        indicator.textContent = 'Auto-loading...';
+        document.body.appendChild(indicator);
+
+        setTimeout(() => {
+            indicator.remove();
+        }, 2000);
+    }
+
 }
