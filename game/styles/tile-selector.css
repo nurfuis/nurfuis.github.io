@@ -1,0 +1,231 @@
+
+.tile-palette {
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 4px;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.tile-type-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+    padding-top: 6px;
+}
+
+.variant-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 32px);
+    gap: 4px;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: rgba(165, 165, 165, 0.85);
+    border-radius: 4px;
+    max-height: 600px;
+    overflow-y: auto;
+}
+.action-bar {
+    display: flex;
+    gap: 8px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+.action-slot {
+    width: 32px;
+    height: 32px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    position: relative;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.action-slot.selected {
+    border-color: #00ff00;
+    box-shadow: 0 0 4px #00ff00;
+}
+
+.key-hint {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    background: #000;
+    color: #fff;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-size: 10px;
+    pointer-events: none;
+}
+
+.variant-tile {
+    width: 32px;
+    height: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    position: relative;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.variant-tile.selected {
+    border-color: #00ff00;
+    box-shadow: 0 0 4px #00ff00;
+}
+
+.variant-tile:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.action-slot {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.key-hint {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    font-size: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 1px 3px;
+    border-top-left-radius: 3px;
+}
+
+.variant-tile:hover,
+.action-slot:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.tile-preview-panel {
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 4px;
+    padding: 15px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.tile-preview-panel h4 {
+    margin: 0 0 10px 0;
+    color: #fff;
+    font-size: 14px;
+}
+
+.tile-preview-panel canvas {
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.3);
+    image-rendering: pixelated;
+}
+
+.tile-info {
+    margin-top: 10px;
+    color: #aaa;
+    font-size: 12px;
+}
+
+.tile-info p {
+    margin: 0;
+}
+
+.tile-palette-toolbar {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+}
+
+.toolbar-tips {
+    color: #aaa;
+    font-size: 12px;
+    text-align: center;
+    padding: 4px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tile-selector-panel {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.85);
+    padding: 10px;
+    border-radius: 8px;
+    font-family: 'Cascadia Code', monospace;
+    min-width: 300px;
+    max-height: 80vh;
+    overflow-y: auto;
+
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 1000;
+    transition: filter 0.2s ease;
+}
+
+.tile-selector-panel.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.tile-type-tabs {
+    display: flex;
+    gap: 8px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+
+.tile-viewer canvas {
+    image-rendering: pixelated;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.tile-viewer {
+    background: rgba(165, 165, 165, 0.85);
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.tile-viewer canvas {
+    image-rendering: pixelated;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+
+.tile-palette-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: grab;
+    user-select: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    touch-action: none;
+    font: 14px 'Cascadia Code', monospace;
+}
+
+.tile-palette-header h3 {
+    margin: 0;
+    font-size: 14px;
+    color:rgb(0, 255, 0);
+
+}
+
+.tile-selector-content {
+    transition: all 0.3s ease;
+}

@@ -1,82 +1,13 @@
-const attackTypes = [{
-    name: 'Basic Attack',
-    range: 128,
-    damage: 10,
-    cost: 0
-},
-{
-    name: 'Long Range Attack',
-    range: 512,
-    damage: 5,
-    cost: 5
-},
-{
-    name: 'AOE Attack',
-    range: 256,
-    damage: 15,
-    cost: 10
-},
-{
-    name: 'Heal',
-    range: 128,
-    damage: -10,
-    cost: 5
-}
-];
-const mooreNeighborOffsets = [{
-    x: -1,
-    y: -1
-}, {
-    x: 0,
-    y: -1
-}, {
-    x: 1,
-    y: -1
-},
-{
-    x: -1,
-    y: 0
-}, {
-    x: 0,
-    y: 0
-}, {
-    x: 1,
-    y: 0
-},
-{
-    x: -1,
-    y: 1
-}, {
-    x: 0,
-    y: 1
-}, {
-    x: 1,
-    y: 1
-}
-];
-// TODO when change to 32 fix this
-
-
-
-
-
-
 class Unit extends GameObject {
     constructor(x, y, size, colorClass, speed, name, world, level = 1, experience = 0, health = 100) {
         super();
 
-
         this.debug = false;
+
 
         this.useAutoInput = false;
 
-
-
         document.addEventListener('keydown', (event) => {
-            if (event.key === 'F2') {
-                event.preventDefault();
-                this.debug = !this.debug;
-            }
             if (event.key === 'n') {
                 event.preventDefault();
                 this.useAutoInput = !this.useAutoInput;
@@ -346,6 +277,7 @@ class Unit extends GameObject {
 
         this.calculateMooreNeighbors(this.world);
 
+
         console.log('Unit ready', this);
     }
 
@@ -533,7 +465,7 @@ class Unit extends GameObject {
         // try move
         this.tryMove(direction);
 
-        
+
     }
 
     draw(ctx) {
@@ -1225,7 +1157,15 @@ class Unit extends GameObject {
             const landingTile = this.world.getSolidTileBelow(selectedTile.x, selectedTile.y);
 
             if (!landingTile) {
-                throw new Error('No landing tile found');
+
+                const pos = this.findSafeReturnPosition(this.world);
+
+                this.targetPosition = pos;
+                this.isMoving = true;
+                this.isFalling = false;
+
+                return;
+                // throw new Error('No landing tile found');
             }
 
             const emptyTile = this.world.getEmptyTileAbove(landingTile.x, landingTile.y);
@@ -1953,19 +1893,16 @@ class UnitDebugger extends GameObject {
     constructor(canvas, unit) {
         super();
         this.unit = unit;
-        this.isVisible = false;
+        this.isVisible = true;
         this.isCollapsed = false;
 
         // Create debug container
         this.debugElement = document.createElement('div');
         this.debugElement.id = 'unit-debugger';
-        this.debugElement.className = 'unit-debugger hidden';
+        this.debugElement.className = 'unit-debugger';
 
         // Create header first
-        const header = this.createHeader();
-
-        MenuDraggable.makeDraggable(this.debugElement, header, { left: '20px', top: '20px' });
-
+        this.createHeader();
 
         // Create content container for collapsible section
         this.contentElement = document.createElement('div');
@@ -1987,97 +1924,4 @@ class UnitDebugger extends GameObject {
         });
     }
 
-    setupDebugInfo() {
-        // Debug info configuration
-        this.debugInfo = [
-            { label: 'Position', getValue: () => `X: ${this.unit.position.x.toFixed(2)}, Y: ${this.unit.position.y.toFixed(2)}` },
-            { label: 'Direction', getValue: () => this.unit.direction },
-            { label: 'Facing', getValue: () => this.unit.facingDirection },
-            { label: 'Moving', getValue: () => this.unit.isMoving ? 'Yes' : 'No' },
-            { label: 'Falling', getValue: () => this.unit.isFalling ? 'Yes' : 'No' },
-            { label: 'Floating', getValue: () => this.unit.isFloating ? 'Yes' : 'No' },
-            { label: 'Fall Damage', getValue: () => this.unit.fallingDamage?.toFixed(2) || '0' },
-            { label: 'Current Tile', getValue: () => this.unit.currentTile?.type || 'None' },
-            { label: 'Tile Below', getValue: () => this.unit.tileBelow?.type || 'None' }
-        ];
-
-        // Create debug elements
-        this.debugElements = this.debugInfo.map(info => {
-            const row = document.createElement('div');
-            row.className = 'unit-debugger-row';
-
-            const label = document.createElement('span');
-            label.className = 'unit-debugger-label';
-            label.textContent = info.label;
-
-            const value = document.createElement('span');
-            value.className = 'unit-debugger-value';
-
-            row.appendChild(label);
-            row.appendChild(value);
-            this.contentElement.appendChild(row);
-
-            return { row, valueSpan: value };
-        });
-    }
-
-    createHeader() {
-        const header = document.createElement('div');
-        header.className = 'unit-debugger-header';
-
-
-        const title = document.createElement('h3');
-        title.textContent = '🔧 UNIT DEBUG INFO';
-
-        const collapseBtn = document.createElement('button');
-        collapseBtn.className = 'collapse-btn';
-        collapseBtn.textContent = '▼';
-
-        header.appendChild(title);
-        header.appendChild(collapseBtn);
-
-        header.onclick = () => {
-            this.isCollapsed = !this.isCollapsed;
-            this.contentElement.classList.toggle('collapsed');
-            this.debugElement.classList.toggle('collapsed');
-            collapseBtn.textContent = this.isCollapsed ? '▶' : '▼';
-        };
-
-        this.debugElement.appendChild(header);
-
-        return header;
-    }
-
-    toggle() {
-        this.isVisible = !this.isVisible;
-        this.debugElement.classList.toggle('hidden');
-    }
-
-    step(delta, root) {
-        if (!this.isVisible) return;
-
-        // Update each debug element
-        this.debugElements.forEach((element, index) => {
-            const info = this.debugInfo[index];
-            element.valueSpan.textContent = info.getValue();
-
-            // Update value color based on state
-            if (info.label === 'Health' || info.label === 'Energy' || info.label === 'Oxygen') {
-                const value = parseFloat(info.getValue());
-                element.valueSpan.style.color = value < 30 ? '#ff4444' :
-                    value < 70 ? '#ffaa44' : '#44ff44';
-            }
-        });
-    }
-
-    // Override drawImage since we're using DOM
-    drawImage(ctx, drawPosX, drawPosY) {
-        // No canvas drawing needed
-    }
-
-    // Clean up when destroyed
-    destroy() {
-        this.debugElement.remove();
-        super.destroy();
-    }
 }

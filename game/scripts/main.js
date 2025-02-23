@@ -1,26 +1,42 @@
+const DEBUG = {
+    BYPASS_SAVE: false,  // Set to true to bypass save loading
+    DEFAULT_POSITION: { x: 128, y: 128 }, // Default spawn position
+    WORLD_TYPE: 'superFlat' // Default world type
+};
+window.DEBUG = DEBUG;
+
+Resources.initialize();
+
+
 window.addEventListener('resize', () => {
 
   const canvas = document.getElementById('gameCanvas');
   resizeCanvas(canvas);
+
 });
 
 document.addEventListener('DOMContentLoaded', () => {
+
 
   const canvas = document.getElementById('gameCanvas');
   resizeCanvas(canvas);
 
   const ctx = canvas.getContext('2d');
 
-  const game = new GameObject();
-  game.canvas = canvas;
+
+  const main = new GameObject();
+  main.canvas = canvas;
+
 
   const newWorld = new GameMap(canvas, world);
-  game.world = newWorld;
-  game.addChild(newWorld);
+  main.world = newWorld;
+  main.addChild(newWorld);
+
 
   const camera = new Camera(canvas, newWorld);
-  game.camera = camera;
-  game.addChild(camera)
+  main.camera = camera;
+  main.addChild(camera)
+
 
   const player = new Unit(
     newWorld.tileSize * constants.PLAYER_SPAWN.x,
@@ -31,25 +47,24 @@ document.addEventListener('DOMContentLoaded', () => {
     constants.PLAYER_NAME,
     newWorld
   );
+  main.player = player;
   player.teamName = constants.PLAYER_TEAM;
 
-  const d = new UnitDebugger(canvas, player);
-  player.addChild(d);
 
   const playerTeam = new Team('player-color', teamName = 'Player Team');
-  game.playerTeam = playerTeam;
-  game.playerTeam.playerOne = player;
-  game.playerTeam.addChild(player);
-  game.addChild(game.playerTeam);
+  main.playerTeam = playerTeam;
+  main.playerTeam.playerOne = player;
+  main.playerTeam.addChild(player);
+  main.addChild(main.playerTeam);
 
 
   const dragon = new Flying(player);
-  game.addChild(dragon);
+  main.addChild(dragon);
   dragon.x = 200;
   dragon.y = 200;
 
-  const input = new Input(canvas, camera, game, newWorld);
-  game.input = input;
+  const input = new Input(canvas, camera, main, newWorld);
+  main.input = input;
 
   const automatedInput = new AutomatedInput([
     { direction: "left", weight: 0.5 },
@@ -66,44 +81,60 @@ document.addEventListener('DOMContentLoaded', () => {
     { direction: "up-three-left-one", weight: 0.1 },
     { direction: "up-three-right-one", weight: 0.1 }
   ], 150);
-  game.automatedInput = automatedInput;
+  main.automatedInput = automatedInput;
+
 
   const particleSystem = new ParticleSystem(canvas, camera, newWorld);
-  game.particleSystem = particleSystem;
-  game.addChild(particleSystem);
+  main.particleSystem = particleSystem;
+  main.addChild(particleSystem);
+
 
   const muslin = new Muslin(canvas, camera, newWorld);
-  game.muslin = muslin;
+  main.muslin = muslin;
+
 
   const farBackground = new BackgroundLayer(canvas, camera);
-  game.farBackground = farBackground;
+  main.farBackground = farBackground;
+
 
   const sceneLighting = new LightLayer(canvas, player, newWorld);
-  game.sceneLighting = sceneLighting;
+  main.sceneLighting = sceneLighting;
 
   const darkness = new DarknessLayer(canvas, player, newWorld);
-  game.darkness = darkness;
+  main.darkness = darkness;
+
 
   const curtain = new Curtain(canvas, camera, newWorld);
-  game.curtain = curtain;
+  main.curtain = curtain;
+
 
   const onScreenWriting = new OnScreenWriting(canvas, camera, newWorld);
-  game.onScreenWriting = onScreenWriting;
+  main.onScreenWriting = onScreenWriting;
 
-  const worldEditMenu = new WorldEditMenu(canvas, game);
-  game.worldEditMenu = worldEditMenu;
 
-  const devMenu = new DeveloperMenu(canvas, {
+  const worldEdit = new WorldEditMenu(canvas, main);
+  main.worldEditMenu = worldEdit;
+
+  const spriteSheetViewer = new SpriteSheetViewer(canvas, main);
+  main.spriteSheetViewer = spriteSheetViewer;
+
+
+  const stageManager = new StageManager(canvas, {
     muslin: muslin,
     curtain: curtain,
     darkness: darkness,
     background: farBackground
   });
-  game.devMenu = devMenu;
+  main.devMenu = stageManager;
+
+
+  const game = new Game(canvas, main);
+  main.game = game;
+
 
   const update = (delta) => {
 
-    game.stepEntry(delta, game);
+    main.stepEntry(delta, main);
 
     muslin.update(delta);
     farBackground.update(delta);
@@ -122,13 +153,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     ctx.save();
 
-    game.camera.follow(ctx, 0, 0);
-    game.draw(ctx, 0, 0);
+    main.camera.follow(ctx, 0, 0);
+    main.draw(ctx, 0, 0);
 
     sceneLighting.draw(ctx);
 
-    worldEditMenu.drawGrid(ctx);
-    worldEditMenu.drawHoverTile(ctx);
+    worldEdit.drawGrid(ctx);
+    worldEdit.drawHoverTile(ctx);
+    worldEdit.drawTileStats(ctx);
 
     ctx.restore();
 
@@ -139,12 +171,85 @@ document.addEventListener('DOMContentLoaded', () => {
 
   };
 
+
   const gameLoop = new GameLoop(update, draw);
-  game.gameLoop = gameLoop;
+  main.gameLoop = gameLoop;
   gameLoop.start();
 
 });
 
 
+class TileSheetConfig {
+  static sheets = {};
+
+  static async initialize() {
+    this.sheets = await TileSheetLoader.loadTileSheets();
+    events.emit('TILE_SHEETS_INITIALIZED', this.sheets);
+  }
+
+  static getVariantCoords(type, variant) {
+    const sheet = this.sheets[type];
+    return sheet?.variants[variant] || null;
+  }
+}
+
+
+class TileSheetLoader {
+  static async loadTileSheets() {
+    const tileSheets = {};
+
+    try {
+      // Define the base tile types and their files
+
+      for (const [type, filename] of Object.entries(tileTypes)) {
+        const sheet = await this.analyzeTileSheet(`assets/tiles/${filename}`);
+        tileSheets[type] = {
+          src: `assets/tiles/${filename}`,
+          variants: sheet.variants
+        };
+      }
+      events.emit('TILE_SHEETS_LOADED', tileSheets);
+      return tileSheets;
+    } catch (error) {
+      console.error('Error loading tile sheets:', error);
+      return null;
+    }
+  }
+
+  static analyzeTileSheet(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const variants = [];
+        const baseSize = 32; // Base tile size
+
+        // Calculate number of tiles in the sheet
+        const tilesX = Math.floor(img.width / baseSize);
+        const tilesY = Math.floor(img.height / baseSize);
+
+        // Generate variant data
+        for (let y = 0; y < tilesY; y++) {
+          for (let x = 0; x < tilesX; x++) {
+            variants.push({
+              x: x * baseSize,
+              y: y * baseSize,
+              w: baseSize,
+              h: baseSize
+            });
+          }
+        }
+
+        resolve({
+          width: img.width,
+          height: img.height,
+          variants
+        });
+      };
+
+      img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
+      img.src = src;
+    });
+  }
+}
 
 

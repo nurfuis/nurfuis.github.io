@@ -1,4 +1,4 @@
-class DeveloperMenu {
+class StageManager {
     constructor(canvas, game) {
         this.canvas = canvas;
         this.game = game;
@@ -11,7 +11,7 @@ class DeveloperMenu {
 
         const header = this.createHeader();
 
-        MenuDraggable.makeDraggable(this.debugElement, header, { bottom: '20px', right: '20px' });
+        MenuDraggable.makeDraggable(this.debugElement, header, { top: '400px', right: '20px' });
 
         
         // Initialize layer controls
@@ -30,7 +30,7 @@ class DeveloperMenu {
         header.className = 'dev-menu-header';
 
         const title = document.createElement('h3');
-        title.textContent = '🔧 DEV CONSOLE';
+        title.textContent = '🎭 STAGE MANAGER (F3)';
 
         header.appendChild(title);
 
@@ -356,7 +356,7 @@ class DeveloperMenu {
 
     bindKeyboardEvents() {
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'F7') {
+            if (e.key === 'F3') {
                 e.preventDefault();
                 this.toggle();
             }

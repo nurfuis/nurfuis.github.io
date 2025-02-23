@@ -10,8 +10,6 @@ const endTurnButton = document.getElementById('end-turn-button');
 const moveButton = document.getElementById('move-button');
 const attackButton = document.getElementById('attack-button');
 
-
-
 let uiHidden = false;
 
 class Input {
@@ -26,8 +24,6 @@ class Input {
         this.clickProcessed = true;
         this.cursorTimeout = null;
         this.cursorHidden = false;
-
-
 
         document.addEventListener('keydown', (event) => {
             const key = event.key;
@@ -113,4 +109,16 @@ class Input {
         });
     }
 
+    handleKeyDown(event) {
+        if (!this.keysPressed.includes(event.code)) {
+            this.keysPressed.push(event.code);
+        }
+    }
+
+    handleKeyUp(event) {
+        const index = this.keysPressed.indexOf(event.code);
+        if (index !== -1) {
+            this.keysPressed.splice(index, 1);
+        }
+    }
 }

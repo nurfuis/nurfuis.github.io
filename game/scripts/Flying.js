@@ -183,9 +183,9 @@ class Flying extends GameObject {
         this.frameY = 0;  // Row in sprite sheet (0=down, 1=up, 2=right, 3=left)
 
         // Add patrol and following properties
-        this.followDistance = 256; // Pixels to maintain from player
-        this.followHeight = 64; // New property for hovering height
-        this.patrolRadius = 256; // Radius of patrol circle
+        this.followDistance = 512; // Pixels to maintain from player
+        this.followHeight = 96; // New property for hovering height
+        this.patrolRadius = 512; // Radius of patrol circle
         this.patrolSpeed = 0.001; // Speed of circular motion
         this.patrolAngle = 0;
         this.patrolHeight = 128; // Height above player during patrol
@@ -206,14 +206,14 @@ class Flying extends GameObject {
         this.isSearching = false;
         this.searchDirection = 1; // 1 for right, -1 for left
         this.searchProgress = 0;
-        this.searchWidth = 512; // Increased width to cover more area
+        this.searchWidth = 2000; // Increased width to cover more area
         this.searchSpeed = 0.0004; // Slower movement
         this.searchSegments = {
             forward: 6, // More forward segments
             back: 3    // More back segments
         };
         this.searchRowHeight = 64; // Increased height between rows
-        this.searchMaxHeight = 768; // Maximum height for search pattern
+        this.searchMaxHeight = 1028; // Maximum height for search pattern
         this.searchStartHeight = this.unit.position.y + this.spriteHeight; // Starting height above player
         this.lastSearchDirection = 1; // Track last search direction
         this.searchOffset = new Vector2(0, 0); // Store random offset
@@ -221,7 +221,7 @@ class Flying extends GameObject {
         // Add edge hover properties
         this.isEdgeHovering = false;
         this.edgeHoverSide = 'right'; // or 'left'
-        this.edgeHoverDistance = 512; // Distance from player when at edge
+        this.edgeHoverDistance = 2000; // Distance from player when at edge
         this.edgeHoverHeight = 256; // Height above player while hovering
         this.edgeHoverDuration = 10000; // Time to hover before returning to patrol
         this.edgeHoverStartTime = 0;

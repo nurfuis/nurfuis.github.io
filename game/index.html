@@ -6,12 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fey Unit</title>
     <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/toolpane.css">
+    <link rel="stylesheet" href="styles/world-edit.css">
+    <link rel="stylesheet" href="styles/tile-selector.css">
+    <link rel="stylesheet" href="styles/developer-menu.css">
 </head>
 
 <body>
     <div class="game-interface">
         <canvas id="gameCanvas"></canvas>
-
 
         <div class="oxygen-bar">
             <div class="oxygen-details">
@@ -24,8 +27,6 @@
                 <img src="images/lungs.png" alt="Lungs" class="lungs-icon">
             </div>
         </div>
-
-
         <div class="stomach-bar">
             <div class="stomach-details">
                 <h2>Stomach</h2>
@@ -38,8 +39,6 @@
             </div>
 
         </div>
-
-
         <div class="health-bar">
             <div class="heart-details">
                 <h2>Heart</h2>
@@ -72,14 +71,29 @@
     </div>
 
 
-    <script src="scripts/constants.js"></script>
-    <script src="scripts/utils.js"></script>
     <script src="scripts/Vector2.js"></script>
     <script src="scripts/Events.js"></script>
+    <script src="scripts/constants.js"></script>
+    <script src="scripts/utils.js"></script>
     <script src="scripts/game-utils.js"></script>
+    <script src="scripts/Game.js"></script>
+    <script src="scripts/Resources.js"></script>
     <script src="scripts/Input.js"></script>
-    <script src="scripts/event-listeners.js"></script>
+
     <script src="scripts/game-objects.js"></script>
+
+    <script src="scripts/ui/ToolPane.js"></script>
+    <script src="scripts/ui/Console.js "></script>
+    <script src="scripts/ui/StageManager.js"></script>
+    <script src="scripts/ui/UnitInfoPane.js"></script> 
+    <script src="scripts/ui/WorldEditMenu.js"></script>
+    <script src="scripts/ui/SpriteSheetViewer.js"></script>
+
+    <script src="scripts/Animations.js"></script>
+    <script src="scripts/FrameIndexPattern.js"></script>
+    <script src="scripts/playerAnimations.js"></script>
+    <script src="scripts/Sprite.js"></script>
+
     <script src="scripts/Particle.js"></script>
     <script src="scripts/game-items.js"></script>
     <script src="scripts/Inventory.js"></script>
@@ -93,19 +107,18 @@
     <script src="scripts/GameMap.js"></script>
     <script src="scripts/Organs.js"></script>
     <script src="scripts/Unit.js"></script>
+    <script src ="scripts/UnitDebugger.js"></script>
     <script src="scripts/FeyLight.js"></script>
     <script src="scripts/LuminaSphere.js"></script>
     <script src="scripts/Anemone.js"></script>
     <script src="scripts/PatrolUnit.js"></script>
     <script src="scripts/Flying.js"></script>
-    <script src="scripts/game-camera.js"></script>
+    <script src="scripts/Camera.js"></script>
     <script src="scripts/GameLoop.js"></script>
-    <script src="scripts/debug.js"></script>
     <script src="scripts/Curtain.js"></script>
     <script src="scripts/Muslin.js"></script>
-    <script src="scripts/DeveloperMenu.js"></script>
+    <!-- <script src="scripts/DeveloperMenu.js"></script> -->
     <script src="scripts/TilePrototype.js"></script>
-    <script src="scripts/WorldEditMenu.js"></script>
     <script src="scripts/main.js"></script>
 </body>
 

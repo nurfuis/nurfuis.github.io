@@ -1,0 +1,241 @@
+.tool-pane {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.9);
+    color: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    font-family: 'Cascadia Code', monospace;
+    min-width: 300px;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 1000;
+    transition: filter 0.2s ease;
+    user-select: none;
+}
+
+.tool-pane.hidden {
+    display: none;
+}
+
+.tool-pane-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    cursor: grab;
+    user-select: none;
+}
+
+.tool-pane-header h3 {
+    margin: 0;
+    font-size: 14px;
+    color: #00ff00;
+}
+
+.tool-pane-content {
+    padding: 8px;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+.tool-pane-content.collapsed {
+    display: none;
+}
+
+.tool-pane-section {
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.tool-pane-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+.tool-pane-section-header h4 {
+    margin: 0;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.tool-pane-section-content {
+    padding: 8px;
+}
+
+.tool-pane-section-content.collapsed {
+    display: none;
+}
+
+.tool-pane-control {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.tool-pane-control label {
+    font-size: 12px;
+    margin-right: 8px;
+}
+
+.collapse-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+/* Control-specific styles */
+.tool-pane-toggle,
+.tool-pane-button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.tool-pane-toggle:hover,
+.tool-pane-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.tool-pane-toggle.active {
+    background: rgba(0, 255, 0, 0.2);
+}
+
+/* Add to toolpane.css */
+.tool-pane-value {
+    font-family: monospace;
+    color: #fff;
+    padding: 2px 6px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    min-width: 60px;
+    text-align: right;
+    display: inline-block;
+}
+
+
+
+.console-input-wrapper {
+    display: flex;
+    margin-bottom: 8px;
+}
+
+.console-input {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 6px 8px;
+    font-family: monospace;
+    font-size: 14px;
+    border-radius: 4px;
+}
+
+.console-input:focus {
+    outline: none;
+    border-color: rgba(0, 255, 0, 0.3);
+}
+
+.console-output {
+    height: 200px;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 12px;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+.console-entry {
+    margin-bottom: 4px;
+    white-space: pre-wrap;
+}
+
+.console-entry.console-error {
+    color: #ff4444;
+}
+
+.console-entry.console-info {
+    color: #44ff44;
+}
+
+/* Select Control */
+.tool-pane-select {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    width: 100%;
+    cursor: pointer;
+}
+
+.tool-pane-select:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.tool-pane-select option {
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+}
+
+/* Toggle Control */
+.tool-pane-toggle {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    min-width: 60px;
+}
+
+.tool-pane-toggle:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.tool-pane-toggle.active {
+    background: rgba(0, 255, 0, 0.2);
+    border-color: rgba(0, 255, 0, 0.3);
+}
+
+/* Range Control */
+.tool-pane-range-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tool-pane-range {
+    flex: 1;
+    -webkit-appearance: none;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    height: 4px;
+}
+
+.tool-pane-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    background: white;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.tool-pane-range-value {
+    min-width: 40px;
+    text-align: right;
+    font-family: monospace;
+    color: rgba(255, 255, 255, 0.8);
+}

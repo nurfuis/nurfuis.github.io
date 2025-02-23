@@ -17,9 +17,6 @@ class GameLoop {
 
     this.debug = false;
 
-    events.on('WORLD_EDIT_MODE', this, (data) => {
-      this.isEditing = data.isEditing;
-    });
 
     events.on('TOGGLE_GAME_LOOP', this, (data) => {
       if (data.isRunning) {
@@ -47,15 +44,23 @@ class GameLoop {
       }
     });
 
-    document.addEventListener("keydown", (event) => {
+    document.addEventListener("click", (event) => {
 
-      if (event.key === "Escape") {
-        if (!this.isEditing) {
-          this.start();
-        }
+      if (this.isPaused) {
+        this.start();
         document.title = "Fey Unit";
         document.querySelector('.game-interface').style.filter = "none";
       }
+    });
+
+    document.addEventListener("keydown", (event) => {
+
+      if (event.key === "Escape") {
+        if (this.isPaused)
+          this.start();
+        document.title = "Fey Unit";
+        document.querySelector('.game-interface').style.filter = "none";
+      } 
     });
   }
 

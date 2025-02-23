@@ -40,6 +40,7 @@ class Lungs {
                 this.oxygenDetails.style.display = 'none';
                 this.oxygenLungsIcon.style.display = 'block';
                 this.oxygenLungsIcon.style.opacity = 1;
+
             } else {
                 if (this.fadeTimer > 0) {
                     this.fadeTimer -= delta;
@@ -54,6 +55,8 @@ class Lungs {
             this.oxygenLungsIcon.style.display = 'none';
             this.oxygenLungsIcon.style.opacity = 1;
         }
+        events.emit("OXYGEN_CHANGED", { unit: this });
+
 
     }
 
@@ -66,6 +69,7 @@ class Lungs {
 
         this.oxygen -= amount;
 
+        
         if (this.oxygen < 0) {
             this.oxygen = 0;
         } else if (this.oxygen > this.maxOxygen) {
@@ -185,6 +189,8 @@ class Heart {
             this.healthHeartIcon.style.display = 'none';
             this.healthHeartIcon.style.opacity = 1;
         }
+        events.emit("UNIT_HEALTH_CHANGED", { unit: this });
+
     }
 
     takeDamage(amount) {
@@ -300,6 +306,8 @@ class Stomach {
             this.energyStomachIcon.style.display = 'none';
             this.energyStomachIcon.style.opacity = 1;
         }
+        events.emit("ENERGY_CHANGED", { unit: this });
+
     }
 
     consumeEnergy(amount) {

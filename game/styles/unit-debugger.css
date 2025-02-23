@@ -1,0 +1,144 @@
+
+
+.unit-debugger {
+    transition: filter 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    user-select: none; /* Prevent text selection while dragging */
+    transform: translate(20px, 20px); /* Initial position */
+}
+
+.unit-debugger.collapsed {
+    filter: blur(1px) brightness(0.7);
+}
+
+.unit-debugger-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.95);
+    margin: -20px -20px 20px -20px;
+    padding: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    touch-action: none; /* Prevent scrolling on touch devices */
+}
+
+.unit-debugger-header h3 {
+    margin: 0;
+    font-size: 14px;
+}
+
+.unit-debugger-content {
+    transition: opacity 0.3s ease;
+    flex: 1;
+    overflow-y: auto;
+    max-height: calc(100vh - 100px);
+}
+
+.unit-debugger-content.collapsed {
+    display: none;
+    opacity: 0;
+}
+
+.unit-debugger.collapsed .unit-debugger-content {
+    display: none;
+}
+
+.collapse-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 4px;
+}
+
+.unit-debugger-header:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Unit Debugger Styles */
+.unit-debugger {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.9);
+    color: #ffffff;
+    font-family: 'Cascadia Code', 'Source Code Pro', 'Consolas', monospace;
+    font-size: 14px;
+    padding: 10px;
+    border-radius: 8px;
+    z-index: 1000;
+    width: 400px;
+    transition: filter 0.2s ease;
+}
+
+.unit-debugger.hidden {
+    display: none;
+}
+
+.unit-debugger.collapsed {
+    width: 200px;
+    filter: blur(1px) brightness(0.7);
+}
+
+.unit-debugger-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    /* Prevent blur effect on header */
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+
+    margin: 0;
+    font-size: 14px;
+    color: #00ff00;
+}
+
+.unit-debugger-header h3 {
+    margin: 0;
+    font-size: 14px;
+}
+
+.unit-debugger-row {
+    padding: 4px 5px;
+    margin-bottom: 2px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.unit-debugger-row:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.unit-debugger-label {
+    color: #888888;
+}
+
+.unit-debugger-value {
+    color: #ffffff;
+}
+
+.unit-debugger .collapse-btn {
+    background: none;
+    border: none;
+    color: #00ff00;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.unit-debugger-content {
+    transition: opacity 0.3s ease;
+}
+
+.unit-debugger-content.collapsed {
+    display: none;
+    opacity: 0;
+}

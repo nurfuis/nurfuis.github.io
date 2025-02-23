@@ -14,4 +14,8 @@ class Vector2 {
   duplicate() {
     return new Vector2(this.x, this.y);
   }
+  toFixed(n) {
+
+    return this.x.toFixed(n);
+  }
 }

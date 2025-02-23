@@ -93,7 +93,37 @@ const extendedMooreNeighbors = [{
     y: 2
 }
 ];
-
+const mooreNeighborOffsets = [{
+    x: -1,
+    y: -1
+}, {
+    x: 0,
+    y: -1
+}, {
+    x: 1,
+    y: -1
+},
+{
+    x: -1,
+    y: 0
+}, {
+    x: 0,
+    y: 0
+}, {
+    x: 1,
+    y: 0
+},
+{
+    x: -1,
+    y: 1
+}, {
+    x: 0,
+    y: 1
+}, {
+    x: 1,
+    y: 1
+}
+];
 const vonNuemanNeighbors = [{
     x: -1,
     y: 0

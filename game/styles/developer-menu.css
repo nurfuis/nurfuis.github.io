@@ -1,0 +1,242 @@
+.developer-menu {
+    position: fixed;
+    top: 400px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.9);
+    color: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    font-family: 'Cascadia Code', monospace;
+    min-width: 300px;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 1000;
+    transition: filter 0.2s ease;
+    user-select: none;
+    transform: translate(20px, 20px);
+}
+
+.developer-menu.hidden {
+    display: none;
+}
+
+.dev-menu-section {
+    margin-bottom: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    transition: filter 0.3s ease;
+}
+
+.dev-menu-section.collapsed {
+    filter: blur(1px) brightness(0.7);
+}
+
+.developer-menu.selector-active .dev-menu-section:not(:has(select:focus)) {
+    filter: blur(2px) brightness(0.7);
+    pointer-events: none;
+}
+
+.dev-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    /* Prevent blur effect on header */
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    touch-action: none;
+}
+
+.dev-menu-content {
+    padding: 10px;
+    transition: opacity 0.3s ease;
+}
+
+.dev-menu-content.collapsed {
+    display: none;
+    opacity: 0;
+}
+
+.dev-menu-header h3 {
+    margin: 0;
+    font-size: 14px;
+    color: #00ff00;
+}
+
+.collapse-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 4px;
+    font-size: 12px;
+}
+
+.collapse-btn:hover {
+    color: rgba(0, 255, 0, 0.8);
+}
+
+.dev-menu-content {
+    padding: 10px;
+}
+
+.dev-menu-content.collapsed {
+    display: none;
+}
+
+.dev-menu-control {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.dev-menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    gap: 10px;
+}
+
+.dev-menu-value {
+    color: #00ffff;
+}
+
+.dev-menu-toggle {
+    background: #333;
+    border: 1px solid #666;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+}
+
+.dev-menu-toggle.active {
+    background: #0a0;
+    border-color: #0f0;
+}
+.dev-menu-item input[type="range"] {
+    width: 100px;
+    margin-left: 10px;
+}
+
+.dev-menu-item select {
+    background: #333;
+    color: #fff;
+    border: 1px solid #666;
+    padding: 2px 5px;
+    border-radius: 4px;
+}
+
+.dev-menu-select {
+    position: relative;
+    z-index: 2;
+}
+
+.dev-menu-select:focus {
+    outline: 1px solid rgba(255, 255, 255, 0.5);
+    filter: brightness(1.2);
+}
+
+.dev-menu-select option {
+    background: #333;
+    color: #fff;
+    padding: 8px;
+}
+
+.color-palette {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.color-swatch {
+    width: 24px;
+    height: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.1s;
+}
+
+.color-swatch:hover {
+    transform: scale(1.1);
+}
+
+.color-swatch.active {
+    border-color: #fff;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+.dev-menu-item input[type="range"] {
+    width: 100px;
+    margin-left: 10px;
+    background: #333;
+}
+
+.dev-menu-button, button {
+    background: #333;
+    color: #fff;
+    border: 1px solid #666;
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dev-menu-button:hover {
+    background: #444;
+    border-color: #888;
+}
+
+.dev-menu-toggle,
+.dev-menu-select {
+    min-width: 120px;
+    max-width: 200px;
+    background: #333;
+    color: #fff;
+    border: 1px solid #666;
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dev-menu-toggle:hover,
+.dev-menu-select:hover {
+    background: #444;
+    border-color: #888;
+}
+
+.dev-menu-toggle.active {
+    background: #0a0;
+    border-color: #0f0;
+}
+
+.file-upload-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.file-upload-container .dev-menu-button {
+    min-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+}

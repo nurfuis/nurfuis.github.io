@@ -1,0 +1,157 @@
+.world-edit-menu {
+    position: fixed;
+    right: 20px;
+    top: 20px;
+    background: rgba(0, 0, 0, 0.9);
+    color: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    font-family: 'Cascadia Code', monospace;
+    min-width: 300px;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 1000;
+    transition: filter 0.2s ease;
+    user-select: none;
+    transform: translate(20px, 20px);
+    margin-bottom: 12px;
+}
+
+.world-edit-menu.hidden {
+    display: none;
+}
+
+.world-edit-section {
+    margin-bottom: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    transition: filter 0.3s ease;
+}
+
+.world-edit-section.collapsed {
+    filter: blur(1px) brightness(0.7);
+}
+
+.world-edit.selector-active .world-edit-section:not(:has(select:focus)) {
+    filter: blur(2px) brightness(0.7);
+    pointer-events: none;
+}
+
+.world-edit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    /* Prevent blur effect on header */
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    touch-action: none;
+}
+
+.world-edit-content {
+    padding: 10px;
+    transition: opacity 0.3s ease;
+}
+
+.world-edit-content.collapsed {
+    display: none;
+    opacity: 0;
+}
+
+.world-edit-header h3 {
+    margin: 0;
+    font-size: 14px;
+    color: #00ff00;
+
+}
+
+.world-edit-control {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.world-edit-toggle {
+    background: #333;
+    border: 1px solid #666;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+}
+
+.world-edit-toggle.active {
+    background: #0a0;
+    border-color: #0f0;
+}
+
+.world-edit-select {
+    min-width: 120px;
+    max-width: 200px;
+    background: #333;
+    color: #fff;
+    border: 1px solid #666;
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.world-edit-range {
+    width: 100px;
+    background: #333;
+}
+
+.world-edit-select:focus {
+    outline: 1px solid rgba(255, 255, 255, 0.5);
+    filter: brightness(1.2);
+}
+
+.world-edit-menu.selector-active .world-edit-section:not(:has(select:focus)) {
+    filter: blur(2px) brightness(0.7);
+    pointer-events: none;
+}
+
+.world-edit-button {
+    background: #333;
+    color: #fff;
+    border: 1px solid #666;
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.world-edit-button:hover {
+    background: #444;
+    border-color: #888;
+}
+
+.world-edit-button {
+    min-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+}
+
+.world-edit-menu.editing #gameCanvas {
+    cursor: default;
+}
+
+.world-edit-menu.editing #gameCanvas.panning {
+    cursor: move;
+}
