@@ -9,6 +9,8 @@ class StageManager {
         // Initialize menu container
         this.debugElement = this.createMenuContainer();
 
+        
+
         const header = this.createHeader();
 
         MenuDraggable.makeDraggable(this.debugElement, header, { top: '400px', right: '20px' });
@@ -352,6 +354,7 @@ class StageManager {
         if (this.isVisible) {
             this.refreshAllControls();
         }
+        PanelStateManager.setVisibilityState('stage-manager', this.isVisible);
     }
 
     bindKeyboardEvents() {
