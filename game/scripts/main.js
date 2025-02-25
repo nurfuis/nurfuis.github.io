@@ -1,7 +1,7 @@
 const DEBUG = {
-    BYPASS_SAVE: false,  // Set to true to bypass save loading
-    DEFAULT_POSITION: { x: 128, y: 128 }, // Default spawn position
-    WORLD_TYPE: 'superFlat' // Default world type
+  BYPASS_SAVE: false,  // Set to true to bypass save loading
+  DEFAULT_POSITION: { x: 128, y: 128 }, // Default spawn position
+  WORLD_TYPE: 'superFlat' // Default world type
 };
 window.DEBUG = DEBUG;
 
@@ -142,8 +142,8 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const gameLoop = new GameLoop(update, draw);
-  main.gameLoop = gameLoop;
-  gameLoop.start();
+  main.game.gameLoop = gameLoop;
+
 
 });
 

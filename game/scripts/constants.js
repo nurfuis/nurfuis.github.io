@@ -159,6 +159,7 @@ const constants = {
     PLAYER_SPRITE_Y_OFFSET: -38,
     PLAYER_SPRITE_X_OFFSET: -40,
     JUMP_SPEED: 16,
+    GAME_TITLE: "Fey Unit"
 
     
 }

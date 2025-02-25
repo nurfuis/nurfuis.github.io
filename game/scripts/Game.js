@@ -49,7 +49,28 @@ class Game {
         this.devMenu = stageManager;
         stageManager.isVisible = PanelStateManager.getVisibilityState('stage-manager');
       
-        this.init(worldEdit);
+        // Initialize splash screen
+        this.splashScreen = new SplashScreen(this);
+        
+        // Wait for user interaction before initializing game
+        events.on('GAME_STARTED', () => {
+            this.init(worldEdit);
+            // Enable input handlers here if needed
+            this.initializeInputHandlers();
+        });
+
+    }
+
+    start() {
+        this.gameLoop.start();
+    }
+
+    initializeInputHandlers() {
+        // Move any input initialization here
+        // This ensures inputs only work after splash screen
+
+
+
 
     }
 
