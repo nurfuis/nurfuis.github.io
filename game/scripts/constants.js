@@ -152,11 +152,14 @@ const constants = {
     SIMULATION_RANGE: 640,
     GAS_CLOUD_DURATION: 5000,
     ITEM_SIZE: 64,
-    PLAYER_SPEED: 100,
+    PLAYER_SPEED: 0.5,
     PLAYER_NAME: 'Player',
     PLAYER_SPAWN: { x: 1, y: 4 },
     PLAYER_TEAM: 'Player Team',
-    PLAYER_SPRITE_Y_OFFSET: -73,
-    PLAYER_SPRITE_X_OFFSET: 0,
+    PLAYER_SPRITE_Y_OFFSET: -38,
+    PLAYER_SPRITE_X_OFFSET: -40,
+    JUMP_SPEED: 16,
+
+    
 }
 

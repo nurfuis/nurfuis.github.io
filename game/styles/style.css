@@ -867,3 +867,31 @@ p {
     flex: 1;
     font-size: 14px;
 }
+
+.overlay-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px 8px;
+    margin-right: 8px;
+}
+
+.overlay-btn.active {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+.tool-panel {
+    font-size: 12px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+
+.tool-panel-section h3 {
+    color: #4CAF50;
+    font-size: 14px;
+}
+
+.tool-panel-section div {
+    font-family: 'Consolas', monospace;
+}

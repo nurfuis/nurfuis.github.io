@@ -410,3 +410,22 @@ class OnScreenWriting extends GameObject {
     }
 }
 
+class Team extends GameObject {
+    constructor(colorClass, teamName) {
+        super();
+        this.colorClass = colorClass;
+        this.teamName = teamName;
+        events.on("UNIT_DEATH", this, (data) => {
+            if (data.teamName === this.teamName) {
+                console.log(this.teamName, 'unit died:', data);
+                console.log(this.teamName, 'units left:', this.children.length);
+            }
+        });
+    }
+    step(delta, root) {
+        // ...
+    }
+    addUnit(unit) {
+        this.addChild(unit);
+    }
+}

@@ -8,7 +8,7 @@ class WorldEditMenu extends ToolPane {
         this.canvas = canvas;
         this.game = game;
         this.id = 'world-edit';
-        this.isVisible = PanelStateManager.getVisibilityState(this.id);
+        this.isVisible = false;
         this.isEditing = false;
         this.selectedTile = null;
         this.selectedVariant = 0;
@@ -64,7 +64,7 @@ class WorldEditMenu extends ToolPane {
         header.className = 'world-edit-header';
 
         const title = document.createElement('h3');
-        title.textContent = '📝 WORLD EDIT (F2)';
+        title.textContent = '📝 WORLD EDIT (F3)';
 
         header.appendChild(title);
 
@@ -79,7 +79,7 @@ class WorldEditMenu extends ToolPane {
                 settings: {
                     toggleEdit: {
                         type: 'toggle',
-                        label: 'Edit Mode',
+                        label: 'Edit Mode (t)',
                         getValue: () => this.isEditing,
                         setValue: (value) => {
                             this.isEditing = value;
@@ -91,7 +91,7 @@ class WorldEditMenu extends ToolPane {
                     },
                     showGrid: {
                         type: 'toggle',
-                        label: 'Show Grid',
+                        label: 'Show Grid (g)',
                         getValue: () => this.showGrid,
                         setValue: (value) => {
                             this.showGrid = value;
@@ -286,9 +286,8 @@ class WorldEditMenu extends ToolPane {
     }
 
     bindEvents() {
-        // Toggle menu with F6
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'F2') {
+            if (e.key === 'F3') {
                 e.preventDefault();
                 this.toggle();
             }
@@ -547,6 +546,21 @@ class WorldEditMenu extends ToolPane {
                 }
             }
         });
+        document.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 'g' && this.isVisible) {
+                e.preventDefault();
+                const showGrid = this.controls.editor.settings.showGrid;
+                const newValue = !showGrid.getValue();
+                showGrid.setValue(newValue);
+                
+                // Update any UI elements
+                const toggleButton = this.menuElement.querySelectorAll('.world-edit-toggle')[1];
+                if (toggleButton) {
+                    toggleButton.textContent = newValue ? 'ON' : 'OFF';
+                    toggleButton.classList.toggle('active', newValue);
+                }
+            }
+        });
     }
 
     paintTile(e) {
@@ -654,6 +668,7 @@ class WorldEditMenu extends ToolPane {
                 return;
             }
 
+            
             // set fillStyle to tile.color but at reduced opacity
             ctx.fillStyle = `rgba(${tile.color.r}, ${tile.color.g}, ${tile.color.b}, 0.4)`;
 

@@ -1,11 +1,8 @@
-
-
 .unit-debugger {
     transition: filter 0.3s ease;
     display: flex;
     flex-direction: column;
     user-select: none; /* Prevent text selection while dragging */
-    transform: translate(20px, 20px); /* Initial position */
 }
 
 .unit-debugger.collapsed {
@@ -69,7 +66,7 @@
     background: rgba(0, 0, 0, 0.9);
     color: #ffffff;
     font-family: 'Cascadia Code', 'Source Code Pro', 'Consolas', monospace;
-    font-size: 14px;
+    font-size: 24px;
     padding: 10px;
     border-radius: 8px;
     z-index: 1000;
@@ -124,6 +121,7 @@
 
 .unit-debugger-value {
     color: #ffffff;
+    font-family: monospace;
 }
 
 .unit-debugger .collapse-btn {
@@ -141,4 +139,35 @@
 .unit-debugger-content.collapsed {
     display: none;
     opacity: 0;
+}
+
+/* Color coding for physics values */
+.unit-debugger-row[data-type="physics"] .unit-debugger-value {
+    color: #4CAF50;
+}
+
+/* Color coding for collision values */
+.unit-debugger-row[data-type="collision"] .unit-debugger-value {
+    color: #FFC107;
+}
+
+/* Color coding for state values */
+.unit-debugger-row[data-type="state"] .unit-debugger-value {
+    color: #2196F3;
+}
+
+.noclip-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px 8px;
+    margin-right: 8px;
+    opacity: 0.5;
+}
+
+.noclip-btn.active {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
 }

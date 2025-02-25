@@ -32,7 +32,7 @@ class StageManager {
         header.className = 'dev-menu-header';
 
         const title = document.createElement('h3');
-        title.textContent = '🎭 STAGE MANAGER (F3)';
+        title.textContent = '🎭 STAGE MANAGER (F6)';
 
         header.appendChild(title);
 
@@ -359,7 +359,7 @@ class StageManager {
 
     bindKeyboardEvents() {
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'F3') {
+            if (e.key === 'F6') {
                 e.preventDefault();
                 this.toggle();
             }

@@ -206,9 +206,18 @@ class GameMap extends GameObject {
                 // return the air tile above a solid tile or the last tile if no solid tile is found
                 const solidTile = tiles.find(tile => tile.solid);
                 if (solidTile) {
+                    console.log('solid tile found');
                     return this.getEmptyTileAbove(solidTile.x, solidTile.y);
                 } else {
-                    return tiles[tiles.length - 1];
+                    // untested code to return the last tile if no solid tile is found
+                    console.log('no solid tile found');
+                    if (tiles.length > 0) {
+                        return tiles[tiles.length - 1];
+                    } else {
+                        return tiles[0];
+                    }
+
+
                 }
             }
         }

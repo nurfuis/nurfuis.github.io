@@ -101,7 +101,6 @@ class Game {
 
         try {
             localStorage.setItem('gameState', JSON.stringify(gameState));
-            console.log('Game state saved:', gameState);
         } catch (error) {
             console.error('Failed to save game state:', error);
         }

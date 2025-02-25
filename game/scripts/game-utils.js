@@ -1,18 +1,14 @@
 class AutomatedInput {
     constructor(directions = [
-        { direction: "left", weight: 2 },
-        { direction: "right", weight: 2 },
-        { direction: "up", weight: 1 },
-        { direction: "down", weight: 1 },
-        { direction: "up-left", weight: 0.5 },
-        { direction: "up-right", weight: 0.5 },
-        { direction: "down-left", weight: 0.5 },
-        { direction: "down-right", weight: 0.5 },
-        { direction: "up-two", weight: 0.3 },
-        { direction: "up-left-two", weight: 0.2 },
-        { direction: "up-right-two", weight: 0.2 },
-        { direction: "up-three-left-one", weight: 0.1 },
-        { direction: "up-three-right-one", weight: 0.1 }
+        { direction: "LEFT", weight: 2 },
+        { direction: "RIGHT", weight: 2 },
+        { direction: "UP", weight: 1 },
+        { direction: "DOWN", weight: 1 },
+        { direction: "UP-LEFT", weight: 0.5 },
+        { direction: "UP-RIGHT", weight: 0.5 },
+        { direction: "DOWN-LEFT", weight: 0.5 },
+        { direction: "DOWN-RIGHT", weight: 0.5 },
+        { direction: "CENTER", weight: 1 }
     ], interval = 1000) {
         this.directions = directions;
         this.interval = interval;
@@ -159,3 +155,4 @@ class UI {
     }
 
 }
+

@@ -133,3 +133,14 @@ function intersectsRect(x1, y1, x2, y2, rx, ry, rw, rh) {
     // There is an intersection
     return true;
 }
+
+function roundTo(number, decimals) {
+    const multiplier = Math.pow(10, decimals);
+    return Math.round(number * multiplier) / multiplier;
+}
+function approximatelyEqual(a, b, epsilon = 0.0001) {
+    return Math.abs(a - b) < epsilon;
+}
+function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+}
