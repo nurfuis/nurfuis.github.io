@@ -1,0 +1,170 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Source+Sans+Pro:wght@400;600&display=swap');
+
+/* Base styles */
+body {
+    font-family: 'Source Sans Pro', sans-serif;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    padding: 1rem;
+}
+
+h1,
+h2,
+h3,
+h4,
+#header {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+}
+
+#settings {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 1400px; /* Same as weather container */
+    margin: 1rem auto;
+}
+
+#settings button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #3B82F6;
+    color: white;
+    transition: background 0.2s ease;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+}
+
+#settings button:hover {
+    background: #2563EB;
+}
+
+#header {
+    cursor: pointer;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    background: rgba(59, 130, 246, 0.1);
+    transition: background 0.2s ease;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    width: 100%;
+    max-width: 1400px; /* Same as weather container */
+    margin: 1rem auto;
+}
+
+#header:hover {
+    background: rgba(59, 130, 246, 0.2);
+}
+
+#ticker {
+    font-size: 1.2em;
+    font-weight: 500;
+    font-family: 'Quicksand', sans-serif;
+    letter-spacing: 0.02em;
+}
+
+.period h2 {
+    font-size: 1.5em;
+    margin-bottom: 0.5em;
+    color: #2563EB;
+}
+
+.period h4 {
+    font-size: 1.1em;
+    margin-bottom: 1em;
+}
+
+.period p {
+    font-size: 1em;
+    line-height: 1.6;
+}
+
+.period {
+    padding: 1.5rem;
+    margin: 1rem 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.period h2 {
+    margin-bottom: 1rem;
+}
+
+.period h4 {
+    margin-bottom: 0.75rem;
+}
+
+.period p {
+    line-height: 1.6;
+}
+
+button {
+    padding: .3em;
+    margin: .3em;
+    margin-top: .6em;
+    line-height: 1.4em;
+    font-size: 1em;
+    color: rgba(44, 7, 3, 1);
+    border: 1px solid #890620;
+    background-color: rgba(235, 212, 203, .8);
+}
+
+/* Add or update these styles */
+#weather {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin: 1rem auto;
+    width: 100%;
+    max-width: 1400px; /* Adjust this value to control maximum width */
+}
+
+.period {
+    min-height: 200px;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.period > div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.period h2 {
+    font-size: clamp(1.1em, 2vw, 1.5em);
+    margin-bottom: 0.5em;
+}
+
+.period h4 {
+    font-size: clamp(1.1em, 2vw, 1.5em);
+    margin-bottom: 0.5em;
+}
+
+.period p {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+}
+
+#bgCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}

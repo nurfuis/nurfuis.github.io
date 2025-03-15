@@ -28,22 +28,25 @@ function displayCity(city, state) {
 	
 }	
 function darkTheme() {
-	document.getElementById('body').style.color = 'rgba(235, 212, 203, 0.95)';
-	document.getElementById('body').style.backgroundColor = 'rgba(44, 7, 3, 1)';
-	document.getElementById('body').style.backgroundImage = "url('./images/bg_dark.png')";
-	const periods = document.getElementsByClassName('period');
-	for (i = 0; i < periods.length; i++) {
-		periods[i].style.backgroundColor = 'rgba(44, 7, 3, 0.4)';
-	}	
-}	
+    document.getElementById('body').style.color = '#E4E4E7';
+    document.getElementById('body').style.backgroundColor = '#18181B';
+    document.getElementById('body').style.backgroundImage = "url('./images/bg_dark.png')";
+    const periods = document.getElementsByClassName('period');
+    for (i = 0; i < periods.length; i++) {
+        periods[i].style.backgroundColor = 'rgba(39, 39, 42, 0.8)';
+        periods[i].style.borderLeft = '4px solid #60A5FA';
+    }    
+}    
+
 function lightTheme() {
-	document.getElementById('body').style.color = '#2C0703';
-	document.getElementById('body').style.backgroundColor = 'rgba(235, 212, 203, .8)';
-	document.getElementById('body').style.backgroundImage = "url('./images/bg.png')";
-	const periods = document.getElementsByClassName('period');
-	for (i = 0; i < periods.length; i++) {
-		periods[i].style.backgroundColor = 'rgba(235, 212, 203, .9)';
-	}	
+    document.getElementById('body').style.color = '#18181B';
+    document.getElementById('body').style.backgroundColor = '#F4F4F5';
+    document.getElementById('body').style.backgroundImage = "url('./images/bg.png')";
+    const periods = document.getElementsByClassName('period');
+    for (i = 0; i < periods.length; i++) {
+        periods[i].style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+        periods[i].style.borderLeft = '4px solid #3B82F6';
+    }    
 }
 function setTheme(isDaytime) {
 	if (isDaytime) {
@@ -57,8 +60,10 @@ function getCoordinates() {
     let location = localStorage.getItem("location");
 
     if (location !== null) {
-		startWeatherRefresh(location);
-		return;
+        // Hide settings if location exists
+        document.getElementById("settings").style.display = "none";
+        startWeatherRefresh(location);
+        return;
     }
 
     const prompt = window.prompt("Please enter your latitude and longitude, separated by a comma.");
@@ -106,11 +111,15 @@ function getWeather(location) {
 	  });
 	}
 function tellWeather(weather) {
-	const weatherDisplay = document.getElementById('weather');
-	const twoWeekForecast = weather.properties.periods;				
-	const isDaytime = twoWeekForecast[0].isDaytime;
-	
-	weatherDisplay.innerHTML = ' ';
+    const weatherDisplay = document.getElementById('weather');
+    const twoWeekForecast = weather.properties.periods;            
+    const isDaytime = twoWeekForecast[0].isDaytime;
+    const currentTemp = twoWeekForecast[0].temperature;
+    
+    weatherDisplay.innerHTML = ' ';
+    
+    // Update background based on current conditions
+    updateBackground(currentTemp, isDaytime);
 			
 	for(i = 0; i < 6; i++) {
 		const container = document.createElement('div');
@@ -234,5 +243,58 @@ function start() {
 	window.addEventListener('load', tellTime);	
 	window.addEventListener('load', getCoordinates);
 	addStartMenu();
+    window.addEventListener('resize', () => {
+        const weather = document.querySelector('.period');
+        if (weather) {
+            const temp = parseInt(weather.querySelector('h4').textContent);
+            const isDaytime = new Date().getHours() >= 6 && new Date().getHours() < 18;
+            updateBackground(temp, isDaytime);
+        }
+    });
 }
 start();
+
+function updateBackground(temperature, isDaytime) {
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Set canvas size to window size
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    // Create gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    const colors = getTemperatureColors(temperature, isDaytime);
+    
+    gradient.addColorStop(0, colors.top);
+    gradient.addColorStop(1, colors.bottom);
+    
+    // Fill background
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+function getTemperatureColors(temp, isDaytime) {
+    // Base alpha values
+    const topAlpha = isDaytime ? 0.8 : 0.3;
+    const bottomAlpha = isDaytime ? 0.2 : 0.1;
+    
+    let r, g, b;
+    
+    if (temp <= 32) { // Freezing
+        r = 200; g = 230; b = 255;
+    } else if (temp <= 50) { // Cold
+        r = 166; g = 209; b = 230;
+    } else if (temp <= 70) { // Moderate
+        r = 173; g = 216; b = 180;
+    } else if (temp <= 85) { // Warm
+        r = 255; g = 200; b = 100;
+    } else { // Hot
+        r = 255; g = 140; b = 80;
+    }
+    
+    return {
+        top: `rgba(${r},${g},${b},${topAlpha})`,
+        bottom: `rgba(${r},${g},${b},${bottomAlpha})`
+    };
+}
