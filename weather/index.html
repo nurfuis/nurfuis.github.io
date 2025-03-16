@@ -8,15 +8,19 @@
 </head>
 <body id="body">
 <canvas id="bgCanvas"></canvas>
-<header id="header" class="hover">
-	<h1>The Weather</h1>  
-	<p id="ticker"></p>
-	<div id="settings">
-		<h3 id="city"></h3>
-	</div>
+<header id="header">
+    <h1>Local Weather</h1>  
+    <p id="ticker"></p>
+    <div id="settings">
+        <span class="settings-icon">⚙️</span>
+        <div class="settings-content">
+            <h3 id="city"></h3>
+            <!-- buttons will be added here by JavaScript -->
+        </div>
+    </div>
 </header>
 
-<div id="weather" style="" ></div>
+<div id="weather"></div>
 
 <script src="./index.js"></script>
 

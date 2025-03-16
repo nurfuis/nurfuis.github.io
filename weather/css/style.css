@@ -1,15 +1,67 @@
 /* Import Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Source+Sans+Pro:wght@400;600&display=swap');
 
+/* Theme Variables */
+:root {
+    --bg-color: rgba(255, 252, 242, 0.7);
+    --text-color: #4A4737;
+    --border-color: #D4A373;
+    --period-bg: rgba(255, 252, 242, 0.7);
+    --header-bg: rgba(255, 252, 242, 0.7);
+    --header-hover: rgba(255, 252, 242, 0.9);
+    --canvas-opacity: 1;
+}
+
+body.dark-mode {
+    --bg-color: rgba(44, 51, 51, 0.8);
+    --text-color: #E5E1D6;
+    --border-color: #829191;
+    --period-bg: rgba(44, 51, 51, 0.8);
+    --header-bg: rgba(44, 51, 51, 0.8);
+    --header-hover: rgba(54, 61, 61, 0.9);
+    --canvas-opacity: 0.7;
+}
+
 /* Base styles */
+html, body {
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    background-color: transparent !important;
+}
+
 body {
     font-family: 'Source Sans Pro', sans-serif;
     line-height: 1.6;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     margin: 0;
-    padding: 1rem;
+    padding: 0;
+    min-height: 100vh;
+    height: auto;
+    overflow-y: auto;
+    width: 100vw;
+    overflow: hidden;
+    background-color: var(--bg-color);
+    transition: all 0.3s ease;
+    -webkit-app-region: drag; /* Makes the window draggable */
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+    color: var(--text-color);
+}
+
+body.collapsed {
+    justify-content: flex-start;
+    padding-top: 2rem;
+    transition: all 0.5s ease;
+    background-color: transparent !important;
 }
 
 h1,
@@ -19,57 +71,166 @@ h4,
 #header {
     font-family: 'Quicksand', sans-serif;
     font-weight: 600;
+    user-select: none;
 }
 
 #settings {
     display: flex;
-    gap: 10px;
-    margin: 20px 0;
-    flex-wrap: wrap;
-    width: 100%;
-    max-width: 1400px; /* Same as weather container */
-    margin: 1rem auto;
+    align-items: center;
+    gap: 1rem;
+    margin-left: auto;
+    position: relative;
 }
 
-#settings button {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 6px;
+.settings-icon {
+    font-size: 1.5em;
     cursor: pointer;
-    background: #3B82F6;
-    color: white;
-    transition: background 0.2s ease;
-    font-family: 'Quicksand', sans-serif;
-    font-weight: 600;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+    padding: 0.5rem;
+    border-radius: 50%;
+    background: var(--header-bg);
+    border: 1px solid var(--border-color);
 }
 
-#settings button:hover {
-    background: #2563EB;
+.settings-icon:hover {
+    opacity: 1;
+    transform: rotate(45deg);
+}
+
+.settings-content {
+    position: absolute;
+    right: 0;
+    top: 120%;
+    background: var(--header-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 1rem;
+    min-width: 200px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+#settings:hover .settings-content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.settings-content #city {
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.9em;
+}
+
+.settings-content button {
+    display: block;
+    width: 100%;
+    padding: 0.5rem;
+    margin: 0.5rem 0;
+    background: var(--header-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-color);
+}
+
+.settings-content button:hover {
+    background: var(--header-hover);
 }
 
 #header {
-    cursor: pointer;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    background: rgba(59, 130, 246, 0.1);
-    transition: background 0.2s ease;
+    cursor: default;
+    padding: 1rem 1.5rem;
+    border-radius: 2px;
+    background: var(--header-bg);
+    border-bottom: 2px solid var(--border-color);
+    transition: all 0.5s ease, transform 0.5s ease;
     font-family: 'Quicksand', sans-serif;
     font-weight: 600;
     width: 100%;
-    max-width: 1400px; /* Same as weather container */
+    max-width: 90vw;
     margin: 1rem auto;
+    position: relative;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+body.collapsed #header {
+    margin-top: 2rem;
+    transform: translateY(0);
 }
 
 #header:hover {
-    background: rgba(59, 130, 246, 0.2);
+    background: var(--header-hover);
+}
+
+#header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: inherit;
+    backdrop-filter: blur(8px);
+    z-index: -1;
+}
+
+body.dark-mode #header {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+#header::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        rgba(0, 0, 0, 0.05),
+        rgba(0, 0, 0, 0.1)
+    );
+    z-index: -1;
+    pointer-events: none;
+}
+
+body.dark-mode #header::after {
+    background: linear-gradient(
+        rgba(0, 0, 0, 0.2),
+        rgba(0, 0, 0, 0.3)
+    );
+}
+
+#header h1 {
+    margin: 0;
+    flex-shrink: 0;
 }
 
 #ticker {
-    font-size: 1.2em;
+    font-size: 1.1em;
     font-weight: 500;
     font-family: 'Quicksand', sans-serif;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.03em;
+    color: inherit;
+    opacity: 0.9;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+#header:hover #settings {
+    opacity: 1;
+}
+
+#city {
+    margin: 0;
+    white-space: nowrap;
 }
 
 .period h2 {
@@ -93,6 +254,14 @@ h4,
     margin: 1rem 0;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    background-color: var(--period-bg);
+    color: var(--text-color);
+    border-bottom: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+    user-select: none;
+    cursor: default;
 }
 
 .period h2 {
@@ -105,6 +274,10 @@ h4,
 
 .period p {
     line-height: 1.6;
+}
+
+.period:hover {
+    animation: subtle-bounce 0.5s ease-in-out;
 }
 
 button {
@@ -120,51 +293,415 @@ button {
 
 /* Add or update these styles */
 #weather {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: 1.5rem;
-    margin: 1rem auto;
+    margin: 0 auto;
     width: 100%;
-    max-width: 1400px; /* Adjust this value to control maximum width */
+    max-width: 90vw; /* Allows more horizontal space */
+    opacity: 0.9;
+    transition: opacity 0.3s ease, transform 0.3s ease, height 0.5s ease;
+    -webkit-app-region: no-drag; /* Allows interaction with these elements */
+}
+
+#weather.collapsed {
+    opacity: 0;
+    transform: translateY(-20px);
+    height: 0;
+    margin: 0;
+    overflow: hidden;
+    background-color: transparent !important;
+    margin-top: 0;
+}
+
+.forecast-row {
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.5rem; /* Adds space for potential scrollbar */
 }
 
 .period {
-    min-height: 200px;
-    height: fit-content;
-    display: flex;
-    flex-direction: column;
+    flex: 1 1 300px; /* Allow more flexible growth */
+    min-width: 200px;
+    max-width: none; /* Remove max-width restriction */
     padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.period > div {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+    border-radius: 2px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
+    user-select: none;
+    border: 1px solid rgba(210, 205, 190, 0.3);
+    backdrop-filter: blur(8px);
+    background-color: var(--period-bg);
+    border-bottom: 2px solid var(--border-color);
+    color: var(--text-color);
 }
 
 .period h2 {
-    font-size: clamp(1.1em, 2vw, 1.5em);
-    margin-bottom: 0.5em;
+    font-size: clamp(1.1em, 2vw, 1.3em);
+    margin-bottom: 0.8em;
+    font-family: 'Quicksand', serif;
+    color: inherit;
+    letter-spacing: 0.03em;
 }
 
 .period h4 {
-    font-size: clamp(1.1em, 2vw, 1.5em);
-    margin-bottom: 0.5em;
+    font-size: clamp(1em, 1.8vw, 1.2em);
+    margin-bottom: 0.8em;
+    font-weight: 500;
+    color: inherit;
 }
 
 .period p {
     overflow-wrap: break-word;
     word-wrap: break-word;
     hyphens: auto;
+    font-size: 0.95em;
+    line-height: 1.7;
+    color: inherit;
+    opacity: 0.9;
+}
+
+.period-day {
+    background-color: rgba(255, 252, 242, 0.7);
+    border-bottom: 2px solid #D4A373;
+    color: #4A4737;
+}
+
+.period-night {
+    background-color: rgba(255, 252, 242, 0.7);
+    border-bottom: 2px solid #D4A373;
+    color: #4A4737;
 }
 
 #bgCanvas {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     z-index: -1;
+    opacity: var(--canvas-opacity);
+    transition: opacity 0.3s ease;
+    background-color: transparent;
+}
+
+body.collapsed #bgCanvas {
+    opacity: 0;
+}
+
+#toggle-weather {
+    margin-left: auto;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+#toggle-weather:hover {
+    opacity: 1;
+}
+
+.collapsed #settings {
+    margin-top: 0;
+}
+
+@keyframes subtle-bounce {
+    0%, 100% { transform: translateY(0); }
+    25% { transform: translateY(-1.5px); }
+    75% { transform: translateY(1.5px); }
+}
+
+/* Optional: Disable animation if user prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .period:hover {
+        animation: none;
+    }
+}
+
+/* Update exit button styles for better accessibility */
+#exit-button {
+    border-top: 1px solid var(--border-color);
+    margin-top: 1rem;
+    padding-top: 1rem;
+    color: #F5A623; /* Warm yellow that works in both light/dark modes */
+    font-weight: 600;
+}
+
+#exit-button:hover {
+    background: rgba(245, 166, 35, 0.1);
+}
+
+/* Add dark mode specific styling for exit button */
+body.dark-mode #exit-button {
+    color: #FFD700; /* Brighter yellow for dark mode */
+}
+
+body.dark-mode #exit-button:hover {
+    background: rgba(255, 215, 0, 0.1);
+}
+
+.forecast-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.forecast-row {
+    display: flex;
+    gap: 1.5rem;
+    transition: transform 0.5s ease;
+    width: 100%;
+}
+
+.forecast-row.slide-left {
+    transform: translateX(-100%);
+}
+
+.detail-view {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    width: 100%;
+    height: auto;
+    min-height: 100%;
+    transition: transform 0.5s ease;
+    background: var(--period-bg);
+    padding: 2rem;
+    border-radius: 2px;
+    border-bottom: 2px solid var(--border-color);
+    overflow-y: auto;
+}
+
+.detail-view.slide-in {
+    transform: translateX(-100%);
+}
+
+.discussion-content {
+    max-width: 90%;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 25% 75%;
+    grid-template-areas: 
+        "timestamp timestamp"
+        "current hourly";
+    gap: 2rem;
+    padding: 1rem;
+    user-select: none;
+}
+
+.timestamp {
+    grid-area: timestamp;
+    text-align: right;
+    padding: 0.5rem;
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+.current-conditions {
+    grid-area: current;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.current-conditions h3 {
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.hourly-section {
+    grid-area: hourly;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.hourly-section .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.hourly-section h4 {
+    margin: 0;
+}
+
+.timestamp {
+    grid-area: unset;
+    text-align: right;
+    font-size: 0.9em;
+    opacity: 0.8;
+    margin: 0;
+    padding: 0;
+}
+
+.hourly-forecast {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--header-bg);
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    flex: 1;
+    height: fit-content;
+    overflow-x: auto;
+}
+
+@media (max-width: 1200px) {
+    .discussion-content {
+        grid-template-columns: 1fr;
+        grid-template-areas: 
+            "timestamp"
+            "current"
+            "hourly";
+    }
+}
+
+.current-conditions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: var(--header-bg);
+    padding: 1.5rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    height: fit-content;
+}
+
+.condition-row {
+    padding: 1rem;
+    background: var(--period-bg);
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.condition-row span {
+    font-weight: 600;
+}
+
+.hourly-forecast {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(3, auto);
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--header-bg);
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    height: fit-content;
+    overflow-x: auto;
+}
+
+.hour-forecast {
+    background: var(--period-bg);
+    border-radius: 2px;
+    border: 1px solid var(--border-color);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0.75rem;
+    min-height: 100px;
+    transition: border-color 0.3s ease;
+}
+
+.hour-forecast .time {
+    font-weight: 500;
+    font-size: 0.9em;
+    opacity: 0.75;
+    color: var(--text-color);
+}
+
+.hour-forecast .temp {
+    font-size: 1.2em;
+    font-weight: 600;
+    margin: 0.25rem 0;
+}
+
+.hour-forecast .short {
+    font-size: 0.85em;
+    opacity: 0.75;
+    color: var(--text-color);
+}
+
+.hour-forecast.coldest {
+    border-color: #4a90e2;
+    border-width: 2px;
+}
+
+.hour-forecast.hottest {
+    border-color: #e24a4a;
+    border-width: 2px;
+}
+
+@media (max-width: 1200px) {
+    .discussion-content {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .hourly-forecast {
+        grid-template-columns: repeat(6, 1fr);
+        grid-template-rows: repeat(4, auto);
+    }
+
+    .current-conditions {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .hourly-forecast {
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(6, auto);
+    }
+
+    .current-conditions {
+        grid-template-columns: 1fr;
+    }
+}
+
+.navigation-controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.nav-button {
+    padding: 0.75rem 1.5rem;
+    background: var(--header-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-color);
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.95em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background: var(--header-hover);
+    transform: translateY(-1px);
+}
+
+.nav-button.back-to-forecast {
+    margin-right: auto;
+}
+
+.nav-button.view-detail {
+    background: var(--period-bg);
 }
