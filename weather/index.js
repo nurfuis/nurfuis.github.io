@@ -256,9 +256,10 @@ function getWeather(location) {
     const cachedWeather = localStorage.getItem('cachedWeather');
     const cachedTimestamp = localStorage.getItem('weatherTimestamp');
     const now = Date.now();
+    const ONE_HOUR = 3600000; // 1 hour in milliseconds
 
-    // If we have cached data less than 1 minute old, use it
-    if (cachedWeather && cachedTimestamp && (now - parseInt(cachedTimestamp) < 60000)) {
+    // If we have cached data less than 1 hour old, use it
+    if (cachedWeather && cachedTimestamp && (now - parseInt(cachedTimestamp) < ONE_HOUR)) {
         console.log('Using cached weather data');
         const weatherData = JSON.parse(cachedWeather);
 
@@ -281,6 +282,7 @@ function getWeather(location) {
     }
 
     // Otherwise fetch fresh data
+    console.log('Fetching fresh weather data');
     const coords = JSON.parse(location);
     const request = new Request('https://api.weather.gov/points/' + coords.lat.trim() + "," + coords.lon.trim());
 
