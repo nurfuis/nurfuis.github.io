@@ -188,7 +188,7 @@ function displayDetailedWeather(weatherData) {
             <div class="hourly-section">
                 <div class="header-row">
                     <h4>24 Hour Forecast</h4>
-                    <p class="timestamp">weather.gov</p>
+                    <p class="timestamp">weather.gov | airnow.gov</p>
                 </div>
                 <div class="hourly-forecast">
                     ${weatherData.hourlyForecast.map(hour => `
@@ -510,7 +510,6 @@ function startWeatherRefresh(location) {
         checkAlerts(location);
     }, 300000); // 5 minutes
 }
-
 async function checkAlerts(location) {
     try {
         const alerts = await getWeatherAlerts(location);
@@ -599,7 +598,6 @@ function setAutoTheme(isDaytime) {
         body.classList.remove('dark-mode');
     }
 }
-
 function toggleTheme() {
     const body = document.getElementById('body');
     const toggle = document.getElementById('theme-toggle');
@@ -640,7 +638,6 @@ function toggleTheme() {
         period.style.backgroundColor = '';
     }
 }
-
 function addStartMenu() {
     const settingsContent = document.querySelector('.settings-content');
 
@@ -711,11 +708,11 @@ function addStartMenu() {
             if (isEnabled) {
                 localStorage.setItem('useBackground', 'false');
                 canvas.style.opacity = '0';
-                bgToggle.textContent = "🖼️ Play Background";
+                bgToggle.textContent = "🖼️ Pause Background";
             } else {
                 localStorage.setItem('useBackground', 'true');
                 canvas.style.opacity = '1';
-                bgToggle.textContent = "🖼️ Pause Background";
+                bgToggle.textContent = "🖼️ Play Background";
             }
         });
 
@@ -995,6 +992,20 @@ function initBackgroundAnimation() {
     animate();
 }
 async function getAirQuality(location) {
+    // Try to get cached AQI first
+    const cachedAQI = localStorage.getItem('cachedAQI');
+    const cachedTimestamp = localStorage.getItem('aqiTimestamp');
+    const now = Date.now();
+    const ONE_HOUR = 3600000; // 1 hour in milliseconds
+
+    // If we have cached data less than 1 hour old, use it
+    if (cachedAQI && cachedTimestamp && (now - parseInt(cachedTimestamp) < ONE_HOUR)) {
+        console.log('Using cached AQI data');
+        return JSON.parse(cachedAQI);
+    }
+
+    // Otherwise fetch fresh data
+    console.log('Fetching fresh AQI data');
     const aqiZip = localStorage.getItem("aqiLocation");
     const coords = JSON.parse(location);
     const API_KEY = 'FBB76473-912E-4FDD-AEE4-6BA26080C2BD';
@@ -1022,13 +1033,19 @@ async function getAirQuality(location) {
             return null;
         }
 
-        return {
+        const aqiData = {
             aqi: data[0].AQI,
             category: data[0].Category.Name,
             pollutant: data[0].ParameterName,
             timestamp: data[0].DateObserved,
             location: aqiZip || 'weather location'
         };
+
+        // Cache the AQI data
+        localStorage.setItem('cachedAQI', JSON.stringify(aqiData));
+        localStorage.setItem('aqiTimestamp', now.toString());
+
+        return aqiData;
     } catch (error) {
         console.error('Error fetching air quality:', error);
         return null;
@@ -1076,7 +1093,6 @@ async function getWeatherAlerts(location) {
         return [];
     }
 }
-
 function displayAlerts(alerts) {
     // Remove any existing alerts
     const alertDiv = document.querySelector('.ticker-alerts');
