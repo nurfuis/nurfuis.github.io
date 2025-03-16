@@ -17,6 +17,12 @@ function clearLocation() {
         localStorage.setItem('locationWeatherCache', JSON.stringify(cachedWeathers));
         localStorage.setItem('locationAQICache', JSON.stringify(cachedAQIs));
         localStorage.setItem('locationAlertsCache', JSON.stringify(cachedAlerts));
+
+        // Clear current alert display
+        const alertDiv = document.querySelector('.ticker-alerts');
+        if (alertDiv) {
+            alertDiv.innerHTML = '';
+        }
     }
 
     localStorage.removeItem("location");
@@ -1142,31 +1148,34 @@ async function getWeatherAlerts(location) {
     }
 }
 function displayAlerts(alerts) {
-    // Remove any existing alerts
     const alertDiv = document.querySelector('.ticker-alerts');
+    if (!alertDiv) return;
 
+    // Clear existing alert content
+    alertDiv.innerHTML = '';
 
-    if (alerts.length > 0) {
-        // Sort alerts by severity
-        const sortedAlerts = alerts.sort((a, b) => {
-            const severityOrder = ['Extreme', 'Severe', 'Moderate', 'Minor'];
-            return severityOrder.indexOf(a.properties.severity) - severityOrder.indexOf(b.properties.severity);
-        });
-        const mostSevereAlert = sortedAlerts[0].properties;
-        console.log('Most severe alert:', mostSevereAlert);
-
-        // Create alert content with scrolling text
-        alertDiv.innerHTML = `
-            <div class="alert ${mostSevereAlert.severity.toLowerCase()}">
-                <span class="alert-tag">⚠️ ${mostSevereAlert.event}</span>
-                <div class="alert-scroll-container">
-                    <span class="alert-scroll-text">${mostSevereAlert.parameters.NWSheadline?.[0] || mostSevereAlert.description}</span>
-                </div>
-            </div>
-        `;
-    } else {
+    if (!alerts || alerts.length === 0) {
         console.log('No active weather alerts for this location');
+        return;
     }
+
+    // Sort alerts by severity
+    const sortedAlerts = alerts.sort((a, b) => {
+        const severityOrder = ['Extreme', 'Severe', 'Moderate', 'Minor'];
+        return severityOrder.indexOf(a.properties.severity) - severityOrder.indexOf(b.properties.severity);
+    });
+    const mostSevereAlert = sortedAlerts[0].properties;
+    console.log('Most severe alert:', mostSevereAlert);
+
+    // Create alert content with scrolling text
+    alertDiv.innerHTML = `
+        <div class="alert ${mostSevereAlert.severity.toLowerCase()}">
+            <span class="alert-tag">⚠️ ${mostSevereAlert.event}</span>
+            <div class="alert-scroll-container">
+                <span class="alert-scroll-text">${mostSevereAlert.parameters.NWSheadline?.[0] || mostSevereAlert.description}</span>
+            </div>
+        </div>
+    `;
 }
 function setTemperatureColor(element, temp) {
     let colorVar;
