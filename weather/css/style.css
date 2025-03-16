@@ -10,6 +10,12 @@
     --header-bg: rgba(255, 252, 242, 0.7);
     --header-hover: rgba(255, 252, 242, 0.9);
     --canvas-opacity: 1;
+    /* Add temperature color variables */
+    --temp-freezing: rgba(200, 230, 255, 0.7);
+    --temp-cold: rgba(166, 209, 230, 0.7);
+    --temp-moderate: rgba(173, 216, 180, 0.7);
+    --temp-warm: rgba(255, 200, 100, 0.7);
+    --temp-hot: rgba(255, 140, 80, 0.7);
 }
 
 body.dark-mode {
@@ -373,7 +379,6 @@ button {
     background-color: var(--period-bg);
     border-bottom: 2px solid var(--border-color);
     color: var(--text-color);
-    font-size: larger;
 }
 
 .period h2 {
@@ -395,7 +400,7 @@ button {
     overflow-wrap: break-word;
     word-wrap: break-word;
     hyphens: auto;
-    font-size: 0.95em;
+    font-size: 1.15em;
     line-height: 1.7;
     color: inherit;
     opacity: 0.9;
@@ -654,7 +659,7 @@ body.dark-mode #exit-button:hover {
 
 .hour-forecast .time {
     font-weight: 500;
-    font-size: 0.9em;
+    font-size: 1em;
     opacity: 0.75;
     color: var(--text-color);
 }
@@ -666,7 +671,7 @@ body.dark-mode #exit-button:hover {
 }
 
 .hour-forecast .short {
-    font-size: 0.85em;
+    font-size: 1em;
     opacity: 0.75;
     color: var(--text-color);
 }
@@ -872,6 +877,7 @@ body.dark-mode #exit-button:hover {
     overflow: hidden;
     display: flex;
     align-items: center;
+    margin: 0 1rem;
 }
 
 .ticker-alerts .alert {
@@ -952,11 +958,12 @@ body.dark-mode #exit-button:hover {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    margin: 0 1rem;
     padding: 0.25rem 0.75rem;
-    background: var(--header-bg);
     border-radius: 4px;
     font-size: 0.9em;
+    /* Remove the existing background */
+    background: var(--temp-color, var(--header-bg));
+    transition: background-color 0.3s ease;
 }
 
 .temp-value {

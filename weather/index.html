@@ -1,30 +1,34 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <meta charset="utf-8">
-  <title>Forecast</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Handjet"> 
-    <link rel="stylesheet" href="./css/style.css">  
+    <meta charset="utf-8">
+    <title>Forecast</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Handjet">
+    <link rel="stylesheet" href="./css/style.css">
 </head>
+
 <body id="body">
-<canvas id="bgCanvas"></canvas>
-<header id="header">
-    <h1>Local Weather</h1>  
-    <p id="ticker"></p>
-    <div id="brief-display"></div>
-    <div id="aqi-display"></div>
-    <div id="settings">
-        <span class="settings-icon">⚙️</span>
-        <div class="settings-content">
-            <h3 id="city"></h3>
-            <!-- buttons will be added here by JavaScript -->
+    <canvas id="bgCanvas"></canvas>
+    <header id="header">
+        <h1>Local Weather</h1>
+        <div id="brief-display"></div>
+        <div id="aqi-display"></div>
+        <div class="ticker-alerts"></div>
+        <p id="ticker"></p>
+        <div id="settings">
+            <span class="settings-icon">⚙️</span>
+            <div class="settings-content">
+                <h3 id="city"></h3>
+                <!-- buttons will be added here by JavaScript -->
+            </div>
         </div>
-    </div>
-</header>
+    </header>
 
-<div id="weather"></div>
+    <div id="weather"></div>
 
-<script src="./index.js"></script>
+    <script src="./index.js"></script>
 
 </body>
+
 </html>

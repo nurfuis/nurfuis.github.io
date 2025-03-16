@@ -205,6 +205,7 @@ function displayDetailedWeather(weatherData) {
         </div>
     `;
 
+    const detailButton = document.querySelector('.view-detail');
     detailButton.addEventListener('click', async () => {
         dayRow.classList.add('slide-left');
         nightRow.classList.add('slide-left');
@@ -251,6 +252,35 @@ function displayDetailedWeather(weatherData) {
     }
 }
 function getWeather(location) {
+    // Try to get cached weather first
+    const cachedWeather = localStorage.getItem('cachedWeather');
+    const cachedTimestamp = localStorage.getItem('weatherTimestamp');
+    const now = Date.now();
+    
+    // If we have cached data less than 1 minute old, use it
+    if (cachedWeather && cachedTimestamp && (now - parseInt(cachedTimestamp) < 60000)) {
+        console.log('Using cached weather data');
+        const weatherData = JSON.parse(cachedWeather);
+        
+        // Initialize UI with cached data
+        displayCity(weatherData.city, weatherData.state);
+        tellWeather(weatherData.forecast);
+        if (weatherData.airQuality) {
+            displayAirQuality(weatherData.airQuality);
+        }
+        if (weatherData.alerts) {
+            displayAlerts(weatherData.alerts);
+        }
+        
+        // Ensure ticker is running
+        if (!document.getElementById('ticker').textContent) {
+            tellTime();
+        }
+        
+        return;
+    }
+
+    // Otherwise fetch fresh data
     const coords = JSON.parse(location);
     const request = new Request('https://api.weather.gov/points/' + coords.lat.trim() + "," + coords.lon.trim());
 
@@ -258,35 +288,40 @@ function getWeather(location) {
         fetch(request),
         getDetailedWeatherInfo(location),
         getAirQuality(location),
-        getWeatherAlerts(location)  // Add alerts fetch
+        getWeatherAlerts(location)
     ])
         .then(([weatherResponse, detailedData, airQualityData, alerts]) => {
-            displayAirQuality(airQualityData);
-            displayAlerts(alerts);  // Display any active alerts
             weatherResponse.json().then(data => {
                 const forecastURL = data.properties.forecast;
                 const city = data.properties.relativeLocation.properties.city;
                 const state = data.properties.relativeLocation.properties.state;
-                displayCity(city, state);
-                console.log(data.properties);
+
                 fetch(forecastURL)
                     .then(result => result.json())
-                    .then((output) => {
-                        const weather = output;
+                    .then((weather) => {
+                        // Cache the weather data
+                        const cacheData = {
+                            forecast: weather,
+                            city: city,
+                            state: state,
+                            airQuality: airQualityData,
+                            alerts: alerts,
+                            detailed: detailedData,
+                            timestamp: now
+                        };
+                        localStorage.setItem('cachedWeather', JSON.stringify(cacheData));
+                        localStorage.setItem('weatherTimestamp', now.toString());
 
+                        // Display the weather
+                        displayCity(city, state);
                         tellWeather(weather);
-
-                        console.log(weather);
-                        console.log('Weather updated');
-
-                    }).catch(err => console.error(err));
+                        displayAirQuality(airQualityData);
+                        displayAlerts(alerts);
+                        if (detailedData) {
+                            displayDetailedWeather(detailedData);
+                        }
+                    });
             });
-
-            if (detailedData) {
-                displayDetailedWeather(detailedData);
-            }
-
-            displayAlerts(alerts);
         });
 }
 function tellWeather(weather) {
@@ -372,13 +407,14 @@ function tellWeather(weather) {
     const currentPeriod = oneWeekForecast[0];
     const briefDisplay = document.getElementById('brief-display');
 
-
     const tempBadgeDiv = document.createElement('div');
     tempBadgeDiv.className = 'current-temp-badge';
     tempBadgeDiv.innerHTML = `
         <span class="temp-value">${currentPeriod.temperature}°F</span>
         <span class="temp-desc">${currentPeriod.shortForecast}</span>
     `;
+    setTemperatureColor(tempBadgeDiv, currentPeriod.temperature);
+    briefDisplay.innerHTML = ''; // Clear any existing content
     briefDisplay.appendChild(tempBadgeDiv);
     // Add event listeners
     const backButton = navigationControls.querySelector('.back-to-forecast');
@@ -633,7 +669,7 @@ function addStartMenu() {
 
     // Add Weather Toggle button
     const toggleButton = document.createElement("button");
-    toggleButton.textContent = document.getElementById('weather').classList.contains('collapsed') ? "Show Weather" : "Hide Weather";
+    toggleButton.textContent = document.getElementById('weather').classList.contains('collapsed') ? "Show Forecast" : "Hide Forecast";
     toggleButton.id = "toggle-weather";
     toggleButton.addEventListener("click", toggleWeather);
     settingsContent.appendChild(toggleButton);
@@ -689,9 +725,28 @@ function toggleWeather() {
     button.textContent = isCollapsed ? "Show Weather" : "Hide Weather";
 }
 function start() {
-    window.addEventListener('load', tellTime);
-    window.addEventListener('load', getCoordinates);
+    // Initialize UI components first
+    tellTime();
     addStartMenu();
+    
+    // Try to display cached weather if available
+    const cachedWeather = localStorage.getItem('cachedWeather');
+    if (cachedWeather) {
+        const weatherData = JSON.parse(cachedWeather);
+        displayCity(weatherData.city, weatherData.state);
+        tellWeather(weatherData.forecast);
+        if (weatherData.airQuality) {
+            displayAirQuality(weatherData.airQuality);
+        }
+        if (weatherData.alerts) {
+            displayAlerts(weatherData.alerts);
+        }
+    }
+
+    // Then get coordinates and start weather updates
+    getCoordinates();
+    
+    // ...rest of start function...
     window.addEventListener('resize', () => {
         const weather = document.querySelector('.period');
         if (weather) {
@@ -772,10 +827,10 @@ function setWallpaper() {
             bgCanvas.style.backgroundImage = `url("file:///${wallpaperPath}")`;
             document.body.style.backgroundImage = `url("file:///${wallpaperPath}")`;
         } else {
-            console.error('No wallpaper path in URL parameters');
+            console.warn('No wallpaper path in URL parameters');
         }
     } catch (error) {
-        console.error('Error setting wallpaper:', error);
+        console.warn('Warning, problem setting wallpaper:', error);
     }
 }
 // Add this to verify the script is loading
@@ -792,69 +847,81 @@ function initBackgroundAnimation() {
     let offsetX = 0;
     let offsetY = 0;
 
+    // Check if we're using a wallpaper
+    const params = new URLSearchParams(window.location.search);
+    const wallpaperPath = params.get('wallpaper');
+    const isUsingWallpaper = !!wallpaperPath;
+
     backgroundImage.onload = () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-
-        // Store original dimensions for reference
         backgroundImage.originalWidth = backgroundImage.width;
         backgroundImage.originalHeight = backgroundImage.height;
     };
 
-    const params = new URLSearchParams(window.location.search);
-    const wallpaperPath = params.get('wallpaper');
     if (wallpaperPath) {
         backgroundImage.src = `file:///${wallpaperPath}`;
     }
 
     function animate() {
-        if (!backgroundImage.complete) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // If using wallpaper and it's not loaded, wait
+        if (isUsingWallpaper && !backgroundImage.complete) {
             requestAnimationFrame(animate);
             return;
         }
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        // Draw gradient background first
+        const weather = document.querySelector('.period');
+        if (weather) {
+            const temp = parseInt(weather.querySelector('h4').textContent);
+            const isDaytime = new Date().getHours() >= 6 && new Date().getHours() < 18;
+            const tempColor = getTemperatureColor(temp);
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
 
-        // More subtle scale changes
-        scale += 0.00003 * direction;
-        if (scale > 1.1) direction = -1;
-        if (scale < 1.0) direction = 1;
+            if (isDaytime) {
+                gradient.addColorStop(0, `rgba(${tempColor}, 0.8)`);
+                gradient.addColorStop(1, `rgba(${tempColor}, 0.2)`);
+            } else {
+                gradient.addColorStop(0, `rgba(${tempColor}, 0.3)`);
+                gradient.addColorStop(1, `rgba(${tempColor}, 0.1)`);
+            }
 
-        // Calculate minimum scale needed to cover canvas
-        const minScaleX = canvas.width / backgroundImage.originalWidth;
-        const minScaleY = canvas.height / backgroundImage.originalHeight;
-        const baseScale = Math.max(minScaleX, minScaleY) * 1.1; // Add 10% to ensure coverage
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
 
-        // Apply base scale to our animation scale
-        const currentScale = baseScale * scale;
+        // If using wallpaper, draw it on top with animation
+        if (isUsingWallpaper && backgroundImage.complete) {
+            scale += 0.00003 * direction;
+            if (scale > 1.1) direction = -1;
+            if (scale < 1.0) direction = 1;
 
-        // Calculate dimensions to maintain aspect ratio and cover
-        const drawWidth = backgroundImage.originalWidth * currentScale;
-        const drawHeight = backgroundImage.originalHeight * currentScale;
+            const minScaleX = canvas.width / backgroundImage.originalWidth;
+            const minScaleY = canvas.height / backgroundImage.originalHeight;
+            const baseScale = Math.max(minScaleX, minScaleY) * 1.1;
+            const currentScale = baseScale * scale;
 
-        // Calculate max allowed offset based on scaled dimensions
-        const maxOffsetX = Math.max(0, (drawWidth - canvas.width) / 4);
-        const maxOffsetY = Math.max(0, (drawHeight - canvas.height) / 4);
+            const drawWidth = backgroundImage.originalWidth * currentScale;
+            const drawHeight = backgroundImage.originalHeight * currentScale;
 
-        // Smooth sinusoidal movement
-        offsetX = Math.sin(Date.now() / 12000) * maxOffsetX;
-        offsetY = Math.cos(Date.now() / 15000) * maxOffsetY;
+            const maxOffsetX = Math.max(0, (drawWidth - canvas.width) / 4);
+            const maxOffsetY = Math.max(0, (drawHeight - canvas.height) / 4);
 
-        // Clear canvas
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+            offsetX = Math.sin(Date.now() / 12000) * maxOffsetX;
+            offsetY = Math.cos(Date.now() / 15000) * maxOffsetY;
 
-        // Center the image
-        const x = (canvas.width - drawWidth) / 2 + offsetX;
-        const y = (canvas.height - drawHeight) / 2 + offsetY;
+            const x = (canvas.width - drawWidth) / 2 + offsetX;
+            const y = (canvas.height - drawHeight) / 2 + offsetY;
 
-        // Draw the image
-        ctx.drawImage(backgroundImage, x, y, drawWidth, drawHeight);
+            ctx.drawImage(backgroundImage, x, y, drawWidth, drawHeight);
+        }
 
         requestAnimationFrame(animate);
     }
 
-    // Handle window resize
     window.addEventListener('resize', () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -947,10 +1014,8 @@ async function getWeatherAlerts(location) {
 
 function displayAlerts(alerts) {
     // Remove any existing alerts
-    const existingAlerts = document.querySelector('.ticker-alerts');
-    if (existingAlerts) {
-        existingAlerts.remove();
-    }
+    const alertDiv = document.querySelector('.ticker-alerts');
+
 
     if (alerts.length > 0) {
         // Sort alerts by severity
@@ -958,14 +1023,8 @@ function displayAlerts(alerts) {
             const severityOrder = ['Extreme', 'Severe', 'Moderate', 'Minor'];
             return severityOrder.indexOf(a.properties.severity) - severityOrder.indexOf(b.properties.severity);
         });
-
         const mostSevereAlert = sortedAlerts[0].properties;
         console.log('Most severe alert:', mostSevereAlert);
-
-        // Create alert container
-        const alertDiv = document.createElement('div');
-        alertDiv.className = 'ticker-alerts';
-
         // Create alert content with scrolling text
         alertDiv.innerHTML = `
             <div class="alert ${mostSevereAlert.severity.toLowerCase()}">
@@ -975,11 +1034,22 @@ function displayAlerts(alerts) {
                 </div>
             </div>
         `;
-
-        // Insert alert after ticker
-        const ticker = document.getElementById('ticker');
-        ticker.parentNode.insertBefore(alertDiv, ticker.nextSibling);
     } else {
         console.log('No active weather alerts for this location');
     }
+}
+function setTemperatureColor(element, temp) {
+    let colorVar;
+    if (temp <= 32) {
+        colorVar = 'var(--temp-freezing)';
+    } else if (temp <= 50) {
+        colorVar = 'var(--temp-cold)';
+    } else if (temp <= 70) {
+        colorVar = 'var(--temp-moderate)';
+    } else if (temp <= 85) {
+        colorVar = 'var(--temp-warm)';
+    } else {
+        colorVar = 'var(--temp-hot)';
+    }
+    element.style.setProperty('--temp-color', colorVar);
 }
