@@ -252,16 +252,19 @@ function displayDetailedWeather(weatherData) {
     }
 }
 function getWeather(location) {
-    // Try to get cached weather first
-    const cachedWeather = localStorage.getItem('cachedWeather');
-    const cachedTimestamp = localStorage.getItem('weatherTimestamp');
-    const now = Date.now();
-    const ONE_HOUR = 3600000; // 1 hour in milliseconds
+    const coords = JSON.parse(location);
+    const locationKey = `${coords.lat},${coords.lon}`;
+    const ONE_HOUR = 3600000;
 
-    // If we have cached data less than 1 hour old, use it
-    if (cachedWeather && cachedTimestamp && (now - parseInt(cachedTimestamp) < ONE_HOUR)) {
-        console.log('Using cached weather data');
-        const weatherData = JSON.parse(cachedWeather);
+    // Try to get cached weather for this specific location
+    const cachedWeathers = JSON.parse(localStorage.getItem('locationWeatherCache') || '{}');
+    const cachedData = cachedWeathers[locationKey];
+    const now = Date.now();
+
+    // If we have valid cached data for this location
+    if (cachedData && (now - cachedData.timestamp < ONE_HOUR)) {
+        console.log('Using cached weather data for location:', locationKey);
+        const weatherData = cachedData.data;
 
         // Initialize UI with cached data
         displayCity(weatherData.city, weatherData.state);
@@ -272,18 +275,11 @@ function getWeather(location) {
         if (weatherData.alerts) {
             displayAlerts(weatherData.alerts);
         }
-
-        // Ensure ticker is running
-        if (!document.getElementById('ticker').textContent) {
-            tellTime();
-        }
-
         return;
     }
 
     // Otherwise fetch fresh data
-    console.log('Fetching fresh weather data');
-    const coords = JSON.parse(location);
+    console.log('Fetching fresh weather data for location:', locationKey);
     const request = new Request('https://api.weather.gov/points/' + coords.lat.trim() + "," + coords.lon.trim());
 
     Promise.all([
@@ -301,18 +297,21 @@ function getWeather(location) {
                 fetch(forecastURL)
                     .then(result => result.json())
                     .then((weather) => {
-                        // Cache the weather data
+                        // Cache the weather data for this location
                         const cacheData = {
                             forecast: weather,
                             city: city,
                             state: state,
                             airQuality: airQualityData,
                             alerts: alerts,
-                            detailed: detailedData,
-                            timestamp: now
+                            detailed: detailedData
                         };
-                        localStorage.setItem('cachedWeather', JSON.stringify(cacheData));
-                        localStorage.setItem('weatherTimestamp', now.toString());
+
+                        cachedWeathers[locationKey] = {
+                            timestamp: now,
+                            data: cacheData
+                        };
+                        localStorage.setItem('locationWeatherCache', JSON.stringify(cachedWeathers));
 
                         // Display the weather
                         displayCity(city, state);
@@ -992,26 +991,28 @@ function initBackgroundAnimation() {
     animate();
 }
 async function getAirQuality(location) {
-    // Try to get cached AQI first
-    const cachedAQI = localStorage.getItem('cachedAQI');
-    const cachedTimestamp = localStorage.getItem('aqiTimestamp');
-    const now = Date.now();
-    const ONE_HOUR = 3600000; // 1 hour in milliseconds
+    const coords = JSON.parse(location);
+    const locationKey = `${coords.lat},${coords.lon}`;
+    const ONE_HOUR = 3600000;
 
-    // If we have cached data less than 1 hour old, use it
-    if (cachedAQI && cachedTimestamp && (now - parseInt(cachedTimestamp) < ONE_HOUR)) {
-        console.log('Using cached AQI data');
-        return JSON.parse(cachedAQI);
+    // Try to get cached AQI for this specific location
+    const cachedAQIs = JSON.parse(localStorage.getItem('locationAQICache') || '{}');
+    const cachedData = cachedAQIs[locationKey];
+    const now = Date.now();
+
+    // If we have valid cached data for this location
+    if (cachedData && (now - cachedData.timestamp < ONE_HOUR)) {
+        console.log('Using cached AQI data for location:', locationKey);
+        return cachedData.data;
     }
 
     // Otherwise fetch fresh data
-    console.log('Fetching fresh AQI data');
+    console.log('Fetching fresh AQI data for location:', locationKey);
     const aqiZip = localStorage.getItem("aqiLocation");
-    const coords = JSON.parse(location);
     const API_KEY = 'FBB76473-912E-4FDD-AEE4-6BA26080C2BD';
 
     try {
-        // If AQI ZIP is set, use those coordinates
+        // If AQI ZIP is set, use those coordinates instead
         if (aqiZip) {
             const zipResponse = await fetch(`https://nominatim.openstreetmap.org/search?postalcode=${aqiZip}&country=USA&format=json`);
             const zipData = await zipResponse.json();
@@ -1041,9 +1042,12 @@ async function getAirQuality(location) {
             location: aqiZip || 'weather location'
         };
 
-        // Cache the AQI data
-        localStorage.setItem('cachedAQI', JSON.stringify(aqiData));
-        localStorage.setItem('aqiTimestamp', now.toString());
+        // Cache the AQI data for this location
+        cachedAQIs[locationKey] = {
+            timestamp: now,
+            data: aqiData
+        };
+        localStorage.setItem('locationAQICache', JSON.stringify(cachedAQIs));
 
         return aqiData;
     } catch (error) {

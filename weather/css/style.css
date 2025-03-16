@@ -68,6 +68,7 @@ body.collapsed {
     padding-top: 2rem;
     transition: all 0.5s ease;
     background-color: transparent !important;
+    padding-bottom: 0;
 }
 
 h1,
@@ -353,6 +354,7 @@ button {
     overflow: hidden;
     background-color: transparent !important;
     margin-top: 0;
+    transform: translateY(100%);
 }
 
 .forecast-row {
@@ -1029,4 +1031,14 @@ body.dark-mode #exit-button:hover {
 
 .temp-desc {
     opacity: 0.9;
+}
+.background-controls {
+    display: flex;
+    gap: 0.5rem;
+    margin: 0.5rem 0;
+}
+
+.background-controls button {
+    flex: 1;
+    white-space: nowrap;
 }
