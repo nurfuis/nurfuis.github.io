@@ -256,12 +256,12 @@ function getWeather(location) {
     const cachedWeather = localStorage.getItem('cachedWeather');
     const cachedTimestamp = localStorage.getItem('weatherTimestamp');
     const now = Date.now();
-    
+
     // If we have cached data less than 1 minute old, use it
     if (cachedWeather && cachedTimestamp && (now - parseInt(cachedTimestamp) < 60000)) {
         console.log('Using cached weather data');
         const weatherData = JSON.parse(cachedWeather);
-        
+
         // Initialize UI with cached data
         displayCity(weatherData.city, weatherData.state);
         tellWeather(weatherData.forecast);
@@ -271,12 +271,12 @@ function getWeather(location) {
         if (weatherData.alerts) {
             displayAlerts(weatherData.alerts);
         }
-        
+
         // Ensure ticker is running
         if (!document.getElementById('ticker').textContent) {
             tellTime();
         }
-        
+
         return;
     }
 
@@ -496,11 +496,34 @@ function tellWeather(weather) {
 function startWeatherRefresh(location) {
     // Initial fetch
     getWeather(location);
+    checkAlerts(location);
 
-    // Update every hour
+    // Update weather every hour
     setInterval(() => {
         getWeather(location);
-    }, 3600000);
+    }, 3600000); // 1 hour
+
+    // Check alerts more frequently
+    setInterval(() => {
+        checkAlerts(location);
+    }, 300000); // 5 minutes
+}
+
+async function checkAlerts(location) {
+    try {
+        const alerts = await getWeatherAlerts(location);
+        displayAlerts(alerts);
+        
+        // Update cached weather data with new alerts
+        const cachedWeather = localStorage.getItem('cachedWeather');
+        if (cachedWeather) {
+            const weatherData = JSON.parse(cachedWeather);
+            weatherData.alerts = alerts;
+            localStorage.setItem('cachedWeather', JSON.stringify(weatherData));
+        }
+    } catch (error) {
+        console.error('Error checking alerts:', error);
+    }
 }
 function tellTime() {
     // Create a new Date object
@@ -667,6 +690,37 @@ function addStartMenu() {
     themeToggle.addEventListener("click", toggleTheme);
     settingsContent.appendChild(themeToggle);
 
+
+    // Check if wallpaper is loaded
+    const params = new URLSearchParams(window.location.search);
+    const wallpaperPath = params.get('wallpaper');
+
+    if (wallpaperPath) {
+        // Add background toggle button
+        const bgToggle = document.createElement("button");
+        bgToggle.id = "background-toggle";
+        const isBackgroundEnabled = localStorage.getItem('useBackground') !== 'false';
+        bgToggle.textContent = isBackgroundEnabled ? "🖼️ Pause Background" : "🖼️ Play Background";
+
+        bgToggle.addEventListener("click", () => {
+            const canvas = document.getElementById('bgCanvas');
+            const isEnabled = localStorage.getItem('useBackground') !== 'false';
+
+            if (isEnabled) {
+                localStorage.setItem('useBackground', 'false');
+                canvas.style.opacity = '0';
+                bgToggle.textContent = "🖼️ Play Background";
+            } else {
+                localStorage.setItem('useBackground', 'true');
+                canvas.style.opacity = '1';
+                bgToggle.textContent = "🖼️ Pause Background";
+            }
+        });
+
+        settingsContent.appendChild(bgToggle);
+    }
+
+
     // Add Weather Toggle button
     const toggleButton = document.createElement("button");
     toggleButton.textContent = document.getElementById('weather').classList.contains('collapsed') ? "Show Forecast" : "Hide Forecast";
@@ -674,12 +728,16 @@ function addStartMenu() {
     toggleButton.addEventListener("click", toggleWeather);
     settingsContent.appendChild(toggleButton);
 
+
+
     // Add Exit button
     const exitButton = document.createElement("button");
     exitButton.textContent = "Exit Application";
     exitButton.id = "exit-button";
     exitButton.addEventListener("click", () => window.close());
     settingsContent.appendChild(exitButton);
+
+
 }
 function setAQILocation() {
     const zip = window.prompt("Enter ZIP code for AQI data:");
@@ -722,13 +780,13 @@ function toggleWeather() {
     localStorage.setItem('weatherCollapsed', isCollapsed);
 
     const button = document.getElementById('toggle-weather');
-    button.textContent = isCollapsed ? "Show Weather" : "Hide Weather";
+    button.textContent = isCollapsed ? "Show Forecast" : "Hide Forecast";
 }
 function start() {
     // Initialize UI components first
     tellTime();
     addStartMenu();
-    
+
     // Try to display cached weather if available
     const cachedWeather = localStorage.getItem('cachedWeather');
     if (cachedWeather) {
@@ -745,7 +803,7 @@ function start() {
 
     // Then get coordinates and start weather updates
     getCoordinates();
-    
+
     // ...rest of start function...
     window.addEventListener('resize', () => {
         const weather = document.querySelector('.period');
@@ -841,6 +899,11 @@ window.addEventListener('load', () => {
 function initBackgroundAnimation() {
     const canvas = document.getElementById('bgCanvas');
     const ctx = canvas.getContext('2d');
+
+    // Check background preference
+    const isBackgroundEnabled = localStorage.getItem('useBackground') !== 'false';
+    canvas.style.opacity = isBackgroundEnabled ? '1' : '0';
+
     let backgroundImage = new Image();
     let scale = 1.0;
     let direction = 1;
@@ -1025,6 +1088,7 @@ function displayAlerts(alerts) {
         });
         const mostSevereAlert = sortedAlerts[0].properties;
         console.log('Most severe alert:', mostSevereAlert);
+
         // Create alert content with scrolling text
         alertDiv.innerHTML = `
             <div class="alert ${mostSevereAlert.severity.toLowerCase()}">
