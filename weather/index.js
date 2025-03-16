@@ -781,15 +781,43 @@ function setAQILocation() {
     // Refresh AQI data
     const location = localStorage.getItem("location");
     if (location) {
-        getAirQuality(location).then(aqiData => displayAirQuality(aqiData));
+        getAirQuality(location).then(aqiData => {
+            displayAirQuality(aqiData);
+            // Update location display after successful fetch
+            if (aqiData) {
+                const aqiLocation = document.getElementById('aqi-location');
+                if (aqiLocation) {
+                    aqiLocation.textContent = `AQI Location: ${aqiData.location}`;
+                }
+            }
+        });
     }
 }
+
 function clearAQILocation() {
     localStorage.removeItem("aqiLocation");
+    
+    // Update AQI location display to show using weather location
+    const aqiLocation = document.getElementById('aqi-location');
+    if (aqiLocation) {
+        aqiLocation.textContent = 'AQI Location: Using weather location';
+    }
+    
     // Refresh AQI data with weather location
     const location = localStorage.getItem("location");
     if (location) {
-        getAirQuality(location).then(aqiData => displayAirQuality(aqiData));
+        const coords = JSON.parse(location);
+        const weatherLoc = coords.zip || `${coords.lat},${coords.lon}`;
+        getAirQuality(location).then(aqiData => {
+            displayAirQuality(aqiData);
+            // Update location display after successful fetch
+            if (aqiData) {
+                const aqiLocation = document.getElementById('aqi-location');
+                if (aqiLocation) {
+                    aqiLocation.textContent = `AQI Location: ${aqiData.location}`;
+                }
+            }
+        });
     }
 }
 function toggleWeather() {
