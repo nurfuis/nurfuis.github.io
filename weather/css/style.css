@@ -129,6 +129,26 @@ h4,
     font-size: 0.9em;
 }
 
+.settings-content #aqi-location {
+    margin: 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+.location-group {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.location-line {
+    font-size: 0.9em;
+    opacity: 0.9;
+    margin: 0.5rem 0;
+}
+
 .settings-content button {
     display: block;
     width: 100%;
@@ -214,6 +234,16 @@ body.dark-mode #header::after {
 }
 
 #ticker {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem;
+    overflow: hidden;
+    white-space: nowrap;
+    flex: 0 0 auto;
+}
+
+#ticker {
     font-size: 1.1em;
     font-weight: 500;
     font-family: 'Quicksand', sans-serif;
@@ -222,6 +252,11 @@ body.dark-mode #header::after {
     opacity: 0.9;
     margin: 0;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem;
+    white-space: nowrap;
 }
 
 #header:hover #settings {
@@ -338,6 +373,7 @@ button {
     background-color: var(--period-bg);
     border-bottom: 2px solid var(--border-color);
     color: var(--text-color);
+    font-size: larger;
 }
 
 .period h2 {
@@ -486,8 +522,8 @@ body.dark-mode #exit-button:hover {
     grid-template-areas: 
         "timestamp timestamp"
         "current hourly";
-    gap: 2rem;
-    padding: 1rem;
+    gap: 0 2.5rem;
+    padding: 0;
     user-select: none;
 }
 
@@ -704,4 +740,286 @@ body.dark-mode #exit-button:hover {
 
 .nav-button.view-detail {
     background: var(--period-bg);
+}
+
+.aqi-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+}
+
+.aqi-value {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+}
+
+.aqi-value strong {
+    font-size: 1.2em;
+}
+
+.aqi-value small {
+    font-size: 0.85em;
+    opacity: 0.8;
+}
+
+#aqi-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9em;
+    margin-left: auto;
+    margin-right: 1rem;
+}
+
+#aqi-display .aqi-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+    font-weight: 600;
+    background-color: rgba(var(--aqi-color), 0.7); /* Add opacity to background */
+}
+
+#aqi-display .aqi-category {
+    opacity: 0.9;
+}
+
+.aqi-fallback {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.aqi-input-group {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.aqi-input-group input {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    background: var(--header-bg);
+    color: var(--text-color);
+    width: 100px;
+}
+
+.aqi-input-group button {
+    padding: 0.25rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    background: var(--period-bg);
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.aqi-input-group button:hover {
+    background: var(--border-color);
+}
+
+.aqi-location {
+    font-size: 0.8em;
+    opacity: 0.7;
+    margin-left: 0.5rem;
+}
+
+.weather-alerts {
+    margin: 0.5rem 0;
+    width: 100%;
+}
+
+.alert {
+    padding: 0.5rem 1rem;
+    margin: 0.25rem 0;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9em;
+}
+
+.alert.extreme {
+    background: rgba(126, 0, 35, 0.9);
+    color: white;
+}
+
+.alert.severe {
+    background: rgba(255, 0, 0, 0.8);
+    color: white;
+}
+
+.alert.moderate {
+    background: rgba(255, 126, 0, 0.8);
+    color: white;
+}
+
+.alert.minor {
+    background: rgba(255, 255, 0, 0.8);
+    color: black;
+}
+
+.time-display {
+    flex-shrink: 0;
+}
+
+.ticker-alerts {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.ticker-alerts .alert {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.9em;
+    white-space: nowrap;
+}
+
+.alert-tag {
+    flex: 0 0 auto;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.alert-scroll-container {
+    overflow: hidden;
+    position: relative;
+}
+
+.alert-scroll-text {
+    display: inline-block;
+    white-space: nowrap;
+    animation: scrollText 20s linear infinite;
+    padding-left: 100%;
+}
+
+@keyframes scrollText {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+}
+
+.ticker-alerts .alert.extreme {
+    background: rgba(126, 0, 35, 0.9);
+    color: white;
+}
+
+.ticker-alerts .alert.severe {
+    background: rgba(255, 0, 0, 0.8);
+    color: white;
+}
+
+.ticker-alerts .alert.moderate {
+    background: rgba(255, 126, 0, 0.8);
+    color: white;
+}
+
+.ticker-alerts .alert.minor {
+    background: rgba(255, 255, 0, 0.8);
+    color: black;
+}
+
+.ticker-alerts {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.ticker-alerts .alert {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9em;
+    animation: flash 2s infinite;
+    white-space: nowrap;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem;
+}
+
+.current-temp-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0 1rem;
+    padding: 0.25rem 0.75rem;
+    background: var(--header-bg);
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.temp-value {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.temp-desc {
+    opacity: 0.9;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+}
+.weather-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem;
+    flex-wrap: nowrap;
+}
+
+.current-temp-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    background: var(--header-bg);
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.weather-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0.5rem;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.current-temp-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    background: var(--header-bg);
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.temp-value {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.temp-desc {
+    opacity: 0.9;
 }

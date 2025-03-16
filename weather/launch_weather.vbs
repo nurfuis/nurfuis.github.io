@@ -12,10 +12,11 @@ If Err.Number <> 0 Then
     WScript.Quit
 End If
 
-' Get wallpaper path
-Set wallpaper = WShell.Exec("powershell -executionpolicy bypass -file """ & strPath & "\get-wallpaper.ps1""")
+' Get wallpaper path using full path to PowerShell script
+pshellCmd = "powershell -executionpolicy bypass -file """ & strPath & "\get-wallpaper.ps1"""
+Set wallpaper = WShell.Exec(pshellCmd)
 If Err.Number <> 0 Then
-    WScript.Echo "Error executing PowerShell: " & Err.Description
+    WScript.Echo "Error executing PowerShell: " & Err.Description & vbCrLf & "Command: " & pshellCmd
     WScript.Quit
 End If
 
@@ -25,6 +26,8 @@ If wallpaperPath = "" Then
     WScript.Quit
 End If
 
-' Launch default browser with the app URL
-url = "file:///" & strPath & "/index.html?wallpaper=" & Replace(wallpaperPath, "\", "/")
-WShell.Run "cmd /c start " & url, 0, False
+' Launch Chrome with wallpaper parameter
+chromeCmd = """C:\Program Files\Google\Chrome\Application\chrome.exe"" --kiosk --app=file:///" & _
+           strPath & "/index.html?wallpaper=" & Replace(wallpaperPath, "\", "/")
+
+WShell.Run chromeCmd, 0, False
