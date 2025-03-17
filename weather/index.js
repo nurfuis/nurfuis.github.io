@@ -156,7 +156,7 @@ function displayDetailedWeather(weatherData) {
     if (!weatherData) {
         discussionDiv.innerHTML = '<div class="discussion-content"><h3>Detailed Weather</h3><p>No detailed data available</p></div>';
         return;
-    }
+                }
 
     const current = weatherData.currentConditions;
 
@@ -164,6 +164,7 @@ function displayDetailedWeather(weatherData) {
     const temperatures = weatherData.hourlyForecast.map(hour => hour.temperature);
     const minTemp = Math.min(...temperatures);
     const maxTemp = Math.max(...temperatures);
+    const isDaytime = weatherData.hourlyForecast.map(hour => hour.isDaytime).includes(true);
 
     discussionDiv.innerHTML = `
         <div class="discussion-content">
@@ -206,7 +207,7 @@ function displayDetailedWeather(weatherData) {
                     ${weatherData.hourlyForecast.map(hour => `
                         <div class="hour-forecast ${hour.temperature === minTemp ? 'coldest' : ''
         } ${hour.temperature === maxTemp ? 'hottest' : ''
-        }">
+        } ${hour.isDaytime ? 'daytime' : 'nighttime'}">
                             <div class="time">${new Date(hour.startTime).toLocaleTimeString([], { hour: 'numeric' })}</div>
                             <div class="temp">${hour.temperature}°F</div>
                             <div class="short">${hour.shortForecast}</div>
@@ -218,9 +219,9 @@ function displayDetailedWeather(weatherData) {
     `;
 
     const detailButton = document.querySelector('.view-detail');
+    const forecastWrapper = document.querySelector('.forecast-wrapper');
     detailButton.addEventListener('click', async () => {
-        dayRow.classList.add('slide-left');
-        nightRow.classList.add('slide-left');
+        forecastWrapper.classList.add('slide-left');
         detailView.classList.add('slide-in');
         backButton.style.display = 'block';
         detailButton.style.display = 'none';

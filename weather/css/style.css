@@ -290,6 +290,7 @@ body.dark-mode #header::after {
 .period p {
     font-size: 1em;
     line-height: 1.6;
+    text-indent: 2rem;
 }
 
 .period {
@@ -1391,4 +1392,22 @@ body.dark-mode ::-webkit-scrollbar-thumb:hover {
         rgba(130, 145, 145, 0.8),
         rgba(100, 110, 110, 0.9)
     );
+}
+
+.hour-forecast {
+    position: relative;
+    overflow: hidden;
+}
+
+.hour-forecast.daytime {
+    border-style: solid;
+}
+
+.hour-forecast.nighttime {
+    border-style: dashed;
+}
+
+@keyframes fadeInOut {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
 }
