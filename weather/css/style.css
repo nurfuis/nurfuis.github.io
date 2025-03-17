@@ -489,6 +489,7 @@ body.dark-mode #exit-button:hover {
     position: relative;
     width: 100%;
     overflow: hidden;
+    contain: content; /* Prevents layout shifts when content changes */
 }
 
 .forecast-row {
@@ -1070,7 +1071,7 @@ body.dark-mode #exit-button:hover {
     border: 1px solid var(--border-color);
     border-radius: 4px;
     padding: 1.5rem;
-    overflow: hidden; /* Changed from overflow-y: auto */
+    overflow: scroll; /* Changed from overflow-y: auto */
     max-height: 80vh;
     backdrop-filter: blur(8px);
     transform: translateX(-100%); /* Start fully off-screen to the left */
@@ -1201,4 +1202,53 @@ body.dark-mode #exit-button:hover {
 .alerts-list::-webkit-scrollbar-thumb {
     background: var(--border-color);
     border-radius: 4px;
+}
+.forecast-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--period-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    width: 48px;
+    height: 128px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0.8;
+    font-size: 24px;
+    z-index: 10;
+    transition: opacity 0.2s;
+    backdrop-filter: blur(4px);
+}
+
+.forecast-nav:hover {
+    opacity: 1;
+}
+
+.forecast-nav.prev {
+    left: 0;
+    border-radius: 0 4px 4px 0;
+}
+.forecast-nav.next {
+    right: 0;
+    border-radius: 4px 0 0 4px;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.forecast-wrapper {
+    transition: transform 0.3s ease;
+    padding: 0 4rem;
+}
+
+.forecast-wrapper.slide-left {
+    transform: translateX(-100%);
+}
+
+.forecast-wrapper.slide-right {
+    transform: translateX(200%);
 }

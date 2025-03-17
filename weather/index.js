@@ -1,6 +1,6 @@
 function clearLocation() {
     const oldLocation = localStorage.getItem("location");
-    
+
     // Return to forecast view if we're in alerts view
     const alertsView = document.querySelector('.alerts-view');
     const dayRow = document.querySelector('.forecast-row');
@@ -21,16 +21,16 @@ function clearLocation() {
     if (oldLocation) {
         const coords = JSON.parse(oldLocation);
         const locationKey = `${coords.lat},${coords.lon}`;
-        
+
         // Clear all location-specific caches
         const cachedWeathers = JSON.parse(localStorage.getItem('locationWeatherCache') || '{}');
         const cachedAQIs = JSON.parse(localStorage.getItem('locationAQICache') || '{}');
         const cachedAlerts = JSON.parse(localStorage.getItem('locationAlertsCache') || '{}');
-        
+
         delete cachedWeathers[locationKey];
         delete cachedAQIs[locationKey];
         delete cachedAlerts[locationKey];
-        
+
         localStorage.setItem('locationWeatherCache', JSON.stringify(cachedWeathers));
         localStorage.setItem('locationAQICache', JSON.stringify(cachedAQIs));
         localStorage.setItem('locationAlertsCache', JSON.stringify(cachedAlerts));
@@ -349,6 +349,16 @@ function tellWeather(weather) {
     const forecastContainer = document.createElement('div');
     forecastContainer.className = 'forecast-container';
 
+    const forecastWrapper = document.createElement('div');
+    forecastWrapper.className = 'forecast-wrapper';
+
+    const navPrev = document.createElement('button');
+    const navNext = document.createElement('button');
+    navPrev.className = 'forecast-nav prev';
+    navNext.className = 'forecast-nav next';
+    navPrev.innerHTML = '‹';
+    navNext.innerHTML = '›';
+
     // Add alerts view container
     const alertsView = document.createElement('div');
     alertsView.className = 'alerts-view';
@@ -370,7 +380,7 @@ function tellWeather(weather) {
     navigationControls.innerHTML = `
         <button class="nav-button alerts-button" style="display: none;">⚠️ View Alerts</button>
         <button class="nav-button back-to-forecast" style="display: none;">← Back to Forecast</button>
-        <button class="nav-button view-detail">View Details ➜</button>
+        <button class="nav-button view-detail">Current Conditions ➜</button>
     `;
 
     // Create the detail view with proper ID for detailed weather
@@ -380,48 +390,79 @@ function tellWeather(weather) {
         <div id="forecast-discussion"></div>
     `;
 
+    let showingLaterDays = false;
+
     // Process periods in pairs
-    for (i = 0; i < oneWeekForecast.length - 4; i += 2) {
-        // Create day period
-        const dayDiv = document.createElement('div');
-        dayDiv.className = 'period';  // Use single period class for theme styling
 
-        const dayName = oneWeekForecast[i].name;
-        const dayDetails = oneWeekForecast[i].detailedForecast;
-        const dayBrief = oneWeekForecast[i].shortForecast;
-        const dayTemp = oneWeekForecast[i].temperature;
+    function updateForecastDisplay() {
+        dayRow.innerHTML = ''; // Clear previous content
+        nightRow.innerHTML = ''; // Clear previous content
 
-        dayDiv.innerHTML = `
+        const startIndex = showingLaterDays ? 4 : 0; // Start from the 5th period if showing later days
+        const endIndex = showingLaterDays ? oneWeekForecast.length : oneWeekForecast.length - 4; // Show only 4 periods if not showing later days
+        for (i = startIndex; i < endIndex; i += 2) {
+            // Create day period
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'period'; // Use single period class for theme styling
+
+            const dayName = oneWeekForecast[i].name;
+            const dayDetails = oneWeekForecast[i].detailedForecast;
+            const dayBrief = oneWeekForecast[i].shortForecast;
+            const dayTemp = oneWeekForecast[i].temperature;
+
+            dayDiv.innerHTML = `
             <h2>${dayName}</h2>
             <h4>${dayTemp} And ${dayBrief}</h4>
             <p>${dayDetails}</p>
         `;
 
-        dayRow.appendChild(dayDiv);
+            dayRow.appendChild(dayDiv);
 
-        // Create night period
-        if (i + 1 < oneWeekForecast.length) {
-            const nightDiv = document.createElement('div');
-            nightDiv.className = 'period';  // Use single period class for theme styling
+            // Create night period
+            if (i + 1 < oneWeekForecast.length) {
+                const nightDiv = document.createElement('div');
+                nightDiv.className = 'period'; // Use single period class for theme styling
 
-            const nightName = oneWeekForecast[i + 1].name;
-            const nightDetails = oneWeekForecast[i + 1].detailedForecast;
-            const nightBrief = oneWeekForecast[i + 1].shortForecast;
-            const nightTemp = oneWeekForecast[i + 1].temperature;
+                const nightName = oneWeekForecast[i + 1].name;
+                const nightDetails = oneWeekForecast[i + 1].detailedForecast;
+                const nightBrief = oneWeekForecast[i + 1].shortForecast;
+                const nightTemp = oneWeekForecast[i + 1].temperature;
 
-            nightDiv.innerHTML = `
+                nightDiv.innerHTML = `
                 <h2>${nightName}</h4>
                 <h4>${nightTemp} And ${nightBrief}</h4>
                 <p>${nightDetails}</p>
             `;
 
-            nightRow.appendChild(nightDiv);
+                nightRow.appendChild(nightDiv);
+            }
         }
+        navPrev.style.display = showingLaterDays ? 'flex' : 'none';
+        navNext.style.display = !showingLaterDays ? 'flex' : 'none';
+
     }
 
+    navPrev.addEventListener('click', () => {
+        showingLaterDays = false;
+        updateForecastDisplay();
+    });
+
+    navNext.addEventListener('click', () => {
+        showingLaterDays = true;
+        updateForecastDisplay();
+    });
+
+    forecastWrapper.appendChild(navPrev);
+    forecastWrapper.appendChild(navNext);
+
+    updateForecastDisplay();
+
     forecastContainer.appendChild(alertsView);
-    forecastContainer.appendChild(dayRow);
-    forecastContainer.appendChild(nightRow);
+
+    forecastContainer.appendChild(forecastWrapper);
+    forecastWrapper.appendChild(dayRow);
+    forecastWrapper.appendChild(nightRow);
+
     forecastContainer.appendChild(detailView);
     weatherDisplay.appendChild(forecastContainer);
     weatherDisplay.appendChild(navigationControls);
@@ -457,19 +498,19 @@ function tellWeather(weather) {
 
     alertsButton.addEventListener('click', () => {
         const detailView = document.querySelector('.detail-view');
-        
+        const forecastWrapper = document.querySelector('.forecast-wrapper');
+
         // If we're in detail view, hide it first
         if (detailView.classList.contains('slide-in')) {
             detailView.classList.remove('slide-in');
         }
-        
-        // Move forecast rows right
-        dayRow.classList.add('slide-right');
-        nightRow.classList.add('slide-right');
-        
+
+        // Move forecast wrapper right
+        forecastWrapper.classList.add('slide-right');
+
         // Show alerts
         alertsView.classList.add('slide-in-left');
-        
+
         // Update navigation
         backButton.style.display = 'block';
         alertsButton.style.display = 'none';
@@ -478,12 +519,12 @@ function tellWeather(weather) {
 
     // Update back button to handle all views
     backButton.addEventListener('click', () => {
+        const forecastWrapper = document.querySelector('.forecast-wrapper');
         // Remove all slide classes
-        dayRow.classList.remove('slide-left', 'slide-right');
-        nightRow.classList.remove('slide-left', 'slide-right');
+        forecastWrapper.classList.remove('slide-left', 'slide-right');
         detailView.classList.remove('slide-in');
         alertsView.classList.remove('slide-in-left');
-        
+
         // Reset navigation buttons
         backButton.style.display = 'none';
         detailButton.style.display = 'block';
@@ -494,11 +535,12 @@ function tellWeather(weather) {
 
     // Add keyboard navigation
     document.addEventListener('keydown', (e) => {
+        const forecastWrapper = document.querySelector('.forecast-wrapper');
+        
         if (e.key === 'ArrowRight') {
             // Show detail view if we're on forecast
             if (!detailView.classList.contains('slide-in')) {
-                dayRow.classList.add('slide-left');
-                nightRow.classList.add('slide-left');
+                forecastWrapper.classList.add('slide-left');
                 detailView.classList.add('slide-in');
                 backButton.style.display = 'block';
                 detailButton.style.display = 'none';
@@ -522,8 +564,7 @@ function tellWeather(weather) {
         } else if (e.key === 'ArrowLeft') {
             // Go back to forecast if we're on detail view
             if (detailView.classList.contains('slide-in')) {
-                dayRow.classList.remove('slide-left');
-                nightRow.classList.remove('slide-left');
+                forecastWrapper.classList.remove('slide-left');
                 detailView.classList.remove('slide-in');
                 backButton.style.display = 'none';
                 detailButton.style.display = 'block';
@@ -534,8 +575,8 @@ function tellWeather(weather) {
     setTheme(isDaytime);
 
     detailButton.addEventListener('click', async () => {
-        dayRow.classList.add('slide-left');
-        nightRow.classList.add('slide-left');
+        const forecastWrapper = document.querySelector('.forecast-wrapper');
+        forecastWrapper.classList.add('slide-left');
         detailView.classList.add('slide-in');
         backButton.style.display = 'block';
         detailButton.style.display = 'none';
@@ -556,6 +597,8 @@ function tellWeather(weather) {
             }
         }
     });
+
+
 }
 function startWeatherRefresh(location) {
     // Initial fetch
@@ -576,7 +619,7 @@ async function checkAlerts(location) {
     try {
         const alerts = await getWeatherAlerts(location);
         displayAlerts(alerts);
-        
+
         // Update cached weather data with new alerts
         const cachedWeather = localStorage.getItem('cachedWeather');
         if (cachedWeather) {
@@ -854,17 +897,17 @@ function start() {
         const locationKey = JSON.parse(location).lat + ',' + JSON.parse(location).lon;
         const cachedWeathers = JSON.parse(localStorage.getItem('locationWeatherCache') || '{}');
         const cachedAQIs = JSON.parse(localStorage.getItem('locationAQICache') || '{}');
-        
+
         if (cachedWeathers[locationKey]) {
             const weatherData = cachedWeathers[locationKey].data;
             displayCity(weatherData.city, weatherData.state);
             tellWeather(weatherData.forecast);
-            
+
             // Display cached AQI if available
             if (cachedAQIs[locationKey]) {
                 displayAirQuality(cachedAQIs[locationKey].data);
             }
-            
+
             if (weatherData.alerts) {
                 displayAlerts(weatherData.alerts);
             }
@@ -1070,7 +1113,7 @@ async function getAirQuality(location) {
 
     // Check if we have a ZIP-to-location mapping
     const zipMappings = JSON.parse(localStorage.getItem('aqiZipMappings') || '{}');
-    
+
     // If this location has an associated ZIP code, use it
     if (zipMappings[locationKey] && !aqiZip) {
         localStorage.setItem("aqiLocation", zipMappings[locationKey]);
@@ -1090,14 +1133,14 @@ async function getAirQuality(location) {
     const API_KEY = 'FBB76473-912E-4FDD-AEE4-6BA26080C2BD';
 
     try {
-        let useCoords = {...coords};
+        let useCoords = { ...coords };
         if (aqiZip) {
             const zipResponse = await fetch(`https://nominatim.openstreetmap.org/search?postalcode=${aqiZip}&country=USA&format=json`);
             const zipData = await zipResponse.json();
             if (zipData.length > 0) {
                 useCoords.lat = zipData[0].lat;
                 useCoords.lon = zipData[0].lon;
-                
+
                 // Store ZIP mapping for this location
                 zipMappings[locationKey] = aqiZip;
                 localStorage.setItem('aqiZipMappings', JSON.stringify(zipMappings));
@@ -1141,7 +1184,7 @@ async function getAirQuality(location) {
 function displayAirQuality(aqiData) {
     const aqiDisplay = document.getElementById('aqi-display');
     const aqiLocation = document.getElementById('aqi-location');
-    
+
     if (!aqiDisplay) return;
 
     // Update AQI display badge
@@ -1177,8 +1220,8 @@ function displayAirQuality(aqiData) {
 
     // Update location display in settings
     if (aqiLocation) {
-        const locationText = aqiData.location === 'weather location' ? 
-            'Using weather location' : 
+        const locationText = aqiData.location === 'weather location' ?
+            'Using weather location' :
             aqiData.location;
         aqiLocation.textContent = `AQI Location: ${locationText}`;
     }
@@ -1204,7 +1247,7 @@ async function getWeatherAlerts(location) {
         const response = await fetch(`https://api.weather.gov/alerts/active?point=${coords.lat},${coords.lon}`);
         const data = await response.json();
         const alerts = data.features || [];
-        
+
         // Cache the alerts for this location
         cachedAlerts[locationKey] = {
             timestamp: now,
@@ -1305,8 +1348,8 @@ function displayExtendedAlerts(alerts) {
     // Sort alerts by severity
     const severityOrder = ['Extreme', 'Severe', 'Moderate', 'Minor'];
     const sortedAlerts = alerts.sort((a, b) => {
-        return severityOrder.indexOf(a.properties.severity) - 
-               severityOrder.indexOf(b.properties.severity);
+        return severityOrder.indexOf(a.properties.severity) -
+            severityOrder.indexOf(b.properties.severity);
     });
 
     // Add alerts to the list
