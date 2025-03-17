@@ -47,34 +47,6 @@ function displayCity(city, state) {
     cityHeading.textContent = `Location: ${city}, ${state}${zip}`;
     document.title = `Forecast for ${city}, ${state}`;
 }
-function darkTheme() {
-    document.getElementById('body').style.color = '#E4E4E7';
-    document.getElementById('body').style.backgroundColor = '#18181B';
-    const dayPeriods = document.getElementsByClassName('period-day');
-    const nightPeriods = document.getElementsByClassName('period-night');
-
-    for (i = 0; i < dayPeriods.length; i++) {
-        dayPeriods[i].style.backgroundColor = 'rgba(39, 39, 42, 0.7)';
-    }
-
-    for (i = 0; i < nightPeriods.length; i++) {
-        nightPeriods[i].style.backgroundColor = 'rgba(24, 24, 27, 0.8)';
-    }
-}
-function lightTheme() {
-    document.getElementById('body').style.color = '#18181B';
-    document.getElementById('body').style.backgroundColor = '#F4F4F5';
-    const dayPeriods = document.getElementsByClassName('period-day');
-    const nightPeriods = document.getElementsByClassName('period-night');
-
-    for (i = 0; i < dayPeriods.length; i++) {
-        dayPeriods[i].style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
-    }
-
-    for (i = 0; i < nightPeriods.length; i++) {
-        nightPeriods[i].style.backgroundColor = 'rgba(243, 244, 246, 0.8)';
-    }
-}
 function setTheme(isDaytime) {
     // Load user preference
     const prefersDark = localStorage.getItem('darkMode') === 'true';
@@ -484,20 +456,35 @@ function tellWeather(weather) {
     }
 
     alertsButton.addEventListener('click', () => {
+        const detailView = document.querySelector('.detail-view');
+        
+        // If we're in detail view, hide it first
+        if (detailView.classList.contains('slide-in')) {
+            detailView.classList.remove('slide-in');
+        }
+        
+        // Move forecast rows right
         dayRow.classList.add('slide-right');
         nightRow.classList.add('slide-right');
+        
+        // Show alerts
         alertsView.classList.add('slide-in-left');
+        
+        // Update navigation
         backButton.style.display = 'block';
         alertsButton.style.display = 'none';
         detailButton.style.display = 'none';
     });
 
-    // Update back button to handle both views
+    // Update back button to handle all views
     backButton.addEventListener('click', () => {
+        // Remove all slide classes
         dayRow.classList.remove('slide-left', 'slide-right');
         nightRow.classList.remove('slide-left', 'slide-right');
         detailView.classList.remove('slide-in');
         alertsView.classList.remove('slide-in-left');
+        
+        // Reset navigation buttons
         backButton.style.display = 'none';
         detailButton.style.display = 'block';
         if (document.querySelector('.alerts-list').children.length > 0) {
@@ -545,6 +532,30 @@ function tellWeather(weather) {
     });
 
     setTheme(isDaytime);
+
+    detailButton.addEventListener('click', async () => {
+        dayRow.classList.add('slide-left');
+        nightRow.classList.add('slide-left');
+        detailView.classList.add('slide-in');
+        backButton.style.display = 'block';
+        detailButton.style.display = 'none';
+
+        // Get fresh data when opening detail view
+        const location = localStorage.getItem('location');
+        if (location) {
+            const [detailedData, airQualityData] = await Promise.all([
+                getDetailedWeatherInfo(location),
+                getAirQuality(location)
+            ]);
+
+            if (detailedData) {
+                if (airQualityData) {
+                    detailedData.airQuality = airQualityData;
+                }
+                displayDetailedWeather(detailedData);
+            }
+        }
+    });
 }
 function startWeatherRefresh(location) {
     // Initial fetch
