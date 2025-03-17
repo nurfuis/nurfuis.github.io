@@ -1104,14 +1104,21 @@ async function getAirQuality(location) {
 }
 function displayAirQuality(aqiData) {
     const aqiDisplay = document.getElementById('aqi-display');
+    const aqiLocation = document.getElementById('aqi-location');
+    
     if (!aqiDisplay) return;
 
+    // Update AQI display badge
     if (!aqiData) {
         aqiDisplay.innerHTML = `
             <span class="aqi-badge" style="--aqi-color: 128, 128, 128">
                 No AQI
             </span>
         `;
+        // Update location display in settings
+        if (aqiLocation) {
+            aqiLocation.textContent = 'AQI Location: No data available';
+        }
         return;
     }
 
@@ -1124,12 +1131,21 @@ function displayAirQuality(aqiData) {
         'Hazardous': '126, 0, 35'
     };
 
+    // Update AQI badge
     aqiDisplay.innerHTML = `
         <span class="aqi-badge" style="--aqi-color: ${aqiColors[aqiData.category]}">
             AQI ${aqiData.aqi}
         </span>
         <span class="aqi-category">${aqiData.category}</span>
     `;
+
+    // Update location display in settings
+    if (aqiLocation) {
+        const locationText = aqiData.location === 'weather location' ? 
+            'Using weather location' : 
+            aqiData.location;
+        aqiLocation.textContent = `AQI Location: ${locationText}`;
+    }
 }
 async function getWeatherAlerts(location) {
     const coords = JSON.parse(location);
