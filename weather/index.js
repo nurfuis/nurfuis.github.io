@@ -1,6 +1,23 @@
 function clearLocation() {
     const oldLocation = localStorage.getItem("location");
     
+    // Return to forecast view if we're in alerts view
+    const alertsView = document.querySelector('.alerts-view');
+    const dayRow = document.querySelector('.forecast-row');
+    const nightRow = document.querySelector('.forecast-row:last-of-type');
+    const backButton = document.querySelector('.back-to-forecast');
+    const alertsButton = document.querySelector('.alerts-button');
+    const detailButton = document.querySelector('.view-detail');
+
+    if (alertsView?.classList.contains('slide-in-left')) {
+        alertsView.classList.remove('slide-in-left');
+        dayRow?.classList.remove('slide-right');
+        nightRow?.classList.remove('slide-right');
+        if (backButton) backButton.style.display = 'none';
+        if (detailButton) detailButton.style.display = 'block';
+    }
+
+    // Clear caches and update location
     if (oldLocation) {
         const coords = JSON.parse(oldLocation);
         const locationKey = `${coords.lat},${coords.lon}`;
@@ -17,12 +34,6 @@ function clearLocation() {
         localStorage.setItem('locationWeatherCache', JSON.stringify(cachedWeathers));
         localStorage.setItem('locationAQICache', JSON.stringify(cachedAQIs));
         localStorage.setItem('locationAlertsCache', JSON.stringify(cachedAlerts));
-
-        // Clear current alert display
-        const alertDiv = document.querySelector('.ticker-alerts');
-        if (alertDiv) {
-            alertDiv.innerHTML = '';
-        }
     }
 
     localStorage.removeItem("location");
@@ -366,6 +377,16 @@ function tellWeather(weather) {
     const forecastContainer = document.createElement('div');
     forecastContainer.className = 'forecast-container';
 
+    // Add alerts view container
+    const alertsView = document.createElement('div');
+    alertsView.className = 'alerts-view';
+    alertsView.innerHTML = `
+        <div id="alerts-content">
+            <h3>Weather Alerts</h3>
+            <div class="alerts-list"></div>
+        </div>
+    `;
+
     const dayRow = document.createElement('div');
     const nightRow = document.createElement('div');
     const navigationControls = document.createElement('div');
@@ -375,6 +396,7 @@ function tellWeather(weather) {
 
     // Add navigation buttons with both forward and back controls
     navigationControls.innerHTML = `
+        <button class="nav-button alerts-button" style="display: none;">⚠️ View Alerts</button>
         <button class="nav-button back-to-forecast" style="display: none;">← Back to Forecast</button>
         <button class="nav-button view-detail">View Details ➜</button>
     `;
@@ -425,6 +447,7 @@ function tellWeather(weather) {
         }
     }
 
+    forecastContainer.appendChild(alertsView);
     forecastContainer.appendChild(dayRow);
     forecastContainer.appendChild(nightRow);
     forecastContainer.appendChild(detailView);
@@ -447,37 +470,39 @@ function tellWeather(weather) {
     // Add event listeners
     const backButton = navigationControls.querySelector('.back-to-forecast');
     const detailButton = navigationControls.querySelector('.view-detail');
+    const alertsButton = navigationControls.querySelector('.alerts-button');
 
-    detailButton.addEventListener('click', async () => {
-        dayRow.classList.add('slide-left');
-        nightRow.classList.add('slide-left');
-        detailView.classList.add('slide-in');
-        backButton.style.display = 'block';
-        detailButton.style.display = 'none';
-
-        // Get fresh data when opening detail view
-        const location = localStorage.getItem('location');
-        if (location) {
-            const [detailedData, airQualityData] = await Promise.all([
-                getDetailedWeatherInfo(location),
-                getAirQuality(location)
-            ]);
-
-            if (detailedData) {
-                if (airQualityData) {
-                    detailedData.airQuality = airQualityData;
-                }
-                displayDetailedWeather(detailedData);
+    // Show alerts button if there are active alerts
+    const location = localStorage.getItem('location');
+    if (location) {
+        getWeatherAlerts(location).then(alerts => {
+            if (alerts && alerts.length > 0) {
+                alertsButton.style.display = 'block';
+                displayExtendedAlerts(alerts);
             }
-        }
+        });
+    }
+
+    alertsButton.addEventListener('click', () => {
+        dayRow.classList.add('slide-right');
+        nightRow.classList.add('slide-right');
+        alertsView.classList.add('slide-in-left');
+        backButton.style.display = 'block';
+        alertsButton.style.display = 'none';
+        detailButton.style.display = 'none';
     });
 
+    // Update back button to handle both views
     backButton.addEventListener('click', () => {
-        dayRow.classList.remove('slide-left');
-        nightRow.classList.remove('slide-left');
+        dayRow.classList.remove('slide-left', 'slide-right');
+        nightRow.classList.remove('slide-left', 'slide-right');
         detailView.classList.remove('slide-in');
+        alertsView.classList.remove('slide-in-left');
         backButton.style.display = 'none';
         detailButton.style.display = 'block';
+        if (document.querySelector('.alerts-list').children.length > 0) {
+            alertsButton.style.display = 'block';
+        }
     });
 
     // Add keyboard navigation
@@ -1212,6 +1237,14 @@ function displayAlerts(alerts) {
             </div>
         </div>
     `;
+
+    // Adjust scroll speed based on content length
+    const scrollText = alertDiv.querySelector('.alert-scroll-text');
+    if (scrollText) {
+        const textLength = scrollText.textContent.length;
+        const duration = Math.max(20, Math.min(45, textLength * 0.2)); // 0.2s per character, min 20s, max 45s
+        scrollText.style.animationDuration = `${duration}s`;
+    }
 }
 function setTemperatureColor(element, temp) {
     let colorVar;
@@ -1227,4 +1260,60 @@ function setTemperatureColor(element, temp) {
         colorVar = 'var(--temp-hot)';
     }
     element.style.setProperty('--temp-color', colorVar);
+}
+function displayExtendedAlerts(alerts) {
+    // Update alerts list
+    const alertsList = document.querySelector('.alerts-list');
+    if (!alertsList) return;
+
+    // Clear existing alerts
+    alertsList.innerHTML = '';
+
+    if (!alerts || alerts.length === 0) {
+        // Hide alerts button if no alerts
+        const alertsButton = document.querySelector('.alerts-button');
+        if (alertsButton) {
+            alertsButton.style.display = 'none';
+        }
+        // Reset alerts view if it's currently shown
+        const alertsView = document.querySelector('.alerts-view');
+        const backButton = document.querySelector('.back-to-forecast');
+        if (alertsView?.classList.contains('slide-in-left')) {
+            alertsView.classList.remove('slide-in-left');
+            backButton.click(); // Return to forecast view
+        }
+        return;
+    }
+
+    // Show alerts button
+    const alertsButton = document.querySelector('.alerts-button');
+    if (alertsButton) {
+        alertsButton.style.display = 'block';
+    }
+
+    // Sort alerts by severity
+    const severityOrder = ['Extreme', 'Severe', 'Moderate', 'Minor'];
+    const sortedAlerts = alerts.sort((a, b) => {
+        return severityOrder.indexOf(a.properties.severity) - 
+               severityOrder.indexOf(b.properties.severity);
+    });
+
+    // Add alerts to the list
+    sortedAlerts.forEach(alert => {
+        const alertEl = document.createElement('div');
+        alertEl.className = `alert-item ${alert.properties.severity.toLowerCase()}`;
+        alertEl.innerHTML = `
+            <h4>${alert.properties.event}</h4>
+            <p class="alert-time">Until: ${new Date(alert.properties.expires).toLocaleString()}</p>
+            <p class="alert-severity">Severity: ${alert.properties.severity}</p>
+            <div class="alert-description">
+                ${alert.properties.description}
+            </div>
+            <div class="alert-instructions">
+                <strong>Instructions:</strong><br>
+                ${alert.properties.instruction || 'No specific instructions provided.'}
+            </div>
+        `;
+        alertsList.appendChild(alertEl);
+    });
 }
