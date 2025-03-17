@@ -813,16 +813,25 @@ function start() {
     addStartMenu();
 
     // Try to display cached weather if available
-    const cachedWeather = localStorage.getItem('cachedWeather');
-    if (cachedWeather) {
-        const weatherData = JSON.parse(cachedWeather);
-        displayCity(weatherData.city, weatherData.state);
-        tellWeather(weatherData.forecast);
-        if (weatherData.airQuality) {
-            displayAirQuality(weatherData.airQuality);
-        }
-        if (weatherData.alerts) {
-            displayAlerts(weatherData.alerts);
+    const location = localStorage.getItem('location');
+    if (location) {
+        const locationKey = JSON.parse(location).lat + ',' + JSON.parse(location).lon;
+        const cachedWeathers = JSON.parse(localStorage.getItem('locationWeatherCache') || '{}');
+        const cachedAQIs = JSON.parse(localStorage.getItem('locationAQICache') || '{}');
+        
+        if (cachedWeathers[locationKey]) {
+            const weatherData = cachedWeathers[locationKey].data;
+            displayCity(weatherData.city, weatherData.state);
+            tellWeather(weatherData.forecast);
+            
+            // Display cached AQI if available
+            if (cachedAQIs[locationKey]) {
+                displayAirQuality(cachedAQIs[locationKey].data);
+            }
+            
+            if (weatherData.alerts) {
+                displayAlerts(weatherData.alerts);
+            }
         }
     }
 
@@ -1021,38 +1030,48 @@ async function getAirQuality(location) {
     const coords = JSON.parse(location);
     const locationKey = `${coords.lat},${coords.lon}`;
     const ONE_HOUR = 3600000;
+    const aqiZip = localStorage.getItem("aqiLocation");
+
+    // Check if we have a ZIP-to-location mapping
+    const zipMappings = JSON.parse(localStorage.getItem('aqiZipMappings') || '{}');
+    
+    // If this location has an associated ZIP code, use it
+    if (zipMappings[locationKey] && !aqiZip) {
+        localStorage.setItem("aqiLocation", zipMappings[locationKey]);
+    }
 
     // Try to get cached AQI for this specific location
     const cachedAQIs = JSON.parse(localStorage.getItem('locationAQICache') || '{}');
     const cachedData = cachedAQIs[locationKey];
     const now = Date.now();
 
-    // If we have valid cached data for this location
     if (cachedData && (now - cachedData.timestamp < ONE_HOUR)) {
-        console.log('Using cached AQI data for location:', locationKey);
+        console.log('Using cached AQI data for location:', locationKey, 'with ZIP:', cachedData.data.location);
         return cachedData.data;
     }
 
-    // Otherwise fetch fresh data
     console.log('Fetching fresh AQI data for location:', locationKey);
-    const aqiZip = localStorage.getItem("aqiLocation");
     const API_KEY = 'FBB76473-912E-4FDD-AEE4-6BA26080C2BD';
 
     try {
-        // If AQI ZIP is set, use those coordinates instead
+        let useCoords = {...coords};
         if (aqiZip) {
             const zipResponse = await fetch(`https://nominatim.openstreetmap.org/search?postalcode=${aqiZip}&country=USA&format=json`);
             const zipData = await zipResponse.json();
             if (zipData.length > 0) {
-                coords.lat = zipData[0].lat;
-                coords.lon = zipData[0].lon;
+                useCoords.lat = zipData[0].lat;
+                useCoords.lon = zipData[0].lon;
+                
+                // Store ZIP mapping for this location
+                zipMappings[locationKey] = aqiZip;
+                localStorage.setItem('aqiZipMappings', JSON.stringify(zipMappings));
             } else {
                 console.log('No coordinates found for AQI ZIP:', aqiZip);
                 return null;
             }
         }
 
-        const url = `https://www.airnowapi.org/aq/observation/latLong/current/?format=application/json&latitude=${coords.lat}&longitude=${coords.lon}&distance=150&API_KEY=${API_KEY}`;
+        const url = `https://www.airnowapi.org/aq/observation/latLong/current/?format=application/json&latitude=${useCoords.lat}&longitude=${useCoords.lon}&distance=150&API_KEY=${API_KEY}`;
         const response = await fetch(url);
         const data = await response.json();
 
@@ -1066,7 +1085,8 @@ async function getAirQuality(location) {
             category: data[0].Category.Name,
             pollutant: data[0].ParameterName,
             timestamp: data[0].DateObserved,
-            location: aqiZip || 'weather location'
+            location: aqiZip || 'weather location',
+            coordinates: useCoords
         };
 
         // Cache the AQI data for this location
