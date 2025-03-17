@@ -138,8 +138,8 @@ h4,
 
 .settings-content #aqi-location {
     margin: 0;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0;
+    border-bottom: 0px solid var(--border-color);
     font-size: 0.9em;
     opacity: 0.8;
 }
@@ -466,7 +466,7 @@ body.collapsed #bgCanvas {
 /* Update exit button styles for better accessibility */
 #exit-button {
     border-top: 1px solid var(--border-color);
-    margin-top: 1rem;
+    margin-top: 2rem;
     padding-top: 1rem;
     color: #F5A623; /* Warm yellow that works in both light/dark modes */
     font-weight: 600;
@@ -810,7 +810,7 @@ body.dark-mode #exit-button:hover {
 
 .aqi-input-group input {
     padding: 0.25rem 0.5rem;
-    border: 1px solid var(--border-color);
+    border: 0px solid var(--border-color);
     border-radius: 3px;
     background: var(--header-bg);
     color: var(--text-color);
@@ -819,7 +819,7 @@ body.dark-mode #exit-button:hover {
 
 .aqi-input-group button {
     padding: 0.25rem 0.75rem;
-    border: 1px solid var(--border-color);
+    border: 0px solid var(--border-color);
     border-radius: 3px;
     background: var(--period-bg);
     color: var(--text-color);
@@ -1070,8 +1070,8 @@ body.dark-mode #exit-button:hover {
     background: var(--period-bg);
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    padding: 1.5rem;
-    overflow: scroll; /* Changed from overflow-y: auto */
+    padding: 0;
+    overflow: hidden; /* Changed from overflow-y: auto */
     max-height: 80vh;
     backdrop-filter: blur(8px);
     transform: translateX(-100%); /* Start fully off-screen to the left */
@@ -1251,4 +1251,143 @@ body.dark-mode #exit-button:hover {
 
 .forecast-wrapper.slide-right {
     transform: translateX(200%);
+}
+
+.alerts-container {
+    display: flex;
+    gap: 1rem;
+    height: 100%;
+}
+
+.alerts-index {
+    flex: 0 0 200px;
+    padding-right: 1rem;
+    border-right: 1px solid var(--border-color);
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: sticky;
+    top: 0;
+}
+
+.alerts-content {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.index-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    text-decoration: none;
+    color: var(--text-color);
+    border-radius: 4px;
+    background: var(--header-bg);
+}
+
+.index-item:hover {
+    background: var(--period-bg);
+}
+
+.index-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--border-color);
+    font-weight: bold;
+}
+
+.index-title {
+    font-size: 0.9em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.index-item.extreme .index-number { background: rgba(255, 0, 0, 0.8); }
+.index-item.severe .index-number { background: rgba(255, 165, 0, 0.8); }
+.index-item.moderate .index-number { background: rgba(255, 255, 0, 0.8); }
+.index-item.minor .index-number { background: rgba(144, 238, 144, 0.8); }
+
+.index-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    border: none;
+    background: var(--header-bg);
+    color: var(--text-color);
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 4px;
+    font-family: inherit;
+}
+
+.index-item:hover {
+    background: var(--period-bg);
+}
+
+/* Scrollbar styling for alerts and other scrollable content */
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(212, 163, 115, 0.1);
+    border: 1px solid rgba(212, 163, 115, 0.2);
+    backdrop-filter: blur(4px);
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+        to bottom,
+        rgba(212, 163, 115, 0.6),
+        rgba(185, 142, 100, 0.8)
+    );
+    border: 1px solid rgba(212, 163, 115, 0.3);
+    border-radius: 6px;
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(
+        to bottom,
+        rgba(212, 163, 115, 0.8),
+        rgba(185, 142, 100, 0.9)
+    );
+}
+
+::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+/* Dark mode variations */
+body.dark-mode ::-webkit-scrollbar-track {
+    background: rgba(44, 51, 51, 0.3);
+    border-color: rgba(130, 145, 145, 0.3);
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+        to bottom,
+        rgba(130, 145, 145, 0.6),
+        rgba(100, 110, 110, 0.8)
+    );
+    border-color: rgba(130, 145, 145, 0.3);
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(
+        to bottom,
+        rgba(130, 145, 145, 0.8),
+        rgba(100, 110, 110, 0.9)
+    );
 }

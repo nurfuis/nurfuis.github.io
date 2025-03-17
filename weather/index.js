@@ -1,3 +1,5 @@
+const DEBUG = false;
+
 function clearLocation() {
     const oldLocation = localStorage.getItem("location");
 
@@ -536,7 +538,7 @@ function tellWeather(weather) {
     // Add keyboard navigation
     document.addEventListener('keydown', (e) => {
         const forecastWrapper = document.querySelector('.forecast-wrapper');
-        
+
         if (e.key === 'ArrowRight') {
             // Show detail view if we're on forecast
             if (!detailView.classList.contains('slide-in')) {
@@ -824,14 +826,14 @@ function addStartMenu() {
         settingsContent.appendChild(bgToggle);
     }
 
-
-    // Add Weather Toggle button
-    const toggleButton = document.createElement("button");
-    toggleButton.textContent = document.getElementById('weather').classList.contains('collapsed') ? "Show Forecast" : "Hide Forecast";
-    toggleButton.id = "toggle-weather";
-    toggleButton.addEventListener("click", toggleWeather);
-    settingsContent.appendChild(toggleButton);
-
+    if (DEBUG) {
+        // Add Weather Toggle button
+        const toggleButton = document.createElement("button");
+        toggleButton.textContent = document.getElementById('weather').classList.contains('collapsed') ? "Show Forecast" : "Hide Forecast";
+        toggleButton.id = "toggle-weather";
+        toggleButton.addEventListener("click", toggleWeather);
+        settingsContent.appendChild(toggleButton);
+    }
 
 
     // Add Exit button
@@ -1316,45 +1318,59 @@ function setTemperatureColor(element, temp) {
     element.style.setProperty('--temp-color', colorVar);
 }
 function displayExtendedAlerts(alerts) {
-    // Update alerts list
     const alertsList = document.querySelector('.alerts-list');
     if (!alertsList) return;
 
-    // Clear existing alerts
     alertsList.innerHTML = '';
 
     if (!alerts || alerts.length === 0) {
-        // Hide alerts button if no alerts
-        const alertsButton = document.querySelector('.alerts-button');
-        if (alertsButton) {
-            alertsButton.style.display = 'none';
-        }
-        // Reset alerts view if it's currently shown
-        const alertsView = document.querySelector('.alerts-view');
-        const backButton = document.querySelector('.back-to-forecast');
-        if (alertsView?.classList.contains('slide-in-left')) {
-            alertsView.classList.remove('slide-in-left');
-            backButton.click(); // Return to forecast view
-        }
+        // ... existing no-alerts handling ...
         return;
     }
 
-    // Show alerts button
-    const alertsButton = document.querySelector('.alerts-button');
-    if (alertsButton) {
-        alertsButton.style.display = 'block';
-    }
+    // Create alert index container
+    const alertsContainer = document.createElement('div');
+    alertsContainer.className = 'alerts-container';
 
-    // Sort alerts by severity
+    const alertIndex = document.createElement('div');
+    alertIndex.className = 'alerts-index';
+
+    const alertContent = document.createElement('div');
+    alertContent.className = 'alerts-content';
+
+    // Sort alerts
     const severityOrder = ['Extreme', 'Severe', 'Moderate', 'Minor'];
     const sortedAlerts = alerts.sort((a, b) => {
         return severityOrder.indexOf(a.properties.severity) -
             severityOrder.indexOf(b.properties.severity);
     });
 
-    // Add alerts to the list
-    sortedAlerts.forEach(alert => {
+    // Create index and alerts
+    sortedAlerts.forEach((alert, index) => {
+        // Create index item
+        const indexItem = document.createElement('button'); // Changed from 'a'
+        indexItem.className = `index-item ${alert.properties.severity.toLowerCase()}`;
+        indexItem.innerHTML = `
+            <span class="index-number">${index + 1}</span>
+            <span class="index-title">${alert.properties.event}</span>
+        `;
+
+        // Add click handler for smooth scroll
+        indexItem.addEventListener('click', () => {
+            const targetAlert = alertContent.querySelector(`#alert-${index}`);
+            if (targetAlert) {
+                alertContent.scrollTo({
+                    top: targetAlert.offsetTop - 16, // Add some padding
+                    behavior: 'smooth'
+                });
+            }
+        });
+
+        alertIndex.appendChild(indexItem);
+
+        // Create alert content
         const alertEl = document.createElement('div');
+        alertEl.id = `alert-${index}`;
         alertEl.className = `alert-item ${alert.properties.severity.toLowerCase()}`;
         alertEl.innerHTML = `
             <h4>${alert.properties.event}</h4>
@@ -1368,6 +1384,11 @@ function displayExtendedAlerts(alerts) {
                 ${alert.properties.instruction || 'No specific instructions provided.'}
             </div>
         `;
-        alertsList.appendChild(alertEl);
+        alertContent.appendChild(alertEl);
     });
+
+    // Assemble the layout
+    alertsContainer.appendChild(alertIndex);
+    alertsContainer.appendChild(alertContent);
+    alertsList.appendChild(alertsContainer);
 }
