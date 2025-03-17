@@ -1276,13 +1276,24 @@ function displayAlerts(alerts) {
         return;
     }
 
-    // Sort alerts by severity
-    const sortedAlerts = alerts.sort((a, b) => {
-        const severityOrder = ['Extreme', 'Severe', 'Moderate', 'Minor'];
+    // Filter out expired alerts
+    const now = Date.now();
+    const activeAlerts = alerts.filter(alert => {
+        const expirationTime = new Date(alert.properties.expires).getTime();
+        return expirationTime > now;
+    });
+
+    if (activeAlerts.length === 0) {
+        console.log('All alerts have expired');
+        return;
+    }
+
+    // Sort by severity and get most severe active alert
+    const severityOrder = ['Extreme', 'Severe', 'Moderate', 'Minor'];
+    const sortedAlerts = activeAlerts.sort((a, b) => {
         return severityOrder.indexOf(a.properties.severity) - severityOrder.indexOf(b.properties.severity);
     });
     const mostSevereAlert = sortedAlerts[0].properties;
-    console.log('Most severe alert:', mostSevereAlert);
 
     // Create alert content with scrolling text
     alertDiv.innerHTML = `
@@ -1293,14 +1304,6 @@ function displayAlerts(alerts) {
             </div>
         </div>
     `;
-
-    // Adjust scroll speed based on content length
-    const scrollText = alertDiv.querySelector('.alert-scroll-text');
-    if (scrollText) {
-        const textLength = scrollText.textContent.length;
-        const duration = Math.max(20, Math.min(45, textLength * 0.2)); // 0.2s per character, min 20s, max 45s
-        scrollText.style.animationDuration = `${duration}s`;
-    }
 }
 function setTemperatureColor(element, temp) {
     let colorVar;
