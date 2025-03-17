@@ -187,7 +187,7 @@ function displayDetailedWeather(weatherData) {
                     <span>Humidity:</span> ${Math.round(current.humidity)}%
                 </div>
                 <div class="condition-row">
-                    <span>Wind:</span> ${Math.round(current.windSpeed)} mph from ${getCardinalDirection(current.windDirection)} (${Math.round(current.windDirection)}°)
+                    <span>Wind:</span> ${Math.round(current.windSpeed)} mph from ${getCardinalDirection(current.windDirection)}
                 </div>
                 <div class="condition-row">
                     <span>Pressure:</span> ${Math.round(current.barometricPressure / 100)} mb
@@ -200,7 +200,7 @@ function displayDetailedWeather(weatherData) {
             <div class="hourly-section">
                 <div class="header-row">
                     <h4>24 Hour Forecast</h4>
-                    <p class="timestamp">weather.gov | airnow.gov</p>
+                    <p class="timestamp">weather.gov | airnow.gov | openstreetmap.org</p>
                 </div>
                 <div class="hourly-forecast">
                     ${weatherData.hourlyForecast.map(hour => `

@@ -61,6 +61,7 @@ body {
     background-repeat: no-repeat !important;
     background-attachment: fixed !important;
     color: var(--text-color);
+    user-select: none;
 }
 
 body.collapsed {
