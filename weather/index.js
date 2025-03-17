@@ -725,7 +725,7 @@ function addStartMenu() {
         const bgToggle = document.createElement("button");
         bgToggle.id = "background-toggle";
         const isBackgroundEnabled = localStorage.getItem('useBackground') !== 'false';
-        bgToggle.textContent = isBackgroundEnabled ? "🖼️ Pause Background" : "🖼️ Play Background";
+        bgToggle.textContent = isBackgroundEnabled ? "⏸️ Pause Background" : "▶️ Play Background";
 
         bgToggle.addEventListener("click", () => {
             const canvas = document.getElementById('bgCanvas');
@@ -734,11 +734,11 @@ function addStartMenu() {
             if (isEnabled) {
                 localStorage.setItem('useBackground', 'false');
                 canvas.style.opacity = '0';
-                bgToggle.textContent = "🖼️ Pause Background";
+                bgToggle.textContent = "▶️ Play Background";
             } else {
                 localStorage.setItem('useBackground', 'true');
                 canvas.style.opacity = '1';
-                bgToggle.textContent = "🖼️ Play Background";
+                bgToggle.textContent = "⏸️ Pause Background";
             }
         });
 
