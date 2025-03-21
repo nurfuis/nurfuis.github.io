@@ -205,10 +205,13 @@ function displayDetailedWeather(weatherData) {
                 </div>
                 <div class="hourly-forecast">
                     ${weatherData.hourlyForecast.map(hour => `
-                        <div class="hour-forecast ${hour.temperature === minTemp ? 'coldest' : ''
-        } ${hour.temperature === maxTemp ? 'hottest' : ''
-        } ${hour.isDaytime ? 'daytime' : 'nighttime'}">
-                            <div class="time">${new Date(hour.startTime).toLocaleTimeString([], { hour: 'numeric' })}</div>
+                        <div class="hour-forecast ${hour.temperature === minTemp ? 'coldest' : ''} 
+                            ${hour.temperature === maxTemp ? 'hottest' : ''} 
+                            ${hour.isDaytime ? 'daytime' : 'nighttime'}">
+                            <div class="time">${new Date(hour.startTime).toLocaleTimeString([], { 
+                                hour: 'numeric',
+                                hour12: true // Explicitly use 12-hour format
+                            })}</div>
                             <div class="temp">${hour.temperature}°F</div>
                             <div class="short">${hour.shortForecast}</div>
                         </div>
@@ -220,6 +223,7 @@ function displayDetailedWeather(weatherData) {
 
     const detailButton = document.querySelector('.view-detail');
     const forecastWrapper = document.querySelector('.forecast-wrapper');
+    const detailView = document.querySelector('.detail-view');
     detailButton.addEventListener('click', async () => {
         forecastWrapper.classList.add('slide-left');
         detailView.classList.add('slide-in');
@@ -281,7 +285,7 @@ function getWeather(location) {
 
         // Initialize UI with cached data
         displayCity(weatherData.city, weatherData.state);
-        tellWeather(weatherData.forecast);
+        tellWeather(weatherData.forecast, weatherData);
         if (weatherData.airQuality) {
             displayAirQuality(weatherData.airQuality);
         }
@@ -333,6 +337,7 @@ function getWeather(location) {
                         displayAlerts(alerts);
                         if (detailedData) {
                             displayDetailedWeather(detailedData);
+                            console.log('Detailed weather data:', detailedData);
                         }
                     });
             });
@@ -455,6 +460,22 @@ function tellWeather(weather) {
         updateForecastDisplay();
     });
 
+
+    // temp badge
+    const currentConditions = weather.currentConditions || weather.properties.periods[0]; // Fallback to first period if needed
+    const briefDisplay = document.getElementById('brief-display');
+
+    const tempBadgeDiv = document.createElement('div');
+    tempBadgeDiv.className = 'current-temp-badge';
+    tempBadgeDiv.innerHTML = `
+        <span class="temp-value">${currentConditions.temperature}°F</span>
+        <span class="temp-desc">${currentConditions.shortForecast || oneWeekForecast[0].shortForecast}</span>
+    `;
+    setTemperatureColor(tempBadgeDiv, currentConditions.temperature);
+    briefDisplay.innerHTML = ''; // Clear any existing content
+    briefDisplay.appendChild(tempBadgeDiv);
+
+
     forecastWrapper.appendChild(navPrev);
     forecastWrapper.appendChild(navNext);
 
@@ -470,19 +491,7 @@ function tellWeather(weather) {
     weatherDisplay.appendChild(forecastContainer);
     weatherDisplay.appendChild(navigationControls);
 
-    // Add current conditions badge
-    const currentPeriod = oneWeekForecast[0];
-    const briefDisplay = document.getElementById('brief-display');
 
-    const tempBadgeDiv = document.createElement('div');
-    tempBadgeDiv.className = 'current-temp-badge';
-    tempBadgeDiv.innerHTML = `
-        <span class="temp-value">${currentPeriod.temperature}°F</span>
-        <span class="temp-desc">${currentPeriod.shortForecast}</span>
-    `;
-    setTemperatureColor(tempBadgeDiv, currentPeriod.temperature);
-    briefDisplay.innerHTML = ''; // Clear any existing content
-    briefDisplay.appendChild(tempBadgeDiv);
     // Add event listeners
     const backButton = navigationControls.querySelector('.back-to-forecast');
     const detailButton = navigationControls.querySelector('.view-detail');

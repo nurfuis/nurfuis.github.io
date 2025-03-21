@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Card Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Social Media Card Generator</h1>
+            <p class="subheader">Create social media 1:1 infographics from data</p>
+        </header>
+        
+        <div id="loading" class="loading">Loading card data...</div>
+        
+        <div id="card-grid" class="card-grid"></div>
+        
+        <div class="global-actions">
+            <button id="download-all-btn" class="download-all-btn">Generate & Download All Cards</button>
+        </div>
+    </div>
+
+    <script src="cardData.js"></script>
+    <script>
+        // Card layouts and themes
+        const LAYOUTS = [
+            { id: 'layout-centered', name: 'Centered' },
+            { id: 'layout-split', name: 'Split' },
+            { id: 'layout-boxed', name: 'Boxed' }
+        ];
+        
+        const THEMES = [
+            { id: 'theme-blue', name: 'Blue' },
+            { id: 'theme-green', name: 'Green' },
+            { id: 'theme-purple', name: 'Purple' },
+            { id: 'theme-dark', name: 'Dark' },
+            { id: 'theme-sunset', name: 'Sunset' }
+        ];
+        
+        // Add orientation constants after existing LAYOUTS and THEMES
+        const ORIENTATIONS = [
+            { id: 'square', name: 'Square (1:1)', width: 1024, height: 1024 },
+            { id: 'portrait', name: 'Portrait (4:5)', width: 1024, height: 1280 },
+            { id: 'story', name: 'Story (9:16)', width: 1080, height: 1920 }  // Instagram Story dimensions
+        ];
+        
+        // DOM Elements
+        const cardGrid = document.getElementById('card-grid');
+        const loadingElement = document.getElementById('loading');
+        const downloadAllBtn = document.getElementById('download-all-btn');
+        
+        // Store card data globally
+        let cardData = [];
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load card data from JSON
+            fetchCardData();
+            
+            // Set up event listeners
+            downloadAllBtn.addEventListener('click', downloadAllCards);
+        });
+        
+        /**
+         * Fetch card data from JSON file
+         */
+        async function fetchCardData() {
+            try {
+                // Instead of fetching a JSON file, use the data from cardData.js
+                if (typeof CARD_DATA !== 'undefined') {
+                    cardData = CARD_DATA;
+                    
+                    // Hide loading indicator
+                    loadingElement.style.display = 'none';
+                    
+                    // Generate card previews
+                    generateCardPreviews(cardData);
+                } else {
+                    throw new Error('Card data not loaded');
+                }
+            } catch (error) {
+                console.error('Error loading card data:', error);
+                
+                // Show error in UI
+                loadingElement.textContent = 'Error loading card data. Using sample data instead.';
+                
+                // Use sample data as fallback
+                cardData = getSampleCardData();
+                
+                // Hide loading indicator after a delay
+                setTimeout(() => {
+                    loadingElement.style.display = 'none';
+                    
+                    // Generate card previews with sample data
+                    generateCardPreviews(cardData);
+                }, 1500);
+            }
+        }
+        
+        /**
+         * Get sample card data (fallback if JSON loading fails)
+         */
+        function getSampleCardData() {
+            return [
+                {
+                    "title": "Climate Facts",
+                    "points": [
+                        "97% of scientists agree climate change is human-caused",
+                        "Global temperatures have risen 1.1°C since pre-industrial times",
+                        "Sea levels rose 8-9 inches since 1880"
+                    ],
+                    "layout": "layout-centered",
+                    "theme": "theme-blue"
+                },
+                {
+                    "title": "Media Literacy Tips",
+                    "points": [
+                        "Verify sources before sharing",
+                        "Check publication dates",
+                        "Look for multiple confirming sources",
+                        "Be wary of emotionally manipulative content"
+                    ],
+                    "layout": "layout-split",
+                    "theme": "theme-green"
+                },
+                {
+                    "title": "Spotting Deepfakes",
+                    "points": [
+                        "Look for unnatural eye movements",
+                        "Watch for strange facial expressions",
+                        "Check for audio-visual sync issues",
+                        "Verify with trusted news sources"
+                    ],
+                    "layout": "layout-boxed",
+                    "theme": "theme-purple"
+                }
+            ];
+        }
+        
+        /**
+         * Generate card previews for each item in the data
+         */
+        function generateCardPreviews(data) {
+            // Clear existing cards
+            cardGrid.innerHTML = '';
+            
+            // Generate a preview for each card
+            data.forEach((card, index) => {
+                const cardPreviewElement = createCardPreviewElement(card, index);
+                cardGrid.appendChild(cardPreviewElement);
+            });
+        }
+        
+        /**
+         * Create a card preview element
+         */
+        function createCardPreviewElement(card, index) {
+            // Create container for the card preview
+            const cardPreview = document.createElement('div');
+            cardPreview.className = 'card-preview';
+            cardPreview.dataset.index = index;
+            
+            // Create header with title
+            const cardPreviewHeader = document.createElement('div');
+            cardPreviewHeader.className = 'card-preview-header';
+            
+            const cardTitle = document.createElement('div');
+            cardTitle.className = 'card-title';
+            cardTitle.textContent = card.title;
+            
+            cardPreviewHeader.appendChild(cardTitle);
+            cardPreview.appendChild(cardPreviewHeader);
+            
+            // Create canvas container
+            const canvasContainer = document.createElement('div');
+            canvasContainer.className = 'card-canvas-container';
+            
+            const canvasWrapper = document.createElement('div');
+            canvasWrapper.className = 'card-canvas-wrapper';
+            
+            const canvas = document.createElement('canvas');
+            canvas.className = 'card-canvas';
+            canvas.width = 1024;
+            canvas.height = 1024;
+            canvas.id = `canvas-${index}`;
+            
+            canvasWrapper.appendChild(canvas);
+            canvasContainer.appendChild(canvasWrapper);
+            cardPreview.appendChild(canvasContainer);
+            
+            // Create controls
+            const controls = document.createElement('div');
+            controls.className = 'card-controls';
+            
+            // Layout selection
+            const layoutGroup = document.createElement('div');
+            layoutGroup.className = 'control-group';
+            
+            const layoutLabel = document.createElement('label');
+            layoutLabel.textContent = 'Layout:';
+            layoutLabel.htmlFor = `layout-select-${index}`;
+            
+            const layoutSelect = document.createElement('select');
+            layoutSelect.id = `layout-select-${index}`;
+            layoutSelect.addEventListener('change', () => updateCardPreview(index));
+            
+            // Create options for each layout
+            LAYOUTS.forEach(layout => {
+                const option = document.createElement('option');
+                option.value = layout.id;
+                option.textContent = layout.name;
+                option.selected = card.layout === layout.id;
+                layoutSelect.appendChild(option);
+            });
+            
+            layoutGroup.appendChild(layoutLabel);
+            layoutGroup.appendChild(layoutSelect);
+            controls.appendChild(layoutGroup);
+            
+            // Theme selection
+            const themeGroup = document.createElement('div');
+            themeGroup.className = 'control-group';
+            
+            const themeLabel = document.createElement('label');
+            themeLabel.textContent = 'Theme:';
+            themeLabel.htmlFor = `theme-select-${index}`;
+            
+            const themeSelect = document.createElement('select');
+            themeSelect.id = `theme-select-${index}`;
+            themeSelect.addEventListener('change', () => updateCardPreview(index));
+            
+            // Create options for each theme
+            THEMES.forEach(theme => {
+                const option = document.createElement('option');
+                option.value = theme.id;
+                option.textContent = theme.name;
+                option.selected = card.theme === theme.id;
+                themeSelect.appendChild(option);
+            });
+            
+            themeGroup.appendChild(themeLabel);
+            themeGroup.appendChild(themeSelect);
+            controls.appendChild(themeGroup);
+            
+            // Add orientation selection before download button
+            const orientationGroup = document.createElement('div');
+            orientationGroup.className = 'control-group';
+            
+            const orientationLabel = document.createElement('label');
+            orientationLabel.textContent = 'Format:';
+            orientationLabel.htmlFor = `orientation-select-${index}`;
+            
+            const orientationSelect = document.createElement('select');
+            orientationSelect.id = `orientation-select-${index}`;
+            orientationSelect.addEventListener('change', () => {
+                updateCanvasSize(index);
+                updateCardPreview(index);
+            });
+            
+            // Create options for each orientation
+            ORIENTATIONS.forEach(orientation => {
+                const option = document.createElement('option');
+                option.value = orientation.id;
+                option.textContent = orientation.name;
+                orientationSelect.appendChild(option);
+            });
+            
+            orientationGroup.appendChild(orientationLabel);
+            orientationGroup.appendChild(orientationSelect);
+            controls.appendChild(orientationGroup);
+            
+            // Download individual card button
+            const downloadBtn = document.createElement('button');
+            downloadBtn.className = 'download-btn';
+            downloadBtn.textContent = 'Download this card';
+            downloadBtn.addEventListener('click', () => downloadCard(index));
+            controls.appendChild(downloadBtn);
+            
+            cardPreview.appendChild(controls);
+            
+            // Render initial preview
+            setTimeout(() => {
+                updateCardPreview(index);
+            }, 100);
+            
+            return cardPreview;
+        }
+        
+        // Add function to update canvas size based on orientation
+        function updateCanvasSize(index) {
+            const canvas = document.getElementById(`canvas-${index}`);
+            const orientationSelect = document.getElementById(`orientation-select-${index}`);
+            const selectedOrientation = ORIENTATIONS.find(o => o.id === orientationSelect.value);
+            
+            canvas.width = selectedOrientation.width;
+            canvas.height = selectedOrientation.height;
+        }
+        
+        /**
+         * Update the card preview based on selected layout and theme
+         */
+        function updateCardPreview(index) {
+            const card = cardData[index];
+            const canvas = document.getElementById(`canvas-${index}`);
+            const layoutSelect = document.getElementById(`layout-select-${index}`);
+            const themeSelect = document.getElementById(`theme-select-${index}`);
+            
+            // Update card data with current selections
+            card.layout = layoutSelect.value;
+            card.theme = themeSelect.value;
+            
+            // Render the card on the canvas
+            renderCardToCanvas(canvas, card);
+        }
+        
+        /**
+         * Render a card to a canvas element
+         */
+        function renderCardToCanvas(canvas, card) {
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+            
+            // Get layout and theme styles
+            const layoutClass = card.layout || 'layout-centered';
+            const themeClass = card.theme || 'theme-blue';
+            
+            // Create a temporary div to apply CSS styles
+            const tempDiv = document.createElement('div');
+            tempDiv.className = `card-content ${layoutClass} ${themeClass}`;
+            tempDiv.style.width = `${width}px`;
+            tempDiv.style.height = `${height}px`;
+            document.body.appendChild(tempDiv);
+            
+            // Get computed styles
+            const styles = window.getComputedStyle(tempDiv);
+            const backgroundColor = styles.backgroundColor;
+            const color = styles.color;
+            
+            // Remove temporary div
+            document.body.removeChild(tempDiv);
+            
+            // Draw background
+            ctx.fillStyle = backgroundColor;
+            ctx.fillRect(0, 0, width, height);
+            
+            // Adjust spacing based on aspect ratio
+            const aspectRatio = height / width;
+            const isPortrait = aspectRatio > 1;
+            
+            // Adjust title Y position for portrait mode
+            if (isPortrait) {
+                if (layoutClass === 'layout-centered') {
+                    titleY = 250; // Move title down in portrait mode
+                } else if (layoutClass === 'layout-split') {
+                    titleY = 175; // Adjust split layout title position
+                } else if (layoutClass === 'layout-boxed') {
+                    titleBoxY = 150; // Adjust boxed layout title position
+                }
+            }
+            
+            // Get orientation type
+            const orientationSelect = document.getElementById(`orientation-select-${canvas.id.split('-')[1]}`);
+            const isStoryMode = orientationSelect?.value === 'story';
+            
+            // Adjust font sizes and spacing for story mode
+            const titleFontSize = isStoryMode ? 72 : 56; // Larger title for stories
+            const bodyFontSize = isStoryMode ? 42 : 32;  // Larger body text for stories
+            const topPadding = isStoryMode ? 250 : 100;  // Extra padding for story UI
+            
+            // Update layout-specific positions
+            if (isStoryMode) {
+                if (layoutClass === 'layout-centered') {
+                    titleY = topPadding;
+                } else if (layoutClass === 'layout-split') {
+                    titleY = topPadding - 50;
+                } else if (layoutClass === 'layout-boxed') {
+                    titleBoxY = topPadding - 75;
+                }
+            }
+            
+            // Draw content based on layout with story mode adjustments
+            if (layoutClass === 'layout-centered') {
+                renderCenteredLayout(ctx, width, height, card, color, isStoryMode, {
+                    titleFontSize,
+                    bodyFontSize,
+                    topPadding
+                });
+            } else if (layoutClass === 'layout-split') {
+                renderSplitLayout(ctx, width, height, card, color, isStoryMode, {
+                    titleFontSize,
+                    bodyFontSize,
+                    topPadding
+                });
+            } else if (layoutClass === 'layout-boxed') {
+                renderBoxedLayout(ctx, width, height, card, color, isStoryMode, {
+                    titleFontSize,
+                    bodyFontSize,
+                    topPadding
+                });
+            }
+        }
+        
+        // Add this helper function for text wrapping
+
+        /**
+         * Wrap text to fit within a specified width
+         * @param {CanvasRenderingContext2D} ctx - Canvas context
+         * @param {string} text - Text to wrap
+         * @param {number} maxWidth - Maximum width in pixels
+         * @return {string[]} Array of lines
+         */
+        function wrapText(ctx, text, maxWidth) {
+            const words = text.split(' ');
+            const lines = [];
+            let currentLine = words[0];
+
+            for (let i = 1; i < words.length; i++) {
+                const word = words[i];
+                const width = ctx.measureText(currentLine + ' ' + word).width;
+                
+                if (width < maxWidth) {
+                    currentLine += ' ' + word;
+                } else {
+                    lines.push(currentLine);
+                    currentLine = word;
+                }
+            }
+            
+            lines.push(currentLine);
+            return lines;
+        }
+
+        /**
+         * Render the centered layout
+         */
+        function renderCenteredLayout(ctx, width, height, card, color, isStoryMode, options) {
+            ctx.fillStyle = color;
+            ctx.textAlign = 'center';
+            
+            // Draw title with wrapping
+            ctx.font = `bold ${options.titleFontSize}px "Segoe UI", sans-serif`;
+            const titleLines = wrapText(ctx, card.title, isStoryMode ? width - 160 : width - 200);
+            const titleLineHeight = options.titleFontSize + 15;
+            let titleY = options.topPadding + (titleLines.length > 1 ? 0 : 50);
+            
+            titleLines.forEach(line => {
+                ctx.fillText(line, width / 2, titleY);
+                titleY += titleLineHeight;
+            });
+            
+            // Draw points with wrapping
+            ctx.font = `${options.bodyFontSize}px "Segoe UI", sans-serif`;
+            const lineHeight = options.bodyFontSize + 25;
+            let startY = titleY + 80;
+            
+            card.points.forEach((point, index) => {
+                const pointLines = wrapText(ctx, `• ${point}`, isStoryMode ? width - 140 : width - 200);
+                
+                pointLines.forEach((line, lineIndex) => {
+                    ctx.fillText(line, width / 2, startY);
+                    startY += lineHeight;
+                });
+                
+                startY += isStoryMode ? 40 : 10; // More spacing between points in story mode
+            });
+        }
+
+        /**
+         * Render the split layout
+         */
+        function renderSplitLayout(ctx, width, height, card, color, isStoryMode, options) {
+            ctx.fillStyle = color;
+            
+            // Draw title with wrapping
+            ctx.textAlign = 'center';
+            ctx.font = `bold ${options.titleFontSize}px "Segoe UI", sans-serif`;
+            const titleLines = wrapText(ctx, card.title, isStoryMode ? width - 160 : width - 200);
+            const titleLineHeight = options.titleFontSize + 15;
+            let titleY = options.topPadding + (titleLines.length > 1 ? 0 : 50);
+            
+            // Draw title text
+            titleLines.forEach(line => {
+                ctx.fillText(line, width / 2, titleY);
+                titleY += titleLineHeight;
+            });
+            
+            // Draw separator line with consistent spacing
+            const separatorY = titleY + (isStoryMode ? 50 : 30);
+            ctx.beginPath();
+            ctx.moveTo(100, separatorY);
+            ctx.lineTo(width - 100, separatorY);
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = color;
+            ctx.stroke();
+            
+            // Draw points with wrapping
+            ctx.textAlign = 'left';
+            ctx.font = `${options.bodyFontSize}px "Segoe UI", sans-serif`;
+            const lineHeight = options.bodyFontSize + 25;
+            let startY = separatorY + (isStoryMode ? 90 : 70);
+            
+            card.points.forEach((point, index) => {
+                const pointLines = wrapText(ctx, point, isStoryMode ? width - 180 : width - 250);
+                
+                // Draw bullet just once for each point
+                ctx.fillText('•', 100, startY);
+                
+                // Draw each line with proper indentation
+                pointLines.forEach((line, lineIndex) => {
+                    ctx.fillText(line, 130, startY);
+                    startY += lineHeight;
+                });
+                
+                // Add extra space between different points
+                startY += isStoryMode ? 40 : 15;
+            });
+        }
+
+        /**
+         * Render the boxed layout
+         */
+        function renderBoxedLayout(ctx, width, height, card, color, isStoryMode, options) {
+            ctx.fillStyle = color;
+            
+            // Draw title with wrapping
+            ctx.textAlign = 'center';
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 5;
+            
+            // Measure title to determine box height
+            ctx.font = `bold ${options.titleFontSize}px "Segoe UI", sans-serif`;
+            const titleLines = wrapText(ctx, card.title, isStoryMode ? width - 160 : width - 240);
+            const titleLineHeight = options.titleFontSize + 15;
+            const titleBoxHeight = Math.max(120, titleLines.length * titleLineHeight + (isStoryMode ? 100 : 80));
+            
+            // Draw title box with adjusted height
+            const titleBoxY = options.topPadding;
+            ctx.strokeRect(100, titleBoxY, width - 200, titleBoxHeight);
+            
+            // Calculate vertical centering within box
+            const totalTextHeight = titleLines.length * titleLineHeight;
+            const verticalPadding = (titleBoxHeight - totalTextHeight) / 2;
+            let titleY = titleBoxY + verticalPadding + titleLineHeight * 0.8;
+            
+            // Draw title text
+            titleLines.forEach(line => {
+                ctx.fillText(line, width / 2, titleY);
+                titleY += titleLineHeight;
+            });
+            
+            // Set up for points
+            ctx.textAlign = 'left';
+            ctx.font = `${options.bodyFontSize}px "Segoe UI", sans-serif`;
+            const lineHeight = options.bodyFontSize + 25;
+            let startY = titleBoxY + titleBoxHeight + (isStoryMode ? 90 : 70);
+            
+            // Get background color based on theme
+            const boxBackground = card.theme === 'theme-dark' 
+                ? 'rgba(255, 255, 255, 0.25)' 
+                : 'rgba(0, 0, 0, 0.1)';
+            
+            // Draw each point
+            card.points.forEach((point, index) => {
+                const pointLines = wrapText(ctx, point, isStoryMode ? width - 180 : width - 250);
+                const pointBoxHeight = Math.max(60, pointLines.length * lineHeight + (isStoryMode ? 30 : 20));
+                
+                // Draw box for each point
+                ctx.fillStyle = boxBackground;
+                ctx.fillRect(80, startY - 35, width - 160, pointBoxHeight);
+                
+                // Draw bullet and text with proper color
+                ctx.fillStyle = color;
+                ctx.fillText('•', 100, startY);
+                
+                // Draw each line of text
+                pointLines.forEach((line, lineIndex) => {
+                    ctx.fillText(line, 130, startY);
+                    startY += lineHeight;
+                });
+                
+                // Add space between points
+                startY += isStoryMode ? 50 : 35;
+            });
+        }
+        
+        /**
+         * Download a single card as PNG
+         */
+        function downloadCard(index) {
+            const card = cardData[index];
+            const canvas = document.getElementById(`canvas-${index}`);
+            
+            // Create a safe filename from the title
+            const filename = `${card.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.png`;
+            
+            // Convert canvas to data URL and download
+            const dataUrl = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = dataUrl;
+            link.click();
+        }
+        
+        /**
+         * Download all cards as PNG images
+         */
+        function downloadAllCards() {
+            // Slight delay between downloads to prevent browser issues
+            cardData.forEach((card, index) => {
+                setTimeout(() => {
+                    downloadCard(index);
+                }, index * 500);
+            });
+        }
+
+        function renderCardBorder(ctx, width, height, color) {
+            // Add subtle corner accents
+            const cornerSize = 40;
+            const margin = 20;
+            
+            ctx.strokeStyle = adjustColor(color, 0.5);
+            ctx.lineWidth = 2;
+            
+            // Top left corner
+            ctx.beginPath();
+            ctx.moveTo(margin, margin + cornerSize);
+            ctx.lineTo(margin, margin);
+            ctx.lineTo(margin + cornerSize, margin);
+            ctx.stroke();
+            
+            // Similar for other corners...
+        }
+    </script>
+</body>
+</html>
