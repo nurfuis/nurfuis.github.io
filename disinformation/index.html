@@ -760,14 +760,18 @@
                 : 'rgba(0, 0, 0, 0.1)';
 
             // Offset value for the boxes (only in story mode)
-            const boxOffset = isStoryMode ? 15 : 0;
+            const boxOffset = isStoryMode ? -25 : 0;
 
             // Padding for the text inside the box
             const textPadding = 10;
 
             // Draw each point
             card.points.forEach((point, index) => {
-                const pointLines = wrapText(ctx, point, isStoryMode ? width - 180 : width - 250);
+                // Reduce maxWidth for story mode
+                let maxWidth = isStoryMode ? width - 190 : width - 250;
+                // Increase maxWidth by 20px in story mode
+
+                const pointLines = wrapText(ctx, point, maxWidth);
                 const pointBoxHeight = Math.max(60, pointLines.length * lineHeight + (isStoryMode ? 30 : 20));
 
                 // Draw box for each point with offset
