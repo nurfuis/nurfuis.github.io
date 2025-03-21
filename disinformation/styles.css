@@ -101,30 +101,6 @@ h1 {
     max-height: 100%;
 }
 
-/* Add to existing card control styles */
-.card-canvas-wrapper {
-    width: 100%;
-    padding-bottom: 100%; /* Default square aspect ratio */
-    position: relative;
-}
-
-.card-canvas-wrapper.portrait {
-    padding-bottom: 125%; /* 4:5 aspect ratio */
-}
-
-.card-canvas-wrapper.story {
-    padding-bottom: 177.78%; /* 9:16 aspect ratio */
-}
-
-.card-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
 /* Card controls */
 .card-controls {
     display: flex;
