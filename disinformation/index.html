@@ -759,23 +759,29 @@
                 ? 'rgba(255, 255, 255, 0.25)'
                 : 'rgba(0, 0, 0, 0.1)';
 
+            // Offset value for the boxes (only in story mode)
+            const boxOffset = isStoryMode ? 15 : 0;
+
+            // Padding for the text inside the box
+            const textPadding = 10;
+
             // Draw each point
             card.points.forEach((point, index) => {
                 const pointLines = wrapText(ctx, point, isStoryMode ? width - 180 : width - 250);
                 const pointBoxHeight = Math.max(60, pointLines.length * lineHeight + (isStoryMode ? 30 : 20));
 
-                // Draw box for each point
+                // Draw box for each point with offset
                 ctx.fillStyle = boxBackground;
-                ctx.fillRect(80, startY - 35, width - 160, pointBoxHeight);
+                ctx.fillRect(80 + boxOffset, startY - 35, width - 160 - (2 * boxOffset), pointBoxHeight);
 
                 // Draw bullet and text with proper color
                 ctx.fillStyle = color;
 
-                drawBulletPoint(ctx, 100, startY, color, getBulletStyle('box'), card.theme);
+                drawBulletPoint(ctx, 100 + boxOffset, startY, color, getBulletStyle('box'), card.theme);
 
-                // Draw each line of text
+                // Draw each line of text with padding
                 pointLines.forEach((line, lineIndex) => {
-                    ctx.fillText(line, 130, startY);
+                    ctx.fillText(line, 130 + boxOffset, startY + textPadding);
                     startY += lineHeight;
                 });
 
@@ -784,7 +790,6 @@
             });
 
             renderCardFooter(ctx, width, height, color, isStoryMode);
-
         }
 
         /**
@@ -914,7 +919,12 @@
          */
         function drawBulletPoint(ctx, x, y, color, style = 'diamond', themeClass = 'theme-blue') {
             const size = 14; // Slightly larger size for better visibility
-            const centerY = y - size / 2 - 5;
+            let centerY = y - size / 2 - 5;
+
+            // Adjust vertical position for boxed layout
+            if (style === 'shield') {
+                centerY = y - size / 2 + 5; // Lower the bullet point
+            }
 
             // Get accent color using color theory
             const accentColor = getBulletAccentColor(color, themeClass);
