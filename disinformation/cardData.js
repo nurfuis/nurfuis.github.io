@@ -1,37 +1,338 @@
 // Define card data for disinformation tactics
 const CARD_DATA = [
+  // ===================================
+  // INTRODUCTION
+  // ===================================
   {
-    "title": "Repetition",
+    "title": "Disinformation Tactics & Defense",
     "points": [
-      "Menticide's hammer that wears you down",
-      "Repeats lies until they feel familiar",
-      "Familiarity begins to feel like truth",
-      "It's not persuasion - it's erosion"
+      "Modern propaganda uses psychological vulnerabilities against you",
+      "Understanding these tactics is your first line of defense",
+      "This deck maps manipulation methods and counter-strategies",
+      "Knowledge is immunity in the age of weaponized information"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-dark"
+  },
+  
+  // ===================================
+  // 1. EMOTIONAL MANIPULATION - CATEGORY HEADER
+  // ===================================
+  {
+    "title": "EMOTIONAL MANIPULATION",
+    "points": [
+      "How disinformation targets your feelings to bypass reason",
+      "Exploits fear, outrage, pride, and empathy",
+      "Creates emotional reactions that override critical thinking",
+      "When emotions drive, reason takes the passenger seat"
     ],
     "layout": "layout-centered",
     "theme": "theme-red"
   },
   {
-    "title": "Appeal to Prestige",
+    "title": "Amygdala Hacking",
     "points": [
-      "Invokes respected names or institutions",
-      "Lends false credibility to weak arguments",
-      "Uses borrowed trust for deception",
-      "Makes falsehoods seem authoritative"
+      "Triggers fear, rage, and panic responses",
+      "Targets the brain's emotional center",
+      "Bypasses logic and critical thinking",
+      "Makes you react, not reason"
+    ],
+    "layout": "layout-split",
+    "theme": "theme-red"
+  },
+  {
+    "title": "Fear as Control",
+    "points": [
+      "Emotional engine of menticide and manipulation",
+      "Makes people cling to authority figures",
+      "Causes surrender of independent thought",
+      "Trades critical thinking for illusion of safety"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-red"
+  },
+  {
+    "title": "Emotional Layering",
+    "points": [
+      "Stacks multiple emotions to disable critical thinking",
+      "Uses fear, pride, and rage in calculated sequence",
+      "Makes manipulation feel like personal insight",
+      "Creates psychological lock-in through layered triggers"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-sunset"
+  },
+  {
+    "title": "Appeal to Pity",
+    "points": [
+      "Uses emotional pleas and victimhood narratives",
+      "Distracts from weak arguments or wrongdoing",
+      "Makes you feel guilty instead of thinking critically",
+      "Weaponizes empathy to bypass rational scrutiny"
+    ],
+    "layout": "layout-split",
+    "theme": "theme-sunset"
+  },
+  {
+    "title": "Appeal to Flattery",
+    "points": [
+      "Compliments or praises audience to win trust",
+      "Makes you feel smart or special to lower skepticism",
+      "Builds false rapport before pushing an agenda",
+      "Uses emotional validation to bypass critical thinking"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-sunset"
+  },
+  {
+    "title": "Fighting Disinformation: Emotional Awareness",
+    "points": [
+      "Feel your emotions — then think anyway",
+      "Notice when content triggers strong reactions",
+      "If they're trying to make you rush, slow down",
+      "Your emotional responses are their weapons unless you recognize them"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-blue"
+  },
+
+  // ===================================
+  // 2. COGNITIVE EXPLOITATION - CATEGORY HEADER
+  // ===================================
+  {
+    "title": "COGNITIVE EXPLOITATION",
+    "points": [
+      "How disinformation hijacks your mental shortcuts",
+      "Targets thinking patterns, biases, and assumptions",
+      "Exploits psychological tendencies we all share",
+      "Turns your brain's efficiency systems against you"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-purple"
+  },
+  {
+    "title": "Cognitive Shortcuts Exploitation",
+    "points": [
+      "Hijacks mental shortcuts and decision biases",
+      "Exploits confirmation and authority bias",
+      "Uses cognitive ease to bypass analysis",
+      "Makes manipulation feel like natural thinking"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-purple"
+  },
+  {
+    "title": "Confirmation Bias Exploitation",
+    "points": [
+      "Exploits tendency to seek info that confirms existing beliefs",
+      "Creates self-reinforcing echo chambers of misinformation",
+      "Makes contradictory evidence feel threatening",
+      "Turns comfort-seeking into a weapon against truth"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-purple"
+  },
+  {
+    "title": "Cognitive Fatigue Induction",
+    "points": [
+      "Overwhelms with excessive, contradictory information",
+      "Exhausts mental resources needed for critical thinking",
+      "Makes targets too tired to evaluate claims effectively",
+      "Leaves people vulnerable to simplified false narratives"
+    ],
+    "layout": "layout-split",
+    "theme": "theme-purple"
+  },
+  {
+    "title": "Cherry Picking",
+    "points": [
+      "Selects only facts that support a false claim",
+      "Ignores all opposing evidence",
+      "Climate deniers use cold days to \"disprove\" warming",
+      "Creates a false narrative through selective facts"
+    ],
+    "layout": "layout-split",
+    "theme": "theme-dark"
+  },
+  {
+    "title": "Oversimplification",
+    "points": [
+      "Reduces complex issues to simple, catchy solutions",
+      "Ignores nuance and important complexity",
+      "Offers false clarity on multifaceted problems",
+      "Appeals to desire for easy answers to hard questions"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-dark"
+  },
+  {
+    "title": "Gaslighting",
+    "points": [
+      "Leaders deny obvious facts or events",
+      "Makes people doubt their own memory and perception",
+      "Erodes trust in objective reality",
+      "Favorite tool of authoritarians to control dissent"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-dark"
+  },
+  {
+    "title": "Framing Manipulation",
+    "points": [
+      "Shapes context to guide predetermined conclusions",
+      "Controls perception before content is even seen",
+      "Builds psychological reality through selective context",
+      "Makes manipulation feel like natural insight"
+    ],
+    "layout": "layout-split",
+    "theme": "theme-purple"
+  },
+  {
+    "title": "Card Stacking",
+    "points": [
+      "Shows only positive information about a subject",
+      "Hides all negative facts deliberately",
+      "Used by authoritarian regimes to mask suffering",
+      "Controls perception through selective disclosure"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-dark"
+  },
+  {
+    "title": "False Dilemma",
+    "points": [
+      "Reduces complex issues to just two (often flawed) choices",
+      "Hides nuance and eliminates middle ground",
+      "Forces artificial decisions by removing alternatives",
+      "Pressures conformity through limited options"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-purple"
+  },
+  {
+    "title": "Fighting Disinformation: Mental Shortcuts",
+    "points": [
+      "Question simple answers to complex problems",
+      "Recognize when you're being pushed to decide quickly",
+      "Challenge your own comfortable assumptions",
+      "Remember: if it's too easy, it might be a trap"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-blue"
+  },
+  {
+    "title": "Fighting Disinformation: Comfort Check",
+    "points": [
+      "Question the things that feel most comfortable",
+      "The lie you most want to believe controls you most",
+      "Examine your own confirmation bias critically",
+      "Stay curious about your own certainties"
     ],
     "layout": "layout-split",
     "theme": "theme-blue"
   },
   {
-    "title": "Weaponized Irony",
+    "title": "Fighting Disinformation: Framing",
     "points": [
-      "Uses sarcasm or humor to introduce extremist ideas",
-      "Maintains plausible deniability with \"just joking\"",
-      "Shields harmful content behind comedy",
-      "Undermines serious critique with mockery"
+      "Break the frame and look underneath",
+      "Recognize how information presentation shapes perception",
+      "Question why certain aspects are emphasized over others",
+      "If you can't choose your frame, someone else will choose it for you"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-purple"
+    "theme": "theme-blue"
+  },
+
+  // ===================================
+  // 3. SOCIAL & GROUP MANIPULATION - CATEGORY HEADER
+  // ===================================
+  {
+    "title": "SOCIAL & GROUP MANIPULATION",
+    "points": [
+      "How disinformation weaponizes our need to belong",
+      "Exploits tribal psychology and social pressure",
+      "Manufactures consensus to steer individual judgment",
+      "When the group decides truth, manipulation flourishes"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-green"
+  },
+  {
+    "title": "Social Proof Manipulation",
+    "points": [
+      "Creates fake consensus through bots and coordinated accounts",
+      "Exploits human instinct to follow the crowd",
+      "Makes fringe views appear mainstream through volume",
+      "Uses herding behavior to override individual judgment"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-green"
+  },
+  {
+    "title": "Herd Manipulation",
+    "points": [
+      "Exploits crowd behavior to override individual judgment",
+      "Uses artificial consensus to create peer pressure",
+      "Makes dissent feel socially risky and isolating",
+      "Turns group psychology into a weapon"
+    ],
+    "layout": "layout-split",
+    "theme": "theme-green"
+  },
+  {
+    "title": "Manufactured Loyalty",
+    "points": [
+      "Creates artificial bonds to control behavior",
+      "Uses praise and shame to enforce compliance",
+      "Makes belonging conditional on blind agreement",
+      "Weaponizes human need for community"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-green"
+  },
+  {
+    "title": "Cult of Personality",
+    "points": [
+      "Elevates a leader as flawless and heroic",
+      "Uses propaganda, media control, and symbolism",
+      "Suppresses dissent by creating quasi-religious loyalty",
+      "Replaces critical thinking with worship"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-red"
+  },
+  {
+    "title": "Loyalty Rhetoric",
+    "points": [
+      "Uses 'us vs them' language to enforce compliance",
+      "Makes questioning feel like betrayal of the group",
+      "Turns disagreement into disloyalty",
+      "Weaponizes belonging to silence critical thinking"
+    ],
+    "layout": "layout-split",
+    "theme": "theme-green"
+  },
+  {
+    "title": "False Consensus Manufacturing",
+    "points": [
+      "Creates illusion that \"everyone agrees\"",
+      "Uses bots, trolls, and coordinated influencers",
+      "Simulates mass approval or outrage artificially",
+      "Makes fringe opinions appear mainstream"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-green"
+  },
+  {
+    "title": "Divide and Rule",
+    "points": [
+      "Sows division between groups to weaken unity",
+      "Makes a divided population easier to control",
+      "Distracts from real issues with manufactured conflicts",
+      "As old as empire but still thriving today"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-red"
   },
   {
     "title": "Astroturfing",
@@ -45,6 +346,223 @@ const CARD_DATA = [
     "theme": "theme-green"
   },
   {
+    "title": "Fighting Disinformation: Group Pressure",
+    "points": [
+      "Trust your judgment even when standing alone",
+      "Remember crowds can be manufactured or manipulated",
+      "Evaluate evidence independently of popularity",
+      "Popularity measures marketing, not truth"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-blue"
+  },
+  {
+    "title": "Fighting Disinformation: Social Proof",
+    "points": [
+      "Follow evidence instead of crowds",
+      "Check sources before counting shares",
+      "Remember: popularity isn't proof",
+      "Truth often starts as a minority view"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-blue"
+  },
+  {
+    "title": "Fighting Disinformation: True Loyalty",
+    "points": [
+      "Separate loyalty from blind obedience",
+      "Remember: real loyalty allows questions",
+      "Stay curious even when labeled disloyal",
+      "Truth-seeking is more loyal than silence"
+    ],
+    "layout": "layout-split",
+    "theme": "theme-blue"
+  },
+  {
+    "title": "Fighting Disinformation: True Community",
+    "points": [
+      "Build connections based on mutual respect",
+      "Value groups that welcome questions",
+      "Stay loyal to truth over tribe",
+      "Remember: real belonging allows dissent"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-blue"
+  },
+
+  // ===================================
+  // 4. LANGUAGE & COMMUNICATION - CATEGORY HEADER
+  // ===================================
+  {
+    "title": "LANGUAGE & COMMUNICATION",
+    "points": [
+      "How disinformation corrupts the tools of meaning",
+      "Manipulates words, phrases, and communication patterns",
+      "Reshapes reality by controlling how we describe it",
+      "When language is weaponized, clarity becomes resistance"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-blue"
+  },
+  {
+    "title": "Semantic Manipulation",
+    "points": [
+      "Deliberately distorts or redefines language",
+      "Controls words to control how reality is perceived",
+      "Changes meaning of terms to confuse public discourse",
+      "Makes communication itself a battlefield"
+    ],
+    "layout": "layout-split",
+    "theme": "theme-blue"
+  },
+  {
+    "title": "Doublespeak",
+    "points": [
+      "Uses deliberately ambiguous or contradictory language",
+      "Obscures reality and misleads audiences",
+      "Disguises harmful actions with pleasant terms",
+      "The art of lying without technically lying"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-blue"
+  },
+  {
+    "title": "Euphemism",
+    "points": [
+      "Uses mild, vague, or pleasant-sounding words",
+      "Covers up harsh realities and atrocities",
+      "Makes violence and oppression sound normal",
+      "Eases moral discomfort with unethical actions"
+    ],
+    "layout": "layout-split",
+    "theme": "theme-blue"
+  },
+  {
+    "title": "Dysphemism",
+    "points": [
+      "Uses harsh or ugly words instead of neutral ones",
+      "Opposite of euphemism - designed to trigger disgust",
+      "Makes people or ideas seem dangerous or repulsive",
+      "Manipulates perception through negative language"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-blue"
+  },
+  {
+    "title": "Technical Jargon",
+    "points": [
+      "Overuses specialized, complex language",
+      "Confuses, intimidates, or misleads audiences",
+      "Hides weak arguments behind complexity",
+      "Makes the audience feel intellectually inferior"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-blue"
+  },
+  {
+    "title": "Buzzword",
+    "points": [
+      "Trendy, vague, or impressive-sounding terms",
+      "Creates illusion of expertise without substance",
+      "Distracts and confuses with empty language",
+      "Signals affiliation without meaningful content"
+    ],
+    "layout": "layout-split",
+    "theme": "theme-blue"
+  },
+  {
+    "title": "Glittering Generalities",
+    "points": [
+      "Uses vague, emotionally charged words",
+      "\"Freedom,\" \"Greatness,\" \"Security\" without specifics",
+      "Sounds inspiring while saying nothing concrete",
+      "Exploits positive emotional associations"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-blue"
+  },
+  {
+    "title": "Name-Calling",
+    "points": [
+      "Uses insults to replace substantive arguments",
+      "Labels opponents as \"traitors\" or \"foreign agents\"",
+      "Discredits dissent without requiring evidence",
+      "Silences opposition through character assassination"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-sunset"
+  },
+  {
+    "title": "Weaponized Irony",
+    "points": [
+      "Uses sarcasm or humor to introduce extremist ideas",
+      "Maintains plausible deniability with \"just joking\"",
+      "Shields harmful content behind comedy",
+      "Undermines serious critique with mockery"
+    ],
+    "layout": "layout-split",
+    "theme": "theme-blue"
+  },
+
+  // ===================================
+  // 5. INFORMATION CONTROL - CATEGORY HEADER
+  // ===================================
+  {
+    "title": "INFORMATION CONTROL",
+    "points": [
+      "How disinformation manages what you see and believe",
+      "Floods, filters, and fabricates information flows",
+      "Creates false realities through selective exposure",
+      "When information space is polluted, truth becomes scarce"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-sunset"
+  },
+  {
+    "title": "Censorship By Noise",
+    "points": [
+      "Floods information space with garbage content",
+      "Drowns out truth without using force",
+      "Overwhelms through distraction and volume",
+      "Makes finding accurate information exhausting"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-sunset"
+  },
+  {
+    "title": "Information Laundering",
+    "points": [
+      "Introduces false information in fringe spaces",
+      "Gradually amplifies through increasingly credible sources",
+      "Makes falsehoods appear legitimate over time",
+      "Exploits the 'source amnesia' cognitive bias"
+    ],
+    "layout": "layout-split",
+    "theme": "theme-dark"
+  },
+  {
+    "title": "Narrative Flooding",
+    "points": [
+      "Pushes multiple conflicting stories simultaneously",
+      "Overwhelms public discourse with contradictions",
+      "Creates confusion about what is actually happening",
+      "Prevents clear conclusions and understanding"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-sunset"
+  },
+  {
+    "title": "Recursive Narrative Engineering",
+    "points": [
+      "Seeds multiple, layered narratives across different spaces",
+      "Each narrative references others to create circular \"proof\"",
+      "Creates illusion of credibility through self-reference",
+      "Makes falsehoods appear verified by multiple sources"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-dark"
+  },
+  {
     "title": "Obfuscation",
     "points": [
       "Deliberately makes information unclear or complex",
@@ -52,29 +570,224 @@ const CARD_DATA = [
       "Avoids accountability through complexity",
       "Deception by drowning clarity"
     ],
-    "layout": "layout-boxed",
+    "layout": "layout-split",
     "theme": "theme-dark"
   },
   {
-    "title": "Amygdala Hacking",
+    "title": "Psychological Flooding",
     "points": [
-      "Triggers fear, rage, and panic responses",
-      "Targets the brain's emotional center",
-      "Bypasses logic and critical thinking",
-      "Makes you react, not reason"
+      "Overwhelms with constant crises and conflicting narratives",
+      "Bombards with fear-inducing content to exhaust mental resilience",
+      "Disables critical thinking through cognitive overload",
+      "Creates fatigue that leads to disengagement or surrender"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-sunset"
+  },
+  {
+    "title": "Fake News",
+    "points": [
+      "Deliberately fabricated stories spread as factual",
+      "Created to deceive, mislead and manipulate",
+      "Fuels confusion, distrust, and division",
+      "Undermines the credibility of legitimate media"
+    ],
+    "layout": "layout-split",
+    "theme": "theme-sunset"
+  },
+  {
+    "title": "Repetition",
+    "points": [
+      "Menticide's hammer that wears you down",
+      "Repeats lies until they feel familiar",
+      "Familiarity begins to feel like truth",
+      "It's not persuasion - it's erosion"
     ],
     "layout": "layout-centered",
     "theme": "theme-sunset"
   },
   {
-    "title": "Cherry Picking",
+    "title": "Big Lie",
     "points": [
-      "Selects only facts that support a false claim",
-      "Ignores all opposing evidence",
-      "Climate deniers use cold days to \"disprove\" warming",
-      "Creates a false narrative through selective facts"
+      "Outrageous falsehood repeated extensively",
+      "So enormous that people can't believe it's fabricated",
+      "Creates new reality when left unchallenged",
+      "Doesn't just distort history - it rewrites it"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-dark"
+  },
+  {
+    "title": "Doppelgänger Websites",
+    "points": [
+      "Fake websites imitating trusted news sources",
+      "Use cloned designs and similar URLs",
+      "Fool readers into believing lies from 'reputable' sources",
+      "Exploit existing trust for disinformation"
     ],
     "layout": "layout-split",
+    "theme": "theme-sunset"
+  },
+  {
+    "title": "Memetic Programming",
+    "points": [
+      "Creates and spreads contagious ideas or 'memes'",
+      "Designed to shape beliefs without conscious awareness",
+      "Bypasses critical thinking through humor or emotion",
+      "Programs behavior through seemingly harmless content"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-dark"
+  },
+  {
+    "title": "Fighting Disinformation: Focus Control",
+    "points": [
+      "Consciously choose where to direct your attention",
+      "Slow down and refuse to be swept up in chaos",
+      "Prioritize signal over noise in information intake",
+      "When you control your focus, they lose control of you"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-blue"
+  },
+
+  // ===================================
+  // 6. CRISIS & FEAR TACTICS - CATEGORY HEADER
+  // ===================================
+  {
+    "title": "CRISIS & FEAR TACTICS",
+    "points": [
+      "How disinformation exploits emergencies and threats",
+      "Uses urgency to override careful consideration",
+      "Creates panic that demands immediate compliance",
+      "When fear drives decisions, manipulation succeeds"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-red"
+  },
+  {
+    "title": "Crisis-Based Manipulation",
+    "points": [
+      "Exploits emergencies to bypass critical thinking",
+      "Creates artificial urgency to force quick decisions",
+      "Uses fear and chaos to demand instant compliance",
+      "Makes questioning feel like dangerous delay"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-red"
+  },
+  {
+    "title": "Fear, Uncertainty, Doubt",
+    "points": [
+      "Spreads vague threats and scary scenarios",
+      "Creates conflicting information to paralyze decision-making",
+      "Used by corporations and authoritarian regimes",
+      "Prevents action through emotional manipulation"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-red"
+  },
+  {
+    "title": "Stochastic Terrorism",
+    "points": [
+      "Uses public demonization and inflammatory rhetoric",
+      "Inspires unpredictable acts of violence by individuals",
+      "Creates plausible deniability through indirect incitement",
+      "Makes targets feel they're called to act without coordination"
+    ],
+    "layout": "layout-split",
+    "theme": "theme-red"
+  },
+  {
+    "title": "Rotten Herring",
+    "points": [
+      "Creates fake scandals or distractions",
+      "Diverts attention from real problems or crises",
+      "Used when damaging news emerges about the powerful",
+      "Makes people look elsewhere instead of at real issues"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-red"
+  },
+  {
+    "title": "Demonizing the Enemy",
+    "points": [
+      "Portrays opponents as evil or subhuman",
+      "Makes violence or cruelty seem necessary",
+      "Removes moral barriers to aggression",
+      "Justifies extreme actions against dehumanized groups"
+    ],
+    "layout": "layout-split",
+    "theme": "theme-red"
+  },
+  {
+    "title": "Fighting Disinformation: Crisis Response",
+    "points": [
+      "Slow down when others demand instant action",
+      "Question who benefits from panic decisions",
+      "Remember: calm thinking is a form of resistance",
+      "Focus on verifiable facts, not viral fear"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-blue"
+  },
+  {
+    "title": "Fighting Disinformation: Refusing Fear",
+    "points": [
+      "Don't let fear dictate your decisions",
+      "Question demands for obedience in the name of safety",
+      "Recognize when fear is being used as control",
+      "Courage begins with seeing manipulation clearly"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-blue"
+  },
+
+  // ===================================
+  // 7. AUTHORITY & CREDIBILITY - CATEGORY HEADER
+  // ===================================
+  {
+    "title": "AUTHORITY & CREDIBILITY",
+    "points": [
+      "How disinformation borrows and undermines trust",
+      "Exploits our deference to expertise and status",
+      "Uses false authority to bypass critical evaluation",
+      "When credibility is weaponized, skepticism protects"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-blue"
+  },
+  {
+    "title": "Appeal to Authority",
+    "points": [
+      "Uses someone's status rather than evidence",
+      "Leverages celebrities to spread misinformation",
+      "Confuses expertise in one area with authority in another",
+      "Bypasses critical thinking through false credibility"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-blue"
+  },
+  {
+    "title": "Appeal to Prestige",
+    "points": [
+      "Invokes respected names or institutions",
+      "Lends false credibility to weak arguments",
+      "Uses borrowed trust for deception",
+      "Makes falsehoods seem authoritative"
+    ],
+    "layout": "layout-split",
+    "theme": "theme-blue"
+  },
+  {
+    "title": "Beautiful People",
+    "points": [
+      "Uses attractive or influential figures to promote ideas",
+      "Exploits admiration to bypass critical thinking",
+      "Persuades through association rather than evidence",
+      "Transfers positive feelings about person to the message"
+    ],
+    "layout": "layout-centered",
     "theme": "theme-blue"
   },
   {
@@ -85,8 +798,67 @@ const CARD_DATA = [
       "Uses false familiarity to lower skepticism",
       "Makes manipulators seem trustworthy"
     ],
+    "layout": "layout-split",
+    "theme": "theme-blue"
+  },
+  {
+    "title": "Appeal to Tradition",
+    "points": [
+      "Defends ideas because \"it's always been this way\"",
+      "Claims history alone makes something right",
+      "Used to resist social progress and equal rights",
+      "Substitutes longevity for moral or logical validity"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-blue"
+  },
+  {
+    "title": "Whataboutism",
+    "points": [
+      "Deflects criticism by pointing to others' flaws",
+      "Changes the subject rather than addressing the issue",
+      "Used by governments to avoid accountability",
+      "False equivalence that derails meaningful discussion"
+    ],
     "layout": "layout-centered",
-    "theme": "theme-green"
+    "theme": "theme-sunset"
+  },
+  {
+    "title": "Poisoning the Well",
+    "points": [
+      "Discredits a person or source before they speak",
+      "Ensures their statements will be dismissed regardless of content",
+      "Creates preemptive mistrust of legitimate information",
+      "Prevents fair evaluation of evidence or arguments"
+    ],
+    "layout": "layout-split",
+    "theme": "theme-sunset"
+  },
+  {
+    "title": "Sealioning",
+    "points": [
+      "Bad-faith actors bombard with 'polite' demands for explanation",
+      "Not seeking to learn but to exhaust and discredit",
+      "Weaponizes civility to drain resources and attention",
+      "Makes defending truth more costly than spreading lies"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-sunset"
+  },
+
+  // ===================================
+  // 8. ADVANCED PSYCHOLOGICAL OPERATIONS - CATEGORY HEADER
+  // ===================================
+  {
+    "title": "ADVANCED PSYCHOLOGICAL OPERATIONS",
+    "points": [
+      "How professional deception campaigns target populations",
+      "Sophisticated tactics refined by intelligence agencies",
+      "Strategic manipulation methods with military origins",
+      "When your mind becomes the battlefield, awareness is armor"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-dark"
   },
   {
     "title": "Reflexive Control Theory",
@@ -95,6 +867,72 @@ const CARD_DATA = [
       "Manipulates adversary's perceptions",
       "Influences decision-making to serve manipulator's goals",
       "Makes targets believe they're acting freely"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-purple"
+  },
+  {
+    "title": "Reflexive Control",
+    "points": [
+      "Psychological warfare tactic with Russian origins",
+      "Crafts information to guide your decision-making",
+      "Makes you believe the manipulator's choice was your idea",
+      "Controls behavior while maintaining illusion of free will"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-purple"
+  },
+  {
+    "title": "Zersetzung",
+    "points": [
+      "Covert psychological warfare method (East German Stasi)",
+      "Systematically destroys reputation and confidence",
+      "Uses harassment, disinformation, and isolation",
+      "Breaks down targets without physical violence"
+    ],
+    "layout": "layout-split",
+    "theme": "theme-purple"
+  },
+  {
+    "title": "Provokatsiya",
+    "points": [
+      "Russian intelligence tactic of covert provocation",
+      "Incites targets into harmful actions or statements",
+      "Uses target's reaction to discredit or destroy them",
+      "Creates situations where victims appear as aggressors"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-dark"
+  },
+  {
+    "title": "Dezinformatsiya",
+    "points": [
+      "Soviet KGB tactic of strategic disinformation",
+      "Long-term campaigns to spread harmful falsehoods",
+      "Turns international opinion against enemies",
+      "Systematic approach to weaponized deception"
+    ],
+    "layout": "layout-split",
+    "theme": "theme-dark"
+  },
+  {
+    "title": "Information Warfare",
+    "points": [
+      "The battlefield is in your mind",
+      "No uniforms or trenches, just cognitive attacks",
+      "Deliberate campaign to control perception",
+      "Every citizen is a target in this hidden war"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-dark"
+  },
+  {
+    "title": "Cognitive Domain Operations",
+    "points": [
+      "Silent attacks on how you think and choose",
+      "Targets decision-making processes",
+      "Weaponizes psychology and information",
+      "Makes the mind itself a battlefield"
     ],
     "layout": "layout-boxed",
     "theme": "theme-purple"
@@ -111,84 +949,6 @@ const CARD_DATA = [
     "theme": "theme-dark"
   },
   {
-    "title": "Fighting Disinformation: Inoculation",
-    "points": [
-      "Teach others the propaganda playbook",
-      "Every mind you inoculate becomes resistance",
-      "Share knowledge of manipulation techniques",
-      "Build collective resilience through awareness"
-    ],
-    "layout": "layout-centered",
-    "theme": "theme-blue"
-  },
-  {
-    "title": "Fighting Disinformation: Verification",
-    "points": [
-      "Slow down and verify before sharing",
-      "Question patterns your brain invents",
-      "Seek multiple reliable sources",
-      "Pause when content triggers strong emotions"
-    ],
-    "layout": "layout-boxed",
-    "theme": "theme-green"
-  },
-  {
-    "title": "Fighting Disinformation: Independence",
-    "points": [
-      "Think before you follow the crowd",
-      "When crowds decide truth, propaganda wins",
-      "Evaluate evidence on its own merit",
-      "Resist the bandwagon effect"
-    ],
-    "layout": "layout-split",
-    "theme": "theme-sunset"
-  },
-  // Additional disinformation tactics
-  {
-    "title": "False Balance",
-    "points": [
-      "Presents two sides as equally valid despite evidence",
-      "Makes fringe beliefs appear as credible alternatives",
-      "Creates artificial controversy on settled issues",
-      "Media fairness exploited for legitimizing misinformation"
-    ],
-    "layout": "layout-split",
-    "theme": "theme-purple"
-  },
-  {
-    "title": "Card Stacking",
-    "points": [
-      "Shows only positive information about a subject",
-      "Hides all negative facts deliberately",
-      "Used by authoritarian regimes to mask suffering",
-      "Controls perception through selective disclosure"
-    ],
-    "layout": "layout-centered",
-    "theme": "theme-red"
-  },
-  {
-    "title": "Gaslighting",
-    "points": [
-      "Leaders deny obvious facts or events",
-      "Makes people doubt their own memory and perception",
-      "Erodes trust in objective reality",
-      "Favorite tool of authoritarians to control dissent"
-    ],
-    "layout": "layout-boxed",
-    "theme": "theme-dark"
-  },
-  {
-    "title": "Zersetzung",
-    "points": [
-      "Covert psychological warfare method (East German Stasi)",
-      "Systematically destroys reputation and confidence",
-      "Uses harassment, disinformation, and isolation",
-      "Breaks down targets without physical violence"
-    ],
-    "layout": "layout-centered",
-    "theme": "theme-purple"
-  },
-  {
     "title": "False Flag",
     "points": [
       "Staging attacks on oneself to justify aggression",
@@ -196,51 +956,40 @@ const CARD_DATA = [
       "Creates justification for war or repression",
       "Makes the aggressor appear as defender"
     ],
-    "layout": "layout-split",
-    "theme": "theme-red"
-  },
-  {
-    "title": "Doppelgänger Websites",
-    "points": [
-      "Fake websites imitating trusted news sources",
-      "Use cloned designs and similar URLs",
-      "Fool readers into believing lies from 'reputable' sources",
-      "Exploit existing trust for disinformation"
-    ],
-    "layout": "layout-boxed",
-    "theme": "theme-blue"
-  },
-  {
-    "title": "Door-in-the-Face Technique",
-    "points": [
-      "Makes an extreme request expected to be rejected",
-      "Follows with smaller request that seems reasonable by comparison",
-      "Increases likelihood of second request being accepted",
-      "Psychological trickery to manipulate compliance"
-    ],
     "layout": "layout-centered",
-    "theme": "theme-green"
+    "theme": "theme-purple"
   },
   {
-    "title": "Euphemism",
+    "title": "Fifth Column",
     "points": [
-      "Uses mild, vague, or pleasant-sounding words",
-      "Covers up harsh realities and atrocities",
-      "Makes violence and oppression sound normal",
-      "Eases moral discomfort with unethical actions"
-    ],
-    "layout": "layout-split",
-    "theme": "theme-sunset"
-  },
-  {
-    "title": "Information Laundering",
-    "points": [
-      "Introduces false information in fringe spaces",
-      "Gradually amplifies through increasingly credible sources",
-      "Makes falsehoods appear legitimate over time",
-      "Exploits the 'source amnesia' cognitive bias"
+      "Covert groups working within a country to undermine it",
+      "Aids external enemies without open confrontation",
+      "Operates through influence operations and subversion",
+      "Creates internal division that weakens resistance"
     ],
     "layout": "layout-boxed",
+    "theme": "theme-dark"
+  },
+  {
+    "title": "Black Propaganda",
+    "points": [
+      "Creates false information attributed to opponents",
+      "Makes it appear to come from a different source",
+      "Designed to discredit enemies or rivals",
+      "Deception inside deception for maximum damage"
+    ],
+    "layout": "layout-split",
+    "theme": "theme-purple"
+  },
+  {
+    "title": "Kompromat",
+    "points": [
+      "Collection of compromising information on targets",
+      "Uses material (real or fabricated) to control or destroy",
+      "Classic intelligence blackmail technique",
+      "Creates leverage through threat of exposure"
+    ],
+    "layout": "layout-split",
     "theme": "theme-dark"
   },
   {
@@ -262,174 +1011,8 @@ const CARD_DATA = [
       "Stays under the radar of general public",
       "Enables deniability while communicating to insiders"
     ],
-    "layout": "layout-split",
+    "layout": "layout-boxed",
     "theme": "theme-dark"
-  },
-  {
-    "title": "Cognitive Domain Operations",
-    "points": [
-      "Silent attacks on how you think and choose",
-      "Targets decision-making processes",
-      "Weaponizes psychology and information",
-      "Makes the mind itself a battlefield"
-    ],
-    "layout": "layout-boxed",
-    "theme": "theme-sunset"
-  },
-  {
-    "title": "Glittering Generalities",
-    "points": [
-      "Uses vague, emotionally charged words",
-      "\"Freedom,\" \"Greatness,\" \"Security\" without specifics",
-      "Sounds inspiring while saying nothing concrete",
-      "Exploits positive emotional associations"
-    ],
-    "layout": "layout-centered",
-    "theme": "theme-blue"
-  },
-  {
-    "title": "Black Propaganda",
-    "points": [
-      "Creates false information attributed to opponents",
-      "Makes it appear to come from a different source",
-      "Designed to discredit enemies or rivals",
-      "Deception inside deception for maximum damage"
-    ],
-    "layout": "layout-split",
-    "theme": "theme-purple"
-  },
-  {
-    "title": "Dezinformatsiya",
-    "points": [
-      "Soviet KGB tactic of strategic disinformation",
-      "Long-term campaigns to spread harmful falsehoods",
-      "Turns international opinion against enemies",
-      "Systematic approach to weaponized deception"
-    ],
-    "layout": "layout-boxed",
-    "theme": "theme-red"
-  },
-  {
-    "title": "Information Warfare",
-    "points": [
-      "The battlefield is in your mind",
-      "No uniforms or trenches, just cognitive attacks",
-      "Deliberate campaign to control perception",
-      "Every citizen is a target in this hidden war"
-    ],
-    "layout": "layout-centered",
-    "theme": "theme-dark"
-  },
-  // More disinformation tactics
-  {
-    "title": "Censorship By Noise",
-    "points": [
-      "Floods information space with garbage content",
-      "Drowns out truth without using force",
-      "Overwhelms through distraction and volume",
-      "Makes finding accurate information exhausting"
-    ],
-    "layout": "layout-boxed",
-    "theme": "theme-blue"
-  },
-  {
-    "title": "Salami Tactics",
-    "points": [
-      "Erodes rights and freedoms slice by slice",
-      "Each change too small to trigger serious alarm",
-      "By the time people notice, significant damage is done",
-      "Gradual authoritarianism that avoids resistance"
-    ],
-    "layout": "layout-split",
-    "theme": "theme-green"
-  },
-  {
-    "title": "Cult of Personality",
-    "points": [
-      "Elevates a leader as flawless and heroic",
-      "Uses propaganda, media control, and symbolism",
-      "Suppresses dissent by creating quasi-religious loyalty",
-      "Replaces critical thinking with worship"
-    ],
-    "layout": "layout-centered",
-    "theme": "theme-red"
-  },
-  {
-    "title": "Whataboutism",
-    "points": [
-      "Deflects criticism by pointing to others' flaws",
-      "Changes the subject rather than addressing the issue",
-      "Used by governments to avoid accountability",
-      "False equivalence that derails meaningful discussion"
-    ],
-    "layout": "layout-boxed",
-    "theme": "theme-purple"
-  },
-  {
-    "title": "Name-Calling",
-    "points": [
-      "Uses insults to replace substantive arguments",
-      "Labels opponents as \"traitors\" or \"foreign agents\"",
-      "Discredits dissent without requiring evidence",
-      "Silences opposition through character assassination"
-    ],
-    "layout": "layout-split",
-    "theme": "theme-sunset"
-  },
-  {
-    "title": "Technical Jargon",
-    "points": [
-      "Overuses specialized, complex language",
-      "Confuses, intimidates, or misleads audiences",
-      "Hides weak arguments behind complexity",
-      "Makes the audience feel intellectually inferior"
-    ],
-    "layout": "layout-centered",
-    "theme": "theme-dark"
-  },
-  {
-    "title": "Fake News",
-    "points": [
-      "Deliberately fabricated stories spread as factual",
-      "Created to deceive, mislead and manipulate",
-      "Fuels confusion, distrust, and division",
-      "Undermines the credibility of legitimate media"
-    ],
-    "layout": "layout-boxed",
-    "theme": "theme-green"
-  },
-  {
-    "title": "Oversimplification",
-    "points": [
-      "Reduces complex issues to simple, catchy solutions",
-      "Ignores nuance and important complexity",
-      "Offers false clarity on multifaceted problems",
-      "Appeals to desire for easy answers to hard questions"
-    ],
-    "layout": "layout-split",
-    "theme": "theme-blue"
-  },
-  {
-    "title": "Fear, Uncertainty, Doubt",
-    "points": [
-      "Spreads vague threats and scary scenarios",
-      "Creates conflicting information to paralyze decision-making",
-      "Used by corporations and authoritarian regimes",
-      "Prevents action through emotional manipulation"
-    ],
-    "layout": "layout-centered",
-    "theme": "theme-purple"
-  },
-  {
-    "title": "Appeal to Authority",
-    "points": [
-      "Uses someone's status rather than evidence",
-      "Leverages celebrities to spread misinformation",
-      "Confuses expertise in one area with authority in another",
-      "Bypasses critical thinking through false credibility"
-    ],
-    "layout": "layout-boxed",
-    "theme": "theme-red"
   },
   {
     "title": "Accusation in a Mirror",
@@ -440,63 +1023,7 @@ const CARD_DATA = [
       "Creates confusion about who's truly responsible"
     ],
     "layout": "layout-split",
-    "theme": "theme-dark"
-  },
-  {
-    "title": "Appeal to Tradition",
-    "points": [
-      "Defends ideas because \"it's always been this way\"",
-      "Claims history alone makes something right",
-      "Used to resist social progress and equal rights",
-      "Substitutes longevity for moral or logical validity"
-    ],
-    "layout": "layout-centered",
-    "theme": "theme-sunset"
-  },
-  {
-    "title": "Fighting Disinformation: Evidence",
-    "points": [
-      "Don't follow the crowd — follow the evidence",
-      "Evaluate claims based on facts, not popularity",
-      "The herd can lead you astray if you let it",
-      "Resist social pressure to accept misinformation"
-    ],
-    "layout": "layout-boxed",
-    "theme": "theme-blue"
-  },
-  // Final batch of disinformation tactics
-  {
-    "title": "False Consensus Manufacturing",
-    "points": [
-      "Creates illusion that \"everyone agrees\"",
-      "Uses bots, trolls, and coordinated influencers",
-      "Simulates mass approval or outrage artificially",
-      "Makes fringe opinions appear mainstream"
-    ],
-    "layout": "layout-centered",
-    "theme": "theme-green"
-  },
-  {
-    "title": "Doublespeak",
-    "points": [
-      "Uses deliberately ambiguous or contradictory language",
-      "Obscures reality and misleads audiences",
-      "Disguises harmful actions with pleasant terms",
-      "The art of lying without technically lying"
-    ],
-    "layout": "layout-split",
     "theme": "theme-purple"
-  },
-  {
-    "title": "Divide and Rule",
-    "points": [
-      "Sows division between groups to weaken unity",
-      "Makes a divided population easier to control",
-      "Distracts from real issues with manufactured conflicts",
-      "As old as empire but still thriving today"
-    ],
-    "layout": "layout-boxed",
-    "theme": "theme-red"
   },
   {
     "title": "Victim-Blaming",
@@ -510,26 +1037,96 @@ const CARD_DATA = [
     "theme": "theme-dark"
   },
   {
-    "title": "Recursive Narrative Engineering",
+    "title": "Salami Tactics",
     "points": [
-      "Seeds multiple, layered narratives across different spaces",
-      "Each narrative references others to create circular \"proof\"",
-      "Creates illusion of credibility through self-reference",
-      "Makes falsehoods appear verified by multiple sources"
-    ],
-    "layout": "layout-split",
-    "theme": "theme-blue"
-  },
-  {
-    "title": "Psychological Flooding",
-    "points": [
-      "Overwhelms with constant crises and conflicting narratives",
-      "Bombards with fear-inducing content to exhaust mental resilience",
-      "Disables critical thinking through cognitive overload",
-      "Creates fatigue that leads to disengagement or surrender"
+      "Erodes rights and freedoms slice by slice",
+      "Each change too small to trigger serious alarm",
+      "By the time people notice, significant damage is done",
+      "Gradual authoritarianism that avoids resistance"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-sunset"
+    "theme": "theme-purple"
+  },
+  {
+    "title": "Door-in-the-Face Technique",
+    "points": [
+      "Makes an extreme request expected to be rejected",
+      "Follows with smaller request that seems reasonable by comparison",
+      "Increases likelihood of second request being accepted",
+      "Psychological trickery to manipulate compliance"
+    ],
+    "layout": "layout-split",
+    "theme": "theme-dark"
+  },
+  {
+    "title": "Propaganda of Success",
+    "points": [
+      "Exaggerates achievements and hides failures",
+      "Creates illusion of constant victory and progress",
+      "Masks reality with inflated claims of accomplishment",
+      "Silences dissent by manufacturing false consensus"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-dark"
+  },
+
+  // ===================================
+  // 9. COUNTER-STRATEGIES & DEFENSE - CATEGORY HEADER
+  // ===================================
+  {
+    "title": "COUNTER-STRATEGIES & DEFENSE",
+    "points": [
+      "How to protect yourself and others from manipulation",
+      "Practical methods to strengthen mental immunity",
+      "Build resilience through awareness and critical thinking",
+      "When disinformation attacks, these are your shields"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-green"
+  },
+  {
+    "title": "Fighting Disinformation: Inoculation",
+    "points": [
+      "Teach others the propaganda playbook",
+      "Every mind you inoculate becomes resistance",
+      "Share knowledge of manipulation techniques",
+      "Build collective resilience through awareness"
+    ],
+    "layout": "layout-centered",
+    "theme": "theme-green"
+  },
+  {
+    "title": "Fighting Disinformation: Verification",
+    "points": [
+      "Slow down and verify before sharing",
+      "Question patterns your brain invents",
+      "Seek multiple reliable sources",
+      "Pause when content triggers strong emotions"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-green"
+  },
+  {
+    "title": "Fighting Disinformation: Independence",
+    "points": [
+      "Think before you follow the crowd",
+      "When crowds decide truth, propaganda wins",
+      "Evaluate evidence on its own merit",
+      "Resist the bandwagon effect"
+    ],
+    "layout": "layout-split",
+    "theme": "theme-green"
+  },
+  {
+    "title": "Fighting Disinformation: Evidence",
+    "points": [
+      "Don't follow the crowd — follow the evidence",
+      "Evaluate claims based on facts, not popularity",
+      "The herd can lead you astray if you let it",
+      "Resist social pressure to accept misinformation"
+    ],
+    "layout": "layout-boxed",
+    "theme": "theme-green"
   },
   {
     "title": "Fighting Disinformation: Self-Awareness",
@@ -540,7 +1137,7 @@ const CARD_DATA = [
       "Self-knowledge is the foundation of resistance"
     ],
     "layout": "layout-centered",
-    "theme": "theme-purple"
+    "theme": "theme-green"
   },
   {
     "title": "Fighting Disinformation: Community",
@@ -553,284 +1150,6 @@ const CARD_DATA = [
     "layout": "layout-split",
     "theme": "theme-green"
   },
-  // Advanced disinformation tactics
-  {
-    "title": "Stochastic Terrorism",
-    "points": [
-      "Uses public demonization and inflammatory rhetoric",
-      "Inspires unpredictable acts of violence by individuals",
-      "Creates plausible deniability through indirect incitement",
-      "Makes targets feel they're called to act without coordination"
-    ],
-    "layout": "layout-boxed",
-    "theme": "theme-red"
-  },
-  {
-    "title": "Reflexive Control",
-    "points": [
-      "Psychological warfare tactic with Russian origins",
-      "Crafts information to guide your decision-making",
-      "Makes you believe the manipulator's choice was your idea",
-      "Controls behavior while maintaining illusion of free will"
-    ],
-    "layout": "layout-centered",
-    "theme": "theme-purple"
-  },
-  {
-    "title": "Rotten Herring",
-    "points": [
-      "Creates fake scandals or distractions",
-      "Diverts attention from real problems or crises",
-      "Used when damaging news emerges about the powerful",
-      "Makes people look elsewhere instead of at real issues"
-    ],
-    "layout": "layout-split",
-    "theme": "theme-blue"
-  },
-  {
-    "title": "Fifth Column",
-    "points": [
-      "Covert groups working within a country to undermine it",
-      "Aids external enemies without open confrontation",
-      "Operates through influence operations and subversion",
-      "Creates internal division that weakens resistance"
-    ],
-    "layout": "layout-boxed",
-    "theme": "theme-dark"
-  },
-  {
-    "title": "Poisoning the Well",
-    "points": [
-      "Discredits a person or source before they speak",
-      "Ensures their statements will be dismissed regardless of content",
-      "Creates preemptive mistrust of legitimate information",
-      "Prevents fair evaluation of evidence or arguments"
-    ],
-    "layout": "layout-centered",
-    "theme": "theme-green"
-  },
-  {
-    "title": "Semantic Manipulation",
-    "points": [
-      "Deliberately distorts or redefines language",
-      "Controls words to control how reality is perceived",
-      "Changes meaning of terms to confuse public discourse",
-      "Makes communication itself a battlefield"
-    ],
-    "layout": "layout-split",
-    "theme": "theme-sunset"
-  },
-  {
-    "title": "Sealioning",
-    "points": [
-      "Bad-faith actors bombard with 'polite' demands for explanation",
-      "Not seeking to learn but to exhaust and discredit",
-      "Weaponizes civility to drain resources and attention",
-      "Makes defending truth more costly than spreading lies"
-    ],
-    "layout": "layout-boxed",
-    "theme": "theme-purple"
-  },
-  {
-    "title": "Beautiful People",
-    "points": [
-      "Uses attractive or influential figures to promote ideas",
-      "Exploits admiration to bypass critical thinking",
-      "Persuades through association rather than evidence",
-      "Transfers positive feelings about person to the message"
-    ],
-    "layout": "layout-centered",
-    "theme": "theme-blue"
-  },
-  {
-    "title": "Fighting Disinformation: Framing",
-    "points": [
-      "Break the frame and look underneath",
-      "Recognize how information presentation shapes perception",
-      "Question why certain aspects are emphasized over others",
-      "If you can't choose your frame, someone else will choose it for you"
-    ],
-    "layout": "layout-split",
-    "theme": "theme-red"
-  },
-  {
-    "title": "Fighting Disinformation: Anchoring",
-    "points": [
-      "Break the anchor and start fresh",
-      "Don't let others set your starting point in discussions",
-      "Recognize when initial proposals are intentionally extreme",
-      "If others control where you start, they control where you end up"
-    ],
-    "layout": "layout-boxed",
-    "theme": "theme-dark"
-  },
-  // Concluding disinformation tactics
-  {
-    "title": "Buzzword",
-    "points": [
-      "Trendy, vague, or impressive-sounding terms",
-      "Creates illusion of expertise without substance",
-      "Distracts and confuses with empty language",
-      "Signals affiliation without meaningful content"
-    ],
-    "layout": "layout-centered",
-    "theme": "theme-blue"
-  },
-  {
-    "title": "Fear as Control",
-    "points": [
-      "Emotional engine of menticide and manipulation",
-      "Makes people cling to authority figures",
-      "Causes surrender of independent thought",
-      "Trades critical thinking for illusion of safety"
-    ],
-    "layout": "layout-boxed",
-    "theme": "theme-red"
-  },
-  {
-    "title": "Fighting Disinformation: Comfort Check",
-    "points": [
-      "Question the things that feel most comfortable",
-      "The lie you most want to believe controls you most",
-      "Examine your own confirmation bias critically",
-      "Stay curious about your own certainties"
-    ],
-    "layout": "layout-split",
-    "theme": "theme-green"
-  },
-  {
-    "title": "Demonizing the Enemy",
-    "points": [
-      "Portrays opponents as evil or subhuman",
-      "Makes violence or cruelty seem necessary",
-      "Removes moral barriers to aggression",
-      "Justifies extreme actions against dehumanized groups"
-    ],
-    "layout": "layout-centered",
-    "theme": "theme-dark"
-  },
-  {
-    "title": "Dysphemism",
-    "points": [
-      "Uses harsh or ugly words instead of neutral ones",
-      "Opposite of euphemism - designed to trigger disgust",
-      "Makes people or ideas seem dangerous or repulsive",
-      "Manipulates perception through negative language"
-    ],
-    "layout": "layout-boxed",
-    "theme": "theme-purple"
-  },
-  {
-    "title": "Appeal to Pity",
-    "points": [
-      "Uses emotional pleas and victimhood narratives",
-      "Distracts from weak arguments or wrongdoing",
-      "Makes you feel guilty instead of thinking critically",
-      "Weaponizes empathy to bypass rational scrutiny"
-    ],
-    "layout": "layout-split",
-    "theme": "theme-sunset"
-  },
-  {
-    "title": "Big Lie",
-    "points": [
-      "Outrageous falsehood repeated extensively",
-      "So enormous that people can't believe it's fabricated",
-      "Creates new reality when left unchallenged",
-      "Doesn't just distort history - it rewrites it"
-    ],
-    "layout": "layout-centered",
-    "theme": "theme-red"
-  },
-  {
-    "title": "Provokatsiya",
-    "points": [
-      "Russian intelligence tactic of covert provocation",
-      "Incites targets into harmful actions or statements",
-      "Uses target's reaction to discredit or destroy them",
-      "Creates situations where victims appear as aggressors"
-    ],
-    "layout": "layout-boxed",
-    "theme": "theme-blue"
-  },
-  {
-    "title": "Kompromat",
-    "points": [
-      "Collection of compromising information on targets",
-      "Uses material (real or fabricated) to control or destroy",
-      "Classic intelligence blackmail technique",
-      "Creates leverage through threat of exposure"
-    ],
-    "layout": "layout-split",
-    "theme": "theme-dark"
-  },
-  {
-    "title": "False Dilemma",
-    "points": [
-      "Reduces complex issues to just two (often flawed) choices",
-      "Hides nuance and eliminates middle ground",
-      "Forces artificial decisions by removing alternatives",
-      "Pressures conformity through limited options"
-    ],
-    "layout": "layout-centered",
-    "theme": "theme-purple"
-  },
-  {
-    "title": "Memetic Programming",
-    "points": [
-      "Creates and spreads contagious ideas or 'memes'",
-      "Designed to shape beliefs without conscious awareness",
-      "Bypasses critical thinking through humor or emotion",
-      "Programs behavior through seemingly harmless content"
-    ],
-    "layout": "layout-boxed",
-    "theme": "theme-green"
-  },
-  // Supplementary disinformation tactics
-  {
-    "title": "Appeal to Flattery",
-    "points": [
-      "Compliments or praises audience to win trust",
-      "Makes you feel smart or special to lower skepticism",
-      "Builds false rapport before pushing an agenda",
-      "Uses emotional validation to bypass critical thinking"
-    ],
-    "layout": "layout-centered",
-    "theme": "theme-blue"
-  },
-  {
-    "title": "Cognitive Fatigue Induction",
-    "points": [
-      "Overwhelms with excessive, contradictory information",
-      "Exhausts mental resources needed for critical thinking",
-      "Makes targets too tired to evaluate claims effectively",
-      "Leaves people vulnerable to simplified false narratives"
-    ],
-    "layout": "layout-boxed",
-    "theme": "theme-purple"
-  },
-  {
-    "title": "Propaganda of Success",
-    "points": [
-      "Exaggerates achievements and hides failures",
-      "Creates illusion of constant victory and progress",
-      "Masks reality with inflated claims of accomplishment",
-      "Silences dissent by manufacturing false consensus"
-    ],
-    "layout": "layout-split",
-    "theme": "theme-green"
-  },
-  {
-    "title": "Narrative Flooding",
-    "points": [
-      "Pushes multiple conflicting stories simultaneously",
-      "Overwhelms public discourse with contradictions",
-      "Creates confusion about what is actually happening",
-      "Prevents clear conclusions and understanding"
-    ],
-    "layout": "layout-centered",
-    "theme": "theme-dark"
-  },
   {
     "title": "Fighting Disinformation: Synthesis",
     "points": [
@@ -840,19 +1159,7 @@ const CARD_DATA = [
       "See the strategic intent behind tactical confusion"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-sunset"
-  },
-  // Final fighting disinformation strategies
-  {
-    "title": "Fighting Disinformation: Emotional Awareness",
-    "points": [
-      "Feel your emotions — then think anyway",
-      "Notice when content triggers strong reactions",
-      "If they're trying to make you rush, slow down",
-      "Your emotional responses are their weapons unless you recognize them"
-    ],
-    "layout": "layout-centered",
-    "theme": "theme-blue"
+    "theme": "theme-green"
   },
   {
     "title": "Fighting Disinformation: Strategic Thinking",
@@ -863,29 +1170,7 @@ const CARD_DATA = [
       "Expose the manipulation strategy itself"
     ],
     "layout": "layout-split",
-    "theme": "theme-purple"
-  },
-  {
-    "title": "Fighting Disinformation: Refusing Fear",
-    "points": [
-      "Don't let fear dictate your decisions",
-      "Question demands for obedience in the name of safety",
-      "Recognize when fear is being used as control",
-      "Courage begins with seeing manipulation clearly"
-    ],
-    "layout": "layout-boxed",
-    "theme": "theme-red"
-  },
-  {
-    "title": "Fighting Disinformation: Focus Control",
-    "points": [
-      "Consciously choose where to direct your attention",
-      "Slow down and refuse to be swept up in chaos",
-      "Prioritize signal over noise in information intake",
-      "When you control your focus, they lose control of you"
-    ],
-    "layout": "layout-centered",
-    "theme": "theme-dark"
+    "theme": "theme-green"
   },
   {
     "title": "Fighting Disinformation: Sharing Knowledge",
@@ -896,7 +1181,7 @@ const CARD_DATA = [
       "Every mind you help protect strengthens collective resilience"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-sunset"
+    "theme": "theme-green"
   },
   {
     "title": "Fighting Disinformation: Mental Resilience",
@@ -907,6 +1192,17 @@ const CARD_DATA = [
       "Your mind is the battlefield - awareness is your armor"
     ],
     "layout": "layout-split",
+    "theme": "theme-green"
+  },
+  {
+    "title": "Fighting Disinformation: Anchoring",
+    "points": [
+      "Break the anchor and start fresh",
+      "Don't let others set your starting point in discussions",
+      "Recognize when initial proposals are intentionally extreme",
+      "If others control where you start, they control where you end up"
+    ],
+    "layout": "layout-boxed",
     "theme": "theme-green"
   }
 ];

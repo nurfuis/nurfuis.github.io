@@ -136,6 +136,18 @@ h1 {
     border-top: 1px solid #eee;
 }
 
+/* Add styles for global format selector */
+.global-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin: 2rem 0;
+}
+
+.global-format {
+    min-width: 200px;
+}
+
 .download-all-btn {
     background-color: #4CAF50;
     color: white;
@@ -265,6 +277,42 @@ h1 {
 /* Add specific styles for dark theme to ensure contrast */
 .theme-dark .layout-boxed .card-content-points li {
     background-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Add new styles for logo and link */
+.card-footer {
+    position: absolute;
+    bottom: 40px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+}
+
+.card-logo {
+    height: 60px;
+    width: auto;
+    opacity: 0.9;
+}
+
+.card-link {
+    font-size: 1.25rem;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+/* Adjust for story mode */
+.story .card-footer {
+    bottom: 80px;
+}
+
+.story .card-logo {
+    height: 80px;
+}
+
+.story .card-link {
+    font-size: 1.5rem;
 }
 
 /* Themes */
