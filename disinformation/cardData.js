@@ -12,7 +12,8 @@ const CARD_DATA = [
       "Knowledge is immunity in the age of weaponized information"
     ],
     "layout": "layout-centered",
-    "theme": "theme-dark"
+    "theme": "theme-dark",
+    "category": "INTRODUCTION"  // Add this line
   },
   
   // ===================================
@@ -27,7 +28,8 @@ const CARD_DATA = [
       "When emotions drive, reason takes the passenger seat"
     ],
     "layout": "layout-centered",
-    "theme": "theme-red"
+    "theme": "theme-red",
+    "category": "EMOTIONAL MANIPULATION"  // Add this line
   },
   {
     "title": "Amygdala Hacking",
@@ -38,7 +40,8 @@ const CARD_DATA = [
       "Makes you react, not reason"
     ],
     "layout": "layout-split",
-    "theme": "theme-red"
+    "theme": "theme-red",
+    "category": "EMOTIONAL MANIPULATION"
   },
   {
     "title": "Fear as Control",
@@ -49,7 +52,8 @@ const CARD_DATA = [
       "Trades critical thinking for illusion of safety"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-red"
+    "theme": "theme-red",
+    "category": "EMOTIONAL MANIPULATION"
   },
   {
     "title": "Emotional Layering",
@@ -60,7 +64,8 @@ const CARD_DATA = [
       "Creates psychological lock-in through layered triggers"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-sunset"
+    "theme": "theme-sunset",
+    "category": "EMOTIONAL MANIPULATION"
   },
   {
     "title": "Appeal to Pity",
@@ -71,7 +76,8 @@ const CARD_DATA = [
       "Weaponizes empathy to bypass rational scrutiny"
     ],
     "layout": "layout-split",
-    "theme": "theme-sunset"
+    "theme": "theme-sunset",
+    "category": "EMOTIONAL MANIPULATION"
   },
   {
     "title": "Appeal to Flattery",
@@ -82,7 +88,8 @@ const CARD_DATA = [
       "Uses emotional validation to bypass critical thinking"
     ],
     "layout": "layout-centered",
-    "theme": "theme-sunset"
+    "theme": "theme-sunset",
+    "category": "EMOTIONAL MANIPULATION"
   },
   {
     "title": "Fighting Disinformation: Emotional Awareness",
@@ -93,7 +100,8 @@ const CARD_DATA = [
       "Your emotional responses are their weapons unless you recognize them"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "EMOTIONAL MANIPULATION"
   },
 
   // ===================================
@@ -108,7 +116,8 @@ const CARD_DATA = [
       "Turns your brain's efficiency systems against you"
     ],
     "layout": "layout-centered",
-    "theme": "theme-purple"
+    "theme": "theme-purple",
+    "category": "COGNITIVE EXPLOITATION"
   },
   {
     "title": "Cognitive Shortcuts Exploitation",
@@ -119,7 +128,8 @@ const CARD_DATA = [
       "Makes manipulation feel like natural thinking"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-purple"
+    "theme": "theme-purple",
+    "category": "COGNITIVE EXPLOITATION"
   },
   {
     "title": "Confirmation Bias Exploitation",
@@ -130,7 +140,8 @@ const CARD_DATA = [
       "Turns comfort-seeking into a weapon against truth"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-purple"
+    "theme": "theme-purple",
+    "category": "COGNITIVE EXPLOITATION"
   },
   {
     "title": "Cognitive Fatigue Induction",
@@ -141,7 +152,8 @@ const CARD_DATA = [
       "Leaves people vulnerable to simplified false narratives"
     ],
     "layout": "layout-split",
-    "theme": "theme-purple"
+    "theme": "theme-purple",
+    "category": "COGNITIVE EXPLOITATION"
   },
   {
     "title": "Cherry Picking",
@@ -152,7 +164,8 @@ const CARD_DATA = [
       "Creates a false narrative through selective facts"
     ],
     "layout": "layout-split",
-    "theme": "theme-dark"
+    "theme": "theme-dark",
+    "category": "COGNITIVE EXPLOITATION"
   },
   {
     "title": "Oversimplification",
@@ -163,7 +176,8 @@ const CARD_DATA = [
       "Appeals to desire for easy answers to hard questions"
     ],
     "layout": "layout-centered",
-    "theme": "theme-dark"
+    "theme": "theme-dark",
+    "category": "COGNITIVE EXPLOITATION"
   },
   {
     "title": "Gaslighting",
@@ -174,7 +188,8 @@ const CARD_DATA = [
       "Favorite tool of authoritarians to control dissent"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-dark"
+    "theme": "theme-dark",
+    "category": "COGNITIVE EXPLOITATION"
   },
   {
     "title": "Framing Manipulation",
@@ -185,7 +200,8 @@ const CARD_DATA = [
       "Makes manipulation feel like natural insight"
     ],
     "layout": "layout-split",
-    "theme": "theme-purple"
+    "theme": "theme-purple",
+    "category": "COGNITIVE EXPLOITATION"
   },
   {
     "title": "Card Stacking",
@@ -196,7 +212,8 @@ const CARD_DATA = [
       "Controls perception through selective disclosure"
     ],
     "layout": "layout-centered",
-    "theme": "theme-dark"
+    "theme": "theme-dark",
+    "category": "COGNITIVE EXPLOITATION"
   },
   {
     "title": "False Dilemma",
@@ -207,7 +224,8 @@ const CARD_DATA = [
       "Pressures conformity through limited options"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-purple"
+    "theme": "theme-purple",
+    "category": "COGNITIVE EXPLOITATION"
   },
   {
     "title": "Fighting Disinformation: Mental Shortcuts",
@@ -218,7 +236,8 @@ const CARD_DATA = [
       "Remember: if it's too easy, it might be a trap"
     ],
     "layout": "layout-centered",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "COGNITIVE EXPLOITATION"
   },
   {
     "title": "Fighting Disinformation: Comfort Check",
@@ -229,7 +248,8 @@ const CARD_DATA = [
       "Stay curious about your own certainties"
     ],
     "layout": "layout-split",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "COGNITIVE EXPLOITATION"
   },
   {
     "title": "Fighting Disinformation: Framing",
@@ -240,7 +260,8 @@ const CARD_DATA = [
       "If you can't choose your frame, someone else will choose it for you"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "COGNITIVE EXPLOITATION"
   },
 
   // ===================================
@@ -255,7 +276,8 @@ const CARD_DATA = [
       "When the group decides truth, manipulation flourishes"
     ],
     "layout": "layout-centered",
-    "theme": "theme-green"
+    "theme": "theme-green",
+    "category": "SOCIAL & GROUP MANIPULATION"
   },
   {
     "title": "Social Proof Manipulation",
@@ -266,7 +288,8 @@ const CARD_DATA = [
       "Uses herding behavior to override individual judgment"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-green"
+    "theme": "theme-green",
+    "category": "SOCIAL & GROUP MANIPULATION"
   },
   {
     "title": "Herd Manipulation",
@@ -277,7 +300,8 @@ const CARD_DATA = [
       "Turns group psychology into a weapon"
     ],
     "layout": "layout-split",
-    "theme": "theme-green"
+    "theme": "theme-green",
+    "category": "SOCIAL & GROUP MANIPULATION"
   },
   {
     "title": "Manufactured Loyalty",
@@ -288,7 +312,8 @@ const CARD_DATA = [
       "Weaponizes human need for community"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-green"
+    "theme": "theme-green",
+    "category": "SOCIAL & GROUP MANIPULATION"
   },
   {
     "title": "Cult of Personality",
@@ -299,7 +324,8 @@ const CARD_DATA = [
       "Replaces critical thinking with worship"
     ],
     "layout": "layout-centered",
-    "theme": "theme-red"
+    "theme": "theme-red",
+    "category": "SOCIAL & GROUP MANIPULATION"
   },
   {
     "title": "Loyalty Rhetoric",
@@ -310,7 +336,8 @@ const CARD_DATA = [
       "Weaponizes belonging to silence critical thinking"
     ],
     "layout": "layout-split",
-    "theme": "theme-green"
+    "theme": "theme-green",
+    "category": "SOCIAL & GROUP MANIPULATION"
   },
   {
     "title": "False Consensus Manufacturing",
@@ -321,7 +348,8 @@ const CARD_DATA = [
       "Makes fringe opinions appear mainstream"
     ],
     "layout": "layout-centered",
-    "theme": "theme-green"
+    "theme": "theme-green",
+    "category": "SOCIAL & GROUP MANIPULATION"
   },
   {
     "title": "Divide and Rule",
@@ -332,7 +360,8 @@ const CARD_DATA = [
       "As old as empire but still thriving today"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-red"
+    "theme": "theme-red",
+    "category": "SOCIAL & GROUP MANIPULATION"
   },
   {
     "title": "Astroturfing",
@@ -343,7 +372,8 @@ const CARD_DATA = [
       "Makes corporate/government interests seem like popular opinion"
     ],
     "layout": "layout-split",
-    "theme": "theme-green"
+    "theme": "theme-green",
+    "category": "SOCIAL & GROUP MANIPULATION"
   },
   {
     "title": "Fighting Disinformation: Group Pressure",
@@ -354,7 +384,8 @@ const CARD_DATA = [
       "Popularity measures marketing, not truth"
     ],
     "layout": "layout-centered",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "SOCIAL & GROUP MANIPULATION"
   },
   {
     "title": "Fighting Disinformation: Social Proof",
@@ -365,7 +396,8 @@ const CARD_DATA = [
       "Truth often starts as a minority view"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "SOCIAL & GROUP MANIPULATION"
   },
   {
     "title": "Fighting Disinformation: True Loyalty",
@@ -376,7 +408,8 @@ const CARD_DATA = [
       "Truth-seeking is more loyal than silence"
     ],
     "layout": "layout-split",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "SOCIAL & GROUP MANIPULATION"
   },
   {
     "title": "Fighting Disinformation: True Community",
@@ -387,7 +420,8 @@ const CARD_DATA = [
       "Remember: real belonging allows dissent"
     ],
     "layout": "layout-centered",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "SOCIAL & GROUP MANIPULATION"
   },
 
   // ===================================
@@ -402,7 +436,8 @@ const CARD_DATA = [
       "When language is weaponized, clarity becomes resistance"
     ],
     "layout": "layout-centered",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "LANGUAGE & COMMUNICATION"
   },
   {
     "title": "Semantic Manipulation",
@@ -413,7 +448,8 @@ const CARD_DATA = [
       "Makes communication itself a battlefield"
     ],
     "layout": "layout-split",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "LANGUAGE & COMMUNICATION"
   },
   {
     "title": "Doublespeak",
@@ -424,7 +460,8 @@ const CARD_DATA = [
       "The art of lying without technically lying"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "LANGUAGE & COMMUNICATION"
   },
   {
     "title": "Euphemism",
@@ -435,7 +472,8 @@ const CARD_DATA = [
       "Eases moral discomfort with unethical actions"
     ],
     "layout": "layout-split",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "LANGUAGE & COMMUNICATION"
   },
   {
     "title": "Dysphemism",
@@ -446,7 +484,8 @@ const CARD_DATA = [
       "Manipulates perception through negative language"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "LANGUAGE & COMMUNICATION"
   },
   {
     "title": "Technical Jargon",
@@ -457,7 +496,8 @@ const CARD_DATA = [
       "Makes the audience feel intellectually inferior"
     ],
     "layout": "layout-centered",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "LANGUAGE & COMMUNICATION"
   },
   {
     "title": "Buzzword",
@@ -468,7 +508,8 @@ const CARD_DATA = [
       "Signals affiliation without meaningful content"
     ],
     "layout": "layout-split",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "LANGUAGE & COMMUNICATION"
   },
   {
     "title": "Glittering Generalities",
@@ -479,7 +520,8 @@ const CARD_DATA = [
       "Exploits positive emotional associations"
     ],
     "layout": "layout-centered",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "LANGUAGE & COMMUNICATION"
   },
   {
     "title": "Name-Calling",
@@ -490,7 +532,8 @@ const CARD_DATA = [
       "Silences opposition through character assassination"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-sunset"
+    "theme": "theme-sunset",
+    "category": "LANGUAGE & COMMUNICATION"
   },
   {
     "title": "Weaponized Irony",
@@ -501,7 +544,8 @@ const CARD_DATA = [
       "Undermines serious critique with mockery"
     ],
     "layout": "layout-split",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "LANGUAGE & COMMUNICATION"
   },
 
   // ===================================
@@ -516,7 +560,8 @@ const CARD_DATA = [
       "When information space is polluted, truth becomes scarce"
     ],
     "layout": "layout-centered",
-    "theme": "theme-sunset"
+    "theme": "theme-sunset",
+    "category": "INFORMATION CONTROL"
   },
   {
     "title": "Censorship By Noise",
@@ -527,7 +572,8 @@ const CARD_DATA = [
       "Makes finding accurate information exhausting"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-sunset"
+    "theme": "theme-sunset",
+    "category": "INFORMATION CONTROL"
   },
   {
     "title": "Information Laundering",
@@ -538,7 +584,8 @@ const CARD_DATA = [
       "Exploits the 'source amnesia' cognitive bias"
     ],
     "layout": "layout-split",
-    "theme": "theme-dark"
+    "theme": "theme-dark",
+    "category": "INFORMATION CONTROL"
   },
   {
     "title": "Narrative Flooding",
@@ -549,7 +596,8 @@ const CARD_DATA = [
       "Prevents clear conclusions and understanding"
     ],
     "layout": "layout-centered",
-    "theme": "theme-sunset"
+    "theme": "theme-sunset",
+    "category": "INFORMATION CONTROL"
   },
   {
     "title": "Recursive Narrative Engineering",
@@ -560,7 +608,8 @@ const CARD_DATA = [
       "Makes falsehoods appear verified by multiple sources"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-dark"
+    "theme": "theme-dark",
+    "category": "INFORMATION CONTROL"
   },
   {
     "title": "Obfuscation",
@@ -571,7 +620,8 @@ const CARD_DATA = [
       "Deception by drowning clarity"
     ],
     "layout": "layout-split",
-    "theme": "theme-dark"
+    "theme": "theme-dark",
+    "category": "INFORMATION CONTROL"
   },
   {
     "title": "Psychological Flooding",
@@ -582,7 +632,8 @@ const CARD_DATA = [
       "Creates fatigue that leads to disengagement or surrender"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-sunset"
+    "theme": "theme-sunset",
+    "category": "INFORMATION CONTROL"
   },
   {
     "title": "Fake News",
@@ -593,7 +644,8 @@ const CARD_DATA = [
       "Undermines the credibility of legitimate media"
     ],
     "layout": "layout-split",
-    "theme": "theme-sunset"
+    "theme": "theme-sunset",
+    "category": "INFORMATION CONTROL"
   },
   {
     "title": "Repetition",
@@ -604,7 +656,8 @@ const CARD_DATA = [
       "It's not persuasion - it's erosion"
     ],
     "layout": "layout-centered",
-    "theme": "theme-sunset"
+    "theme": "theme-sunset",
+    "category": "INFORMATION CONTROL"
   },
   {
     "title": "Big Lie",
@@ -615,7 +668,8 @@ const CARD_DATA = [
       "Doesn't just distort history - it rewrites it"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-dark"
+    "theme": "theme-dark",
+    "category": "INFORMATION CONTROL"
   },
   {
     "title": "Doppelgänger Websites",
@@ -626,7 +680,8 @@ const CARD_DATA = [
       "Exploit existing trust for disinformation"
     ],
     "layout": "layout-split",
-    "theme": "theme-sunset"
+    "theme": "theme-sunset",
+    "category": "INFORMATION CONTROL"
   },
   {
     "title": "Memetic Programming",
@@ -637,7 +692,8 @@ const CARD_DATA = [
       "Programs behavior through seemingly harmless content"
     ],
     "layout": "layout-centered",
-    "theme": "theme-dark"
+    "theme": "theme-dark",
+    "category": "INFORMATION CONTROL"
   },
   {
     "title": "Fighting Disinformation: Focus Control",
@@ -648,7 +704,8 @@ const CARD_DATA = [
       "When you control your focus, they lose control of you"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "INFORMATION CONTROL"
   },
 
   // ===================================
@@ -663,7 +720,8 @@ const CARD_DATA = [
       "When fear drives decisions, manipulation succeeds"
     ],
     "layout": "layout-centered",
-    "theme": "theme-red"
+    "theme": "theme-red",
+    "category": "CRISIS & FEAR TACTICS"
   },
   {
     "title": "Crisis-Based Manipulation",
@@ -674,7 +732,8 @@ const CARD_DATA = [
       "Makes questioning feel like dangerous delay"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-red"
+    "theme": "theme-red",
+    "category": "CRISIS & FEAR TACTICS"
   },
   {
     "title": "Fear, Uncertainty, Doubt",
@@ -685,7 +744,8 @@ const CARD_DATA = [
       "Prevents action through emotional manipulation"
     ],
     "layout": "layout-centered",
-    "theme": "theme-red"
+    "theme": "theme-red",
+    "category": "CRISIS & FEAR TACTICS"
   },
   {
     "title": "Stochastic Terrorism",
@@ -696,7 +756,8 @@ const CARD_DATA = [
       "Makes targets feel they're called to act without coordination"
     ],
     "layout": "layout-split",
-    "theme": "theme-red"
+    "theme": "theme-red",
+    "category": "CRISIS & FEAR TACTICS"
   },
   {
     "title": "Rotten Herring",
@@ -707,7 +768,8 @@ const CARD_DATA = [
       "Makes people look elsewhere instead of at real issues"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-red"
+    "theme": "theme-red",
+    "category": "CRISIS & FEAR TACTICS"
   },
   {
     "title": "Demonizing the Enemy",
@@ -718,7 +780,8 @@ const CARD_DATA = [
       "Justifies extreme actions against dehumanized groups"
     ],
     "layout": "layout-split",
-    "theme": "theme-red"
+    "theme": "theme-red",
+    "category": "CRISIS & FEAR TACTICS"
   },
   {
     "title": "Fighting Disinformation: Crisis Response",
@@ -729,7 +792,8 @@ const CARD_DATA = [
       "Focus on verifiable facts, not viral fear"
     ],
     "layout": "layout-centered",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "CRISIS & FEAR TACTICS"
   },
   {
     "title": "Fighting Disinformation: Refusing Fear",
@@ -740,7 +804,8 @@ const CARD_DATA = [
       "Courage begins with seeing manipulation clearly"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "CRISIS & FEAR TACTICS"
   },
 
   // ===================================
@@ -755,7 +820,8 @@ const CARD_DATA = [
       "When credibility is weaponized, skepticism protects"
     ],
     "layout": "layout-centered",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "AUTHORITY & CREDIBILITY"
   },
   {
     "title": "Appeal to Authority",
@@ -766,7 +832,8 @@ const CARD_DATA = [
       "Bypasses critical thinking through false credibility"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "AUTHORITY & CREDIBILITY"
   },
   {
     "title": "Appeal to Prestige",
@@ -777,7 +844,8 @@ const CARD_DATA = [
       "Makes falsehoods seem authoritative"
     ],
     "layout": "layout-split",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "AUTHORITY & CREDIBILITY"
   },
   {
     "title": "Beautiful People",
@@ -788,7 +856,8 @@ const CARD_DATA = [
       "Transfers positive feelings about person to the message"
     ],
     "layout": "layout-centered",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "AUTHORITY & CREDIBILITY"
   },
   {
     "title": "Folksy Appeal",
@@ -799,7 +868,8 @@ const CARD_DATA = [
       "Makes manipulators seem trustworthy"
     ],
     "layout": "layout-split",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "AUTHORITY & CREDIBILITY"
   },
   {
     "title": "Appeal to Tradition",
@@ -810,7 +880,8 @@ const CARD_DATA = [
       "Substitutes longevity for moral or logical validity"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-blue"
+    "theme": "theme-blue",
+    "category": "AUTHORITY & CREDIBILITY"
   },
   {
     "title": "Whataboutism",
@@ -821,7 +892,8 @@ const CARD_DATA = [
       "False equivalence that derails meaningful discussion"
     ],
     "layout": "layout-centered",
-    "theme": "theme-sunset"
+    "theme": "theme-sunset",
+    "category": "AUTHORITY & CREDIBILITY"
   },
   {
     "title": "Poisoning the Well",
@@ -832,7 +904,8 @@ const CARD_DATA = [
       "Prevents fair evaluation of evidence or arguments"
     ],
     "layout": "layout-split",
-    "theme": "theme-sunset"
+    "theme": "theme-sunset",
+    "category": "AUTHORITY & CREDIBILITY"
   },
   {
     "title": "Sealioning",
@@ -843,7 +916,8 @@ const CARD_DATA = [
       "Makes defending truth more costly than spreading lies"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-sunset"
+    "theme": "theme-sunset",
+    "category": "AUTHORITY & CREDIBILITY"
   },
 
   // ===================================
@@ -858,7 +932,8 @@ const CARD_DATA = [
       "When your mind becomes the battlefield, awareness is armor"
     ],
     "layout": "layout-centered",
-    "theme": "theme-dark"
+    "theme": "theme-dark",
+    "category": "ADVANCED PSYCHOLOGICAL OPERATIONS"
   },
   {
     "title": "Reflexive Control Theory",
@@ -869,7 +944,8 @@ const CARD_DATA = [
       "Makes targets believe they're acting freely"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-purple"
+    "theme": "theme-purple",
+    "category": "ADVANCED PSYCHOLOGICAL OPERATIONS"
   },
   {
     "title": "Reflexive Control",
@@ -880,7 +956,8 @@ const CARD_DATA = [
       "Controls behavior while maintaining illusion of free will"
     ],
     "layout": "layout-centered",
-    "theme": "theme-purple"
+    "theme": "theme-purple",
+    "category": "ADVANCED PSYCHOLOGICAL OPERATIONS"
   },
   {
     "title": "Zersetzung",
@@ -891,7 +968,8 @@ const CARD_DATA = [
       "Breaks down targets without physical violence"
     ],
     "layout": "layout-split",
-    "theme": "theme-purple"
+    "theme": "theme-purple",
+    "category": "ADVANCED PSYCHOLOGICAL OPERATIONS"
   },
   {
     "title": "Provokatsiya",
@@ -902,7 +980,8 @@ const CARD_DATA = [
       "Creates situations where victims appear as aggressors"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-dark"
+    "theme": "theme-dark",
+    "category": "ADVANCED PSYCHOLOGICAL OPERATIONS"
   },
   {
     "title": "Dezinformatsiya",
@@ -913,7 +992,8 @@ const CARD_DATA = [
       "Systematic approach to weaponized deception"
     ],
     "layout": "layout-split",
-    "theme": "theme-dark"
+    "theme": "theme-dark",
+    "category": "ADVANCED PSYCHOLOGICAL OPERATIONS"
   },
   {
     "title": "Information Warfare",
@@ -924,7 +1004,8 @@ const CARD_DATA = [
       "Every citizen is a target in this hidden war"
     ],
     "layout": "layout-centered",
-    "theme": "theme-dark"
+    "theme": "theme-dark",
+    "category": "ADVANCED PSYCHOLOGICAL OPERATIONS"
   },
   {
     "title": "Cognitive Domain Operations",
@@ -935,7 +1016,8 @@ const CARD_DATA = [
       "Makes the mind itself a battlefield"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-purple"
+    "theme": "theme-purple",
+    "category": "ADVANCED PSYCHOLOGICAL OPERATIONS"
   },
   {
     "title": "Strategic Ambiguity",
@@ -946,7 +1028,8 @@ const CARD_DATA = [
       "Weaponizes confusion as a strategy"
     ],
     "layout": "layout-split",
-    "theme": "theme-dark"
+    "theme": "theme-dark",
+    "category": "ADVANCED PSYCHOLOGICAL OPERATIONS"
   },
   {
     "title": "False Flag",
@@ -957,7 +1040,8 @@ const CARD_DATA = [
       "Makes the aggressor appear as defender"
     ],
     "layout": "layout-centered",
-    "theme": "theme-purple"
+    "theme": "theme-purple",
+    "category": "ADVANCED PSYCHOLOGICAL OPERATIONS"
   },
   {
     "title": "Fifth Column",
@@ -968,7 +1052,8 @@ const CARD_DATA = [
       "Creates internal division that weakens resistance"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-dark"
+    "theme": "theme-dark",
+    "category": "ADVANCED PSYCHOLOGICAL OPERATIONS"
   },
   {
     "title": "Black Propaganda",
@@ -979,7 +1064,8 @@ const CARD_DATA = [
       "Deception inside deception for maximum damage"
     ],
     "layout": "layout-split",
-    "theme": "theme-purple"
+    "theme": "theme-purple",
+    "category": "ADVANCED PSYCHOLOGICAL OPERATIONS"
   },
   {
     "title": "Kompromat",
@@ -990,7 +1076,8 @@ const CARD_DATA = [
       "Creates leverage through threat of exposure"
     ],
     "layout": "layout-split",
-    "theme": "theme-dark"
+    "theme": "theme-dark",
+    "category": "ADVANCED PSYCHOLOGICAL OPERATIONS"
   },
   {
     "title": "Honeypot Operations",
@@ -1001,7 +1088,8 @@ const CARD_DATA = [
       "Enables control through threat of exposure"
     ],
     "layout": "layout-centered",
-    "theme": "theme-purple"
+    "theme": "theme-purple",
+    "category": "ADVANCED PSYCHOLOGICAL OPERATIONS"
   },
   {
     "title": "Dog Whistles",
@@ -1012,7 +1100,8 @@ const CARD_DATA = [
       "Enables deniability while communicating to insiders"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-dark"
+    "theme": "theme-dark",
+    "category": "ADVANCED PSYCHOLOGICAL OPERATIONS"
   },
   {
     "title": "Accusation in a Mirror",
@@ -1023,7 +1112,8 @@ const CARD_DATA = [
       "Creates confusion about who's truly responsible"
     ],
     "layout": "layout-split",
-    "theme": "theme-purple"
+    "theme": "theme-purple",
+    "category": "ADVANCED PSYCHOLOGICAL OPERATIONS"
   },
   {
     "title": "Victim-Blaming",
@@ -1034,7 +1124,8 @@ const CARD_DATA = [
       "Justifies harm by claiming targets deserved it"
     ],
     "layout": "layout-centered",
-    "theme": "theme-dark"
+    "theme": "theme-dark",
+    "category": "ADVANCED PSYCHOLOGICAL OPERATIONS"
   },
   {
     "title": "Salami Tactics",
@@ -1045,7 +1136,8 @@ const CARD_DATA = [
       "Gradual authoritarianism that avoids resistance"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-purple"
+    "theme": "theme-purple",
+    "category": "ADVANCED PSYCHOLOGICAL OPERATIONS"
   },
   {
     "title": "Door-in-the-Face Technique",
@@ -1056,7 +1148,8 @@ const CARD_DATA = [
       "Psychological trickery to manipulate compliance"
     ],
     "layout": "layout-split",
-    "theme": "theme-dark"
+    "theme": "theme-dark",
+    "category": "ADVANCED PSYCHOLOGICAL OPERATIONS"
   },
   {
     "title": "Propaganda of Success",
@@ -1067,7 +1160,8 @@ const CARD_DATA = [
       "Silences dissent by manufacturing false consensus"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-dark"
+    "theme": "theme-dark",
+    "category": "ADVANCED PSYCHOLOGICAL OPERATIONS"
   },
 
   // ===================================
@@ -1082,7 +1176,8 @@ const CARD_DATA = [
       "When disinformation attacks, these are your shields"
     ],
     "layout": "layout-centered",
-    "theme": "theme-green"
+    "theme": "theme-green",
+    "category": "COUNTER-STRATEGIES & DEFENSE"
   },
   {
     "title": "Fighting Disinformation: Inoculation",
@@ -1093,7 +1188,8 @@ const CARD_DATA = [
       "Build collective resilience through awareness"
     ],
     "layout": "layout-centered",
-    "theme": "theme-green"
+    "theme": "theme-green",
+    "category": "COUNTER-STRATEGIES & DEFENSE"
   },
   {
     "title": "Fighting Disinformation: Verification",
@@ -1104,7 +1200,8 @@ const CARD_DATA = [
       "Pause when content triggers strong emotions"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-green"
+    "theme": "theme-green",
+    "category": "COUNTER-STRATEGIES & DEFENSE"
   },
   {
     "title": "Fighting Disinformation: Independence",
@@ -1115,7 +1212,8 @@ const CARD_DATA = [
       "Resist the bandwagon effect"
     ],
     "layout": "layout-split",
-    "theme": "theme-green"
+    "theme": "theme-green",
+    "category": "COUNTER-STRATEGIES & DEFENSE"
   },
   {
     "title": "Fighting Disinformation: Evidence",
@@ -1126,7 +1224,8 @@ const CARD_DATA = [
       "Resist social pressure to accept misinformation"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-green"
+    "theme": "theme-green",
+    "category": "COUNTER-STRATEGIES & DEFENSE"
   },
   {
     "title": "Fighting Disinformation: Self-Awareness",
@@ -1137,7 +1236,8 @@ const CARD_DATA = [
       "Self-knowledge is the foundation of resistance"
     ],
     "layout": "layout-centered",
-    "theme": "theme-green"
+    "theme": "theme-green",
+    "category": "COUNTER-STRATEGIES & DEFENSE"
   },
   {
     "title": "Fighting Disinformation: Community",
@@ -1148,7 +1248,8 @@ const CARD_DATA = [
       "Community inoculation makes skepticism contagious"
     ],
     "layout": "layout-split",
-    "theme": "theme-green"
+    "theme": "theme-green",
+    "category": "COUNTER-STRATEGIES & DEFENSE"
   },
   {
     "title": "Fighting Disinformation: Synthesis",
@@ -1159,7 +1260,8 @@ const CARD_DATA = [
       "See the strategic intent behind tactical confusion"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-green"
+    "theme": "theme-green",
+    "category": "COUNTER-STRATEGIES & DEFENSE"
   },
   {
     "title": "Fighting Disinformation: Strategic Thinking",
@@ -1170,7 +1272,8 @@ const CARD_DATA = [
       "Expose the manipulation strategy itself"
     ],
     "layout": "layout-split",
-    "theme": "theme-green"
+    "theme": "theme-green",
+    "category": "COUNTER-STRATEGIES & DEFENSE"
   },
   {
     "title": "Fighting Disinformation: Sharing Knowledge",
@@ -1181,7 +1284,8 @@ const CARD_DATA = [
       "Every mind you help protect strengthens collective resilience"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-green"
+    "theme": "theme-green",
+    "category": "COUNTER-STRATEGIES & DEFENSE"
   },
   {
     "title": "Fighting Disinformation: Mental Resilience",
@@ -1192,7 +1296,8 @@ const CARD_DATA = [
       "Your mind is the battlefield - awareness is your armor"
     ],
     "layout": "layout-split",
-    "theme": "theme-green"
+    "theme": "theme-green",
+    "category": "COUNTER-STRATEGIES & DEFENSE"
   },
   {
     "title": "Fighting Disinformation: Anchoring",
@@ -1203,6 +1308,7 @@ const CARD_DATA = [
       "If others control where you start, they control where you end up"
     ],
     "layout": "layout-boxed",
-    "theme": "theme-green"
+    "theme": "theme-green",
+    "category": "COUNTER-STRATEGIES & DEFENSE"
   }
 ];
