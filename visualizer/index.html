@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Intelligence Network Graph</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        canvas {
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+
+        .description {
+            max-width: 1400px;
+            margin: auto;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="description">
+        <h1> The Convergence of Technology, Politics, and Potential Election Interference
+        </h1>
+        <p>
+            This analysis outlines a complex network of connections between influential figures, technology companies,
+            and
+            potential election vulnerabilities. The core narrative revolves around Elon Musk's rapid deployment of a
+            low-orbit satellite constellation, Starlink's Direct-to-Cell, just prior to a critical election. This
+            technology, akin to a sophisticated tracking device, raises concerns about potential surveillance and
+            manipulation of voting precincts.
+        </p>
+        <p>
+            Further complicating the scenario are the intertwined relationships of individuals like Leonard Leo, Peter
+            Thiel, and their respective companies. Leo's transfer of Tripp Lite, a company crucial for election machine
+            infrastructure, to Eaton Corp., which subsequently partnered with Palantir, known for its data analysis and
+            security capabilities, introduces questions about data integrity and potential backdoors. The partnerships
+            between Eaton Corp. and Tesla, along with Thiel's involvement in Polymarket, further suggest a coordinated
+            effort that could influence election outcomes.
+        </p>
+        <p>
+            The alleged "Billionaire brain trust" meetings, Musk's connections with Russian oligarchs, and his
+            controversial
+            acquisition of Twitter, coupled with the strategic timing of these events, raise significant red flags. The
+            timing of these developments, including the alleged advanced knowledge of election outcomes and the
+            potential
+            motive related to Ukrainian mineral resources for electric vehicles, adds layers of suspicion.
+        </p>
+        <p>
+            The implications for public relations are profound. This narrative presents a crisis of trust, where the
+            perceived neutrality of election systems is compromised by the actions of powerful individuals. The
+            potential
+            for foreign influence, the misuse of technological advancements, and the erosion of democratic processes
+            necessitates a robust public discourse.
+        </p>
+    </div>
+    <h2>Intelligence Network Graph</h2>
+
+    <!-- Load the NETWORK_A data -->
+    <canvas id="networkCanvas"></canvas>
+    <script src="network_a.js"></script>
+    <!-- The NETWORK_A data should be defined in network_a.js -->
+    <script>
+        // Use the NETWORK_A data for our visualization
+        const network = NETWORK_A;
+
+        const canvas = document.getElementById('networkCanvas');
+        const ctx = canvas.getContext('2d');
+        const nodeRadius = 20;
+        let draggingNode = null;
+        let offsetX = 0, offsetY = 0;
+
+        // Create the popup element that will display node details.
+        const popup = document.createElement('div');
+        popup.id = 'node-popup';
+        popup.style.position = 'absolute';
+        popup.style.backgroundColor = '#fff';
+        popup.style.border = '1px solid #333';
+        popup.style.padding = '5px';
+        popup.style.display = 'none';
+        popup.style.zIndex = 10;
+        popup.style.maxWidth = '300px'; // Set a maximum width for the popup
+        popup.style.lineHeight = '1.5'; // Adjust line spacing for better readability
+        popup.style.wordWrap = 'break-word'; // Ensure long text wraps properly
+        popup.style.overflowWrap = 'break-word'; // Handle word wrapping for long words
+        document.body.appendChild(popup);
+
+        // Global variables for popup selections.
+        let selectedNode = null;
+        let selectedConnection = null;
+
+        // Function to update popup position relative to its selected object.
+        function updatePopupPosition() {
+            const canvasRect = canvas.getBoundingClientRect();
+            if (selectedNode) {
+                // Offset right and slightly above the node.
+                popup.style.left = (canvasRect.left + selectedNode.x + nodeRadius + 10) + 'px';
+                popup.style.top = (canvasRect.top + selectedNode.y - nodeRadius) + 'px';
+            } else if (selectedConnection) {
+                // Compute the midpoint of the connection
+                const source = network.nodes.find(n => n.id === selectedConnection.source);
+                const target = network.nodes.find(n => n.id === selectedConnection.target);
+                let midX = 0, midY = 0;
+                if (source && target) {
+                    midX = (source.x + target.x) / 2;
+                    midY = (source.y + target.y) / 2;
+                }
+                popup.style.left = (canvasRect.left + midX + 10) + 'px';
+                popup.style.top = (canvasRect.top + midY - 10) + 'px';
+            }
+        }
+
+        // Function to hide and clear the popup.
+        function hidePopup() {
+            popup.style.display = 'none';
+            selectedNode = null;
+            selectedConnection = null;
+        }
+
+        // Helper function to format details into a human‑readable HTML string.
+        function formatDetails(details) {
+            let formatted = '';
+            for (const key in details) {
+                if (details.hasOwnProperty(key)) {
+                    // Capitalize the first letter of the key.
+                    const label = key.charAt(0).toUpperCase() + key.slice(1);
+                    if (key === 'link') {
+                        // Add a clickable link for the 'link' property.
+                        formatted += `<div><strong>${label}:</strong> <a href="${details[key]}" target="_blank">${details[key]}</a></div>`;
+                    } else {
+                        formatted += `<div><strong>${label}:</strong> ${details[key]}</div>`;
+                    }
+                }
+            }
+            return formatted;
+        }
+
+        // Function to show popup for a node.
+        function showPopup(node) {
+            selectedNode = node;
+            selectedConnection = null; // Clear connection selection.
+            popup.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong>${node.name}</strong>
+                    <button id="popup-close" style="cursor:pointer;">x</button>
+                </div>
+                <div style="font-size:smaller;">${formatDetails(node.details)}</div>
+            `;
+            popup.style.display = 'block';
+            updatePopupPosition();
+            // Attach close handler.
+            document.getElementById('popup-close').addEventListener('click', hidePopup);
+        }
+
+        // Function to show popup for a connection.
+        function showPopupConnection(conn) {
+            selectedConnection = conn;
+            selectedNode = null; // Clear node selection.
+            popup.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong>Connection: ${conn.relationship}</strong>
+                    <button id="popup-close" style="cursor:pointer;">x</button>
+                </div>
+                <div style="font-size:smaller;">
+                    <div><strong>Source:</strong> ${conn.source}</div>
+                    <div><strong>Target:</strong> ${conn.target}</div>
+                    ${conn.date ? `<div><strong>Date:</strong> ${conn.date}</div>` : ''}
+                    ${formatDetails(conn.details)}
+                </div>
+            `;
+            popup.style.display = 'block';
+            updatePopupPosition();
+            // Attach close handler.
+            document.getElementById('popup-close').addEventListener('click', hidePopup);
+        }
+
+        // Helper to compute distance from point (x0,y0) to line segment between (x1,y1) and (x2,y2).
+        function distanceToLine(x0, y0, x1, y1, x2, y2) {
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const lengthSquared = dx * dx + dy * dy;
+            let t = ((x0 - x1) * dx + (y0 - y1) * dy) / lengthSquared;
+            t = Math.max(0, Math.min(1, t));
+            const closestX = x1 + t * dx;
+            const closestY = y1 + t * dy;
+            return Math.hypot(x0 - closestX, y0 - closestY);
+        }
+
+        // Adjust canvas size to fill the window
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            drawNetwork();
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Define a function that returns a cluster center based on the node role.
+        function getClusterCenter(node) {
+            const role = node.role.toLowerCase();
+            if (role.includes('messenger')) {
+                return { x: canvas.width * 0.25, y: canvas.height * 0.25 };
+            } else if (role.includes('political') || role.includes('media')) {
+                return { x: canvas.width * 0.75, y: canvas.height * 0.25 };
+            } else if (role.includes('security') && !role.includes('tech')) {
+                return { x: canvas.width * 0.25, y: canvas.height * 0.75 };
+            } else if (role.includes('tech') || role.includes('data')) {
+                return { x: canvas.width * 0.75, y: canvas.height * 0.75 };
+            } else if (
+                role.includes('financier') ||
+                role.includes('business') ||
+                role.includes('market')
+            ) {
+                return { x: canvas.width * 0.5, y: canvas.height * 0.5 };
+            }
+            return { x: canvas.width / 2, y: canvas.height / 2 };
+        }
+
+        // Before initializing positions, load any saved node coordinates
+        const savedPositions = JSON.parse(localStorage.getItem('nodePositions') || '{}');
+        network.nodes.forEach(node => {
+            if (savedPositions[node.id]) {
+                node.x = savedPositions[node.id].x;
+                node.y = savedPositions[node.id].y;
+            }
+        });
+
+        // Initialize node positions if not defined with clustering and margin.
+        const margin = 50;
+        network.nodes.forEach(node => {
+            if (typeof node.x === 'undefined' || typeof node.y === 'undefined') {
+                const center = getClusterCenter(node);
+                // Random offset between -50 and 50 pixels.
+                const offsetX = (Math.random() - 0.5) * 100;
+                const offsetY = (Math.random() - 0.5) * 100;
+                node.x = Math.min(Math.max(center.x + offsetX, margin), canvas.width - margin);
+                node.y = Math.min(Math.max(center.y + offsetY, margin), canvas.height - margin);
+            }
+        });
+
+        // Collision resolution: adjust node positions if they overlap.
+        function resolveCollisions() {
+            const maxIterations = 100;
+            for (let iter = 0; iter < maxIterations; iter++) {
+                let adjusted = false;
+                for (let i = 0; i < network.nodes.length; i++) {
+                    for (let j = i + 1; j < network.nodes.length; j++) {
+                        const nodeA = network.nodes[i];
+                        const nodeB = network.nodes[j];
+                        const dx = nodeB.x - nodeA.x;
+                        const dy = nodeB.y - nodeA.y;
+                        const distance = Math.hypot(dx, dy);
+                        // if nodes overlap
+                        if (distance < nodeRadius * 2) {
+                            const overlap = nodeRadius * 2 - distance;
+                            let nx = dx / distance || Math.random();
+                            let ny = dy / distance || Math.random();
+                            // Adjust positions by half the overlap each.
+                            nodeA.x -= nx * (overlap / 2);
+                            nodeA.y -= ny * (overlap / 2);
+                            nodeB.x += nx * (overlap / 2);
+                            nodeB.y += ny * (overlap / 2);
+                            // Ensure nodes remain within the margin.
+                            nodeA.x = Math.min(Math.max(nodeA.x, margin), canvas.width - margin);
+                            nodeA.y = Math.min(Math.max(nodeA.y, margin), canvas.height - margin);
+                            nodeB.x = Math.min(Math.max(nodeB.x, margin), canvas.width - margin);
+                            nodeB.y = Math.min(Math.max(nodeB.y, margin), canvas.height - margin);
+                            adjusted = true;
+                        }
+                    }
+                }
+                if (!adjusted) break;
+            }
+        }
+        resolveCollisions();
+
+        // Save node positions to localStorage
+        function saveNodePositions() {
+            const positions = {};
+            network.nodes.forEach(node => {
+                positions[node.id] = { x: node.x, y: node.y };
+            });
+            localStorage.setItem('nodePositions', JSON.stringify(positions));
+        }
+
+        drawNetwork();
+
+        // Draw network connections and nodes
+        function drawNetwork() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw connections (lines)
+            network.connections.forEach(conn => {
+                const source = network.nodes.find(n => n.id === conn.source);
+                const target = network.nodes.find(n => n.id === conn.target);
+                if (source && target) {
+                    ctx.beginPath();
+                    ctx.moveTo(source.x, source.y);
+                    ctx.lineTo(target.x, target.y);
+                    ctx.strokeStyle = '#888';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    // Draw relationship text near the midpoint
+                    const midX = (source.x + target.x) / 2;
+                    const midY = (source.y + target.y) / 2;
+                    ctx.fillStyle = '#555';
+                    ctx.font = '10px Arial';
+                    ctx.fillText(conn.relationship, midX + 5, midY + 5);
+                }
+            });
+            // Draw nodes (circles) and labels
+            network.nodes.forEach(node => {
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, nodeRadius, 0, 2 * Math.PI);
+                ctx.fillStyle = '#1f77b4';
+                ctx.fill();
+                ctx.strokeStyle = '#333';
+                ctx.stroke();
+                ctx.fillStyle = '#000';
+                ctx.font = '12px Arial';
+                ctx.fillText(node.name, node.x - nodeRadius, node.y - nodeRadius - 5);
+            });
+        }
+
+        // Mouse event handlers for dragging nodes
+        canvas.addEventListener('mousedown', e => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            network.nodes.forEach(node => {
+                const dx = mouseX - node.x;
+                const dy = mouseY - node.y;
+                if (Math.hypot(dx, dy) < nodeRadius) {
+                    draggingNode = node;
+                    offsetX = dx;
+                    offsetY = dy;
+                }
+            });
+        });
+
+        canvas.addEventListener('mousemove', e => {
+            if (draggingNode) {
+                const rect = canvas.getBoundingClientRect();
+                draggingNode.x = e.clientX - rect.left - offsetX;
+                draggingNode.y = e.clientY - rect.top - offsetY;
+                drawNetwork();
+                if (draggingNode === selectedNode) {
+                    updatePopupPosition();
+                }
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            draggingNode = null;
+            saveNodePositions();
+        });
+        canvas.addEventListener('mouseleave', () => {
+            draggingNode = null;
+            saveNodePositions();
+        });
+
+        // Enhanced canvas click handler that supports both node and connection popups.
+        canvas.addEventListener('click', e => {
+            // Avoid showing popup if dragging.
+            if (draggingNode) return;
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            // Check if a node was clicked.
+            let clickedOnNode = false;
+            network.nodes.forEach(node => {
+                const dx = mouseX - node.x;
+                const dy = mouseY - node.y;
+                if (Math.hypot(dx, dy) < nodeRadius) {
+                    clickedOnNode = true;
+                    showPopup(node);
+                }
+            });
+            if (clickedOnNode) return;
+
+            // If not a node, check for a connection click.
+            const threshold = 10; // Adjust threshold as needed.
+            network.connections.forEach(conn => {
+                const source = network.nodes.find(n => n.id === conn.source);
+                const target = network.nodes.find(n => n.id === conn.target);
+                if (source && target) {
+                    const dist = distanceToLine(mouseX, mouseY, source.x, source.y, target.x, target.y);
+                    if (dist < threshold) {
+                        showPopupConnection(conn);
+                    }
+                }
+            });
+        });
+
+        // Initial draw
+        drawNetwork();
+    </script>
+</body>
+
+</html>
